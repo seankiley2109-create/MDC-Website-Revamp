@@ -1,0 +1,36 @@
+# Dependencies & Builds
+node_modules/
+.next/
+out/
+build/
+dist/
+
+# Version Control
+.git/
+.gitignore
+
+# Environment & Secrets (Crucial for Security)
+.env*
+*.pem
+*.key
+credentials.json
+service-account.json
+
+# Cache & Logs
+*.log
+.npm/
+.vercel/
+.turbo/
+
+# Media & Assets
+public/assets/
+*.png
+*.jpg
+*.jpeg
+*.svg
+*.mp4
+
+# Lockfiles (Usually just noise for Claude)
+package-lock.json
+yarn.lock
+pnpm-lock.yaml

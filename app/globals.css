@@ -1,0 +1,56 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@plugin "@tailwindcss/typography";
+
+@theme {
+  --color-montana-bg: #0A0A0A;
+  --color-montana-surface: #1A1A1A;
+  --color-montana-light: #F7F7F7;
+  --color-montana-muted: #BFBFBF;
+  --color-montana-magenta: #DD297D;
+  --color-montana-pink: #F24567;
+  --color-montana-coral: #F65559;
+  --color-montana-orange: #F86C49;
+  
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-space-grotesk), ui-sans-serif, system-ui, sans-serif;
+}
+
+/* Custom scrollbar for a polished look */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #0A0A0A;
+}
+::-webkit-scrollbar-thumb {
+  background: #1A1A1A;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #333333;
+}
+
+.bg-montana-gradient {
+  background: linear-gradient(135deg, var(--color-montana-magenta), var(--color-montana-pink), var(--color-montana-coral), var(--color-montana-orange));
+}
+
+.text-montana-gradient {
+  background: linear-gradient(135deg, var(--color-montana-magenta), var(--color-montana-pink), var(--color-montana-coral), var(--color-montana-orange));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  color: transparent;
+}
+
+.border-montana-gradient {
+  border-image: linear-gradient(135deg, var(--color-montana-magenta), var(--color-montana-pink), var(--color-montana-coral), var(--color-montana-orange)) 1;
+}
+
+/* Add to the bottom of globals.css */
+@utility bg-grid-pattern {
+  background-image: 
+    linear-gradient(to right, var(--color-montana-surface) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--color-montana-surface) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
