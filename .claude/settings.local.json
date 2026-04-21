@@ -7,7 +7,12 @@
       "Bash(npm install:*)",
       "Bash(node -e \"require\\(''resend''\\); console.log\\(''resend OK''\\)\")",
       "Bash(tee /tmp/tsc.log)",
-      "Bash(echo \"EXIT=$?\")"
+      "Bash(echo \"EXIT=$?\")",
+      "Bash(gh pr create --title 'feat: site-wide updates — Resend domain, UI/content overhaul across 12 areas' --body ':*)",
+      "Bash(where gh:*)",
+      "Bash(winget list:*)",
+      "Read(//c/Program Files/GitHub CLI/**)",
+      "Read(//c/Users/seank/AppData/Local/Programs/GitHub CLI/**)"
     ]
   }
 }
