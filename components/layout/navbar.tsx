@@ -13,6 +13,7 @@ const navLinks = [
   { href: "/services",    label: "Services" },
   { href: "/resources",   label: "Resources" },
   { href: "/assessments", label: "Assessments" },
+  { href: "/partners", label: "Partners" },
   { href: "/about",       label: "About" },
   { href: "/contact",     label: "Contact" },
 ];
@@ -156,14 +157,6 @@ export function Navbar() {
                         <CreditCard className="h-4 w-4 shrink-0" />
                         Billing & Subscription
                       </Link>
-                      <Link
-                        href="/pos"
-                        onClick={() => setProfileOpen(false)}
-                        className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-montana-muted hover:text-white hover:bg-white/5 transition-colors"
-                      >
-                        <Zap className="h-4 w-4 shrink-0" />
-                        Manage Plan
-                      </Link>
                     </div>
 
                     {/* Sign out */}
@@ -270,13 +263,6 @@ export function Navbar() {
                   className="flex items-center gap-2 py-2 text-sm text-montana-muted hover:text-white transition-colors"
                 >
                   <CreditCard className="h-4 w-4" /> Billing &amp; Subscription
-                </Link>
-                <Link
-                  href="/pos"
-                  onClick={() => setIsOpen(false)}
-                  className="flex items-center gap-2 py-2 text-sm text-montana-muted hover:text-white transition-colors"
-                >
-                  <Zap className="h-4 w-4" /> Manage Plan
                 </Link>
                 <button
                   onClick={handleSignOut}

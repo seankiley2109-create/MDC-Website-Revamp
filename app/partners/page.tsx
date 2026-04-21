@@ -1,20 +1,20 @@
 import type { Metadata } from 'next';
-import Image from 'next/image';
 import Link from 'next/link';
 import { GlassCard } from '@/components/ui/glass-card';
 import { AnimatedButton } from '@/components/ui/animated-button';
 import {
-  Handshake, TrendingUp, ShieldCheck, Users, Zap,
+  Handshake, TrendingUp, Users, Zap,
   Award, ArrowRight, Phone, Mail, BadgeCheck,
+  Server, Database, Smartphone, Activity, FileText, Lock,
 } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'Partner Programme — Channel & Reseller Partnerships',
+  title: 'Become a Reseller — Montana Data Company Partner Programme',
   description:
-    'Join the Montana Data Company partner programme. Resell, refer, or white-label enterprise cloud backup, data protection, and POPIA compliance solutions across South Africa.',
+    'Grow your business by reselling Montana Data Company\'s enterprise data protection, backup, and compliance portfolio across South Africa.',
   openGraph: {
-    title:       'Partner Programme | Montana Data Company',
-    description: 'Join the Montana Data Company partner programme. Resell, refer, or white-label enterprise data protection solutions.',
+    title:       'Reseller Programme | Montana Data Company',
+    description: 'Grow your business by reselling Montana\'s enterprise data protection portfolio.',
     url:         'https://montanadc.com/partners',
   },
 };
@@ -25,263 +25,264 @@ const benefits = [
   {
     icon:  TrendingUp,
     title: 'Recurring Revenue',
-    body:  'Earn competitive margins on every deal you introduce or manage. Subscription-based services mean predictable monthly income for your business.',
-  },
-  {
-    icon:  ShieldCheck,
-    title: 'Backed by IBM & Druva',
-    body:  'Represent industry-leading technology from IBM and Druva. Our vendor certifications give your clients confidence and your proposals credibility.',
-  },
-  {
-    icon:  Users,
-    title: 'Dedicated Support',
-    body:  'Each partner gets a dedicated account manager, access to pre-sales engineering, and co-branded collateral to accelerate deals.',
+    body:  'Earn competitive margins on every deal you manage. Subscription-based services mean predictable monthly income for your business.',
   },
   {
     icon:  Zap,
     title: 'Fast Onboarding',
-    body:  'Our streamlined onboarding gets you quoting and selling within days — not months. We handle the technical complexity so you can focus on your clients.',
+    body:  'Get up and running quickly with streamlined partner onboarding, deal registration, and dedicated support from day one.',
+  },
+  {
+    icon:  Users,
+    title: 'Dedicated Support',
+    body:  'Access a dedicated partner manager, pre-sales technical support, and co-marketing resources to help you win deals.',
   },
   {
     icon:  Award,
     title: 'Certification & Training',
-    body:  'Access product training, POPIA compliance education, and co-marketing campaigns that position you as a trusted data resilience advisor.',
+    body:  'Build your team\'s expertise with product training and certification programmes across our full solution portfolio.',
   },
   {
     icon:  BadgeCheck,
-    title: 'POPIA-Ready Portfolio',
-    body:  'Our compliance-first product set is purpose-built for South African regulations — a growing differentiator that opens doors in every regulated industry.',
+    title: 'Compliance-Ready Portfolio',
+    body:  'Our solutions are built for South African regulatory requirements — making it easy to position and sell to compliance-conscious clients.',
+  },
+  {
+    icon:  Handshake,
+    title: 'Co-Selling Opportunities',
+    body:  'Work alongside our advisory team on joint opportunities, enterprise engagements, and strategic accounts.',
+  },
+];
+
+const products = [
+  {
+    icon:  Server,
+    title: 'Enterprise Backup',
+    body:  'Bespoke, consultative data protection architecture for complex and high-volume environments.',
+    accent: 'text-montana-pink',
+    border: 'border-montana-pink/20',
+  },
+  {
+    icon:  Database,
+    title: 'SaaS & Endpoint Backup',
+    body:  'Productised cloud backup for M365, Google Workspace, Salesforce, and distributed endpoints — including ransomware protection (premium tier).',
+    accent: 'text-montana-orange',
+    border: 'border-montana-orange/20',
+  },
+  {
+    icon:  Smartphone,
+    title: 'MaaS360 (MDM / UEM)',
+    body:  'Unified endpoint management and mobile device security for corporate and BYOD environments.',
+    accent: 'text-montana-orange',
+    border: 'border-montana-orange/20',
+  },
+  {
+    icon:  Activity,
+    title: 'IBM Guardium',
+    body:  'Advanced data security, monitoring, and governance for on-premises and hybrid environments.',
+    accent: 'text-montana-pink',
+    border: 'border-montana-pink/20',
+  },
+  {
+    icon:  FileText,
+    title: 'POPIA Consulting',
+    body:  'Data privacy compliance assessments, training, and advisory engagements for South African organisations.',
+    accent: 'text-montana-magenta',
+    border: 'border-montana-magenta/20',
+  },
+  {
+    icon:  Lock,
+    title: 'Quantum Security (PQC)',
+    body:  'Post-Quantum Cryptography readiness and architecture advisory for forward-looking organisations.',
+    accent: 'text-montana-pink',
+    border: 'border-montana-pink/20',
   },
 ];
 
 const tiers = [
   {
-    name:    'Referral Partner',
-    accent:  'border-white/20',
-    tagline: 'Earn without selling',
-    perks: [
-      'Refer clients and earn a one-time introduction fee',
-      'No technical knowledge required',
-      'Ideal for accountants, IT consultants, and brokers',
-      'Simple agreement and monthly payments',
+    name: 'Referral Partner',
+    description: 'Introduce qualified leads and earn a one-time referral fee. No technical knowledge required — just a conversation.',
+    highlights: [
+      'One-time referral fee per closed deal',
+      'No technical expertise needed',
+      'Simple online lead registration',
+      'Deal protection for 90 days',
     ],
-    cta: 'Become a Referral Partner',
+    cta: 'Register a Referral',
+    href: '/contact?type=partnership',
+    featured: false,
   },
   {
-    name:    'Reseller Partner',
-    accent:  'border-montana-pink/40',
-    tagline: 'Most popular',
-    highlight: true,
-    perks: [
-      'Quote and sell the full Montana portfolio',
-      'Discounted pricing with healthy margins',
-      'Access to pre-sales and technical support',
-      'Co-branded proposals and case studies',
+    name: 'Reseller Partner',
+    description: 'Actively sell and manage Montana solutions to your clients. Earn ongoing margins and build a recurring revenue stream.',
+    highlights: [
+      'Recurring margins on subscriptions',
+      'Access to full product portfolio',
+      'Co-marketing and pre-sales support',
+      'Dedicated partner manager',
+      'Training & certification included',
     ],
     cta: 'Apply to Resell',
+    href: '/contact?type=partnership',
+    featured: true,
   },
   {
-    name:    'White-Label Partner',
-    accent:  'border-white/20',
-    tagline: 'Sell under your brand',
-    perks: [
-      'Deliver Montana services under your own brand',
-      'Full white-label portal and reporting',
-      'Ideal for MSPs and IT service providers',
-      'Custom SLAs and dedicated engineering support',
+    name: 'White-Label Partner',
+    description: 'Deliver Montana-powered solutions under your own brand with custom SLAs and full white-label pricing.',
+    highlights: [
+      'Sell under your own brand',
+      'Custom SLAs and pricing tiers',
+      'Full technical handover support',
+      'Suitable for MSPs and VARs',
     ],
-    cta: 'Enquire About White-Label',
+    cta: 'Discuss White-Label',
+    href: '/contact?type=partnership',
+    featured: false,
   },
-];
-
-const clientLogos = [
-  { src: '/logos/bcx.jpg',            alt: 'BCX' },
-  { src: '/logos/ntt-data.png',       alt: 'NTT Data' },
-  { src: '/logos/luxottica.jpg',      alt: 'Luxottica' },
-  { src: '/logos/vw.webp',            alt: 'Volkswagen' },
-  { src: '/logos/aspen.jpg',          alt: 'Aspen' },
-  { src: '/logos/arm.jpg',            alt: 'ARM' },
-  { src: '/logos/synapses.png',       alt: 'Synapses' },
-  { src: '/logos/vio-travel.jpg',     alt: 'Vio Travel' },
-  { src: '/logos/fairview.jpg',       alt: 'Fairview' },
-  { src: '/logos/dsk.jpg',            alt: 'DSK' },
-  { src: '/logos/pie-in-the-sky.jpg', alt: 'Pie in the Sky' },
 ];
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function PartnersPage() {
   return (
-    <div className="pt-24 pb-24 bg-montana-bg min-h-screen">
+    <div className="pt-24 pb-16 md:pb-24 bg-montana-bg min-h-screen">
       <div className="mx-auto max-w-7xl px-6">
 
-        {/* ── Hero ── */}
-        <div className="py-16 md:py-20 max-w-3xl">
+        {/* Hero */}
+        <div className="py-10 md:py-20 max-w-4xl">
           <div className="inline-flex items-center border border-white/10 bg-montana-surface/80 backdrop-blur-sm px-4 py-1.5 text-xs font-bold tracking-widest text-montana-muted uppercase mb-8">
             <span className="flex h-2 w-2 bg-montana-pink mr-3 shadow-[0_0_8px_#F24567]" />
-            Partner Programme
+            Reseller Programme
           </div>
           <h1 className="font-display text-4xl md:text-6xl font-bold tracking-tight text-white mb-6">
             Grow your business with{' '}
             <span className="text-montana-gradient">enterprise data protection.</span>
           </h1>
-          <p className="text-lg text-montana-muted leading-relaxed max-w-2xl mb-8">
-            Join a growing network of channel partners delivering IBM and Druva-powered data resilience, cyber security, and POPIA compliance solutions to businesses across South Africa.
+          <p className="text-lg text-montana-muted leading-relaxed max-w-2xl mb-10">
+            Become a Montana reseller and bring enterprise-grade backup, compliance, and security solutions to your clients — backed by our advisory team, technical support, and full product portfolio.
           </p>
           <div className="flex flex-col sm:flex-row gap-4">
-            <Link href="/contact?enquiryType=partnership">
-              <AnimatedButton variant="primary">
-                Apply to Partner Programme
-                <ArrowRight className="h-4 w-4 ml-2" />
+            <Link href="/contact?type=partnership">
+              <AnimatedButton variant="primary" className="w-full sm:w-auto px-8 py-4 text-lg">
+                Apply to Become a Reseller
               </AnimatedButton>
             </Link>
-            <Link href="/services">
-              <AnimatedButton variant="outline">
-                Explore the Portfolio
+            <Link href="#tiers">
+              <AnimatedButton variant="outline" className="w-full sm:w-auto px-8 py-4 text-lg">
+                View Partnership Tiers
               </AnimatedButton>
             </Link>
           </div>
         </div>
 
-        {/* ── Stats strip ── */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-px border border-white/10 mb-20">
-          {[
-            { stat: 'IBM',       label: 'Business Partner' },
-            { stat: 'Druva',     label: 'Channel Partner' },
-            { stat: '3 Tiers',   label: 'Partnership Models' },
-            { stat: 'POPIA',     label: 'Compliance Ready' },
-          ].map(({ stat, label }) => (
-            <div key={label} className="p-6 bg-montana-surface/20 text-center">
-              <div className="font-display text-2xl font-bold text-white mb-1">{stat}</div>
-              <div className="text-xs text-montana-muted uppercase tracking-wider">{label}</div>
-            </div>
-          ))}
+        {/* Why Partner */}
+        <div className="mb-16 md:mb-24">
+          <h2 className="font-display text-3xl md:text-4xl font-bold text-white mb-10">Why partner with Montana?</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {benefits.map((b) => {
+              const Icon = b.icon;
+              return (
+                <GlassCard key={b.title} className="p-6 flex flex-col gap-4">
+                  <div className="inline-flex h-12 w-12 items-center justify-center rounded-sm bg-montana-surface border border-white/10">
+                    <Icon className="h-6 w-6 text-montana-pink" />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-white mb-2">{b.title}</h3>
+                    <p className="text-sm text-montana-muted leading-relaxed">{b.body}</p>
+                  </div>
+                </GlassCard>
+              );
+            })}
+          </div>
         </div>
 
-        {/* ── Why partner ── */}
-        <div className="mb-20">
-          <div className="flex items-center gap-4 mb-10">
-            <Handshake className="h-5 w-5 text-montana-pink shrink-0" />
-            <h2 className="font-display text-2xl md:text-3xl font-bold text-white">
-              Why partner with Montana?
-            </h2>
+        {/* Products to Resell */}
+        <div className="mb-16 md:mb-24">
+          <div className="mb-10">
+            <h2 className="font-display text-3xl md:text-4xl font-bold text-white mb-4">Products you can resell</h2>
+            <p className="text-montana-muted max-w-2xl">
+              Our full portfolio is available to reseller partners — from self-serve SaaS products to consultative enterprise engagements.
+            </p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {benefits.map(({ icon: Icon, title, body }) => (
-              <GlassCard key={title} className="p-6 space-y-3">
-                <div className="flex h-10 w-10 items-center justify-center bg-montana-pink/10 border border-montana-pink/20">
-                  <Icon className="h-5 w-5 text-montana-pink" />
-                </div>
-                <h3 className="font-display font-bold text-white">{title}</h3>
-                <p className="text-sm text-montana-muted leading-relaxed">{body}</p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {products.map((p) => {
+              const Icon = p.icon;
+              return (
+                <GlassCard key={p.title} className={`p-6 flex flex-col gap-3 border ${p.border} hover:border-opacity-60 transition-colors`}>
+                  <Icon className={`h-7 w-7 ${p.accent}`} />
+                  <h3 className="font-bold text-white">{p.title}</h3>
+                  <p className="text-sm text-montana-muted leading-relaxed">{p.body}</p>
+                </GlassCard>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Partnership Tiers */}
+        <div id="tiers" className="mb-16 md:mb-24 scroll-mt-24">
+          <div className="text-center mb-12">
+            <h2 className="font-display text-3xl md:text-4xl font-bold text-white mb-4">Partnership Tiers</h2>
+            <p className="text-montana-muted max-w-2xl mx-auto">
+              Choose the model that fits your business — from simple referrals to full white-label deployments.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
+            {tiers.map((tier) => (
+              <GlassCard
+                key={tier.name}
+                glow={tier.featured}
+                className={`p-8 flex flex-col h-full relative ${tier.featured ? 'border-montana-pink/50 md:-translate-y-4' : ''}`}
+              >
+                {tier.featured && (
+                  <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-montana-pink text-white text-xs font-bold px-4 py-1.5 tracking-wider">
+                    MOST POPULAR
+                  </div>
+                )}
+                <h3 className="font-display text-xl font-bold text-white mb-3">{tier.name}</h3>
+                <p className="text-montana-muted text-sm mb-6">{tier.description}</p>
+                <ul className="space-y-2 mb-8 flex-1">
+                  {tier.highlights.map((h) => (
+                    <li key={h} className="flex items-start gap-2 text-sm text-white/80">
+                      <BadgeCheck className="h-4 w-4 text-montana-pink shrink-0 mt-0.5" />
+                      {h}
+                    </li>
+                  ))}
+                </ul>
+                <Link href={tier.href}>
+                  <AnimatedButton
+                    variant={tier.featured ? 'primary' : 'outline'}
+                    className="w-full group"
+                  >
+                    {tier.cta} <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                  </AnimatedButton>
+                </Link>
               </GlassCard>
             ))}
           </div>
         </div>
 
-        {/* ── Partnership tiers ── */}
-        <div className="mb-20">
-          <h2 className="font-display text-2xl md:text-3xl font-bold text-white mb-2">
-            Choose your partnership model
-          </h2>
-          <p className="text-montana-muted mb-10 max-w-2xl">
-            Whether you want to refer clients, actively resell, or white-label our platform — there&apos;s a tier that fits your business model.
+        {/* CTA */}
+        <GlassCard className="p-8 md:p-12 text-center border-montana-pink/20">
+          <h2 className="font-display text-3xl font-bold text-white mb-4">Ready to get started?</h2>
+          <p className="text-montana-muted max-w-xl mx-auto mb-8">
+            Get in touch with our partnerships team to discuss your goals and find the right programme for your business.
           </p>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {tiers.map(({ name, accent, tagline, highlight, perks, cta }) => (
-              <div
-                key={name}
-                className={`relative flex flex-col border bg-montana-surface/20 p-8 ${accent} ${highlight ? 'bg-montana-pink/5' : ''}`}
-              >
-                {highlight && (
-                  <div className="absolute -top-px left-0 right-0 h-px bg-gradient-to-r from-montana-magenta via-montana-pink to-montana-coral" />
-                )}
-                <div className="mb-6">
-                  <p className="text-xs font-bold uppercase tracking-widest text-montana-pink mb-2">{tagline}</p>
-                  <h3 className="font-display text-xl font-bold text-white">{name}</h3>
-                </div>
-                <ul className="space-y-3 flex-1 mb-8">
-                  {perks.map((perk) => (
-                    <li key={perk} className="flex items-start gap-3 text-sm text-montana-muted">
-                      <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-montana-pink" />
-                      {perk}
-                    </li>
-                  ))}
-                </ul>
-                <Link href="/contact?enquiryType=partnership">
-                  <AnimatedButton
-                    variant={highlight ? 'primary' : 'outline'}
-                    className="w-full"
-                  >
-                    {cta}
-                  </AnimatedButton>
-                </Link>
-              </div>
-            ))}
+          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-6">
+            <Link href="/contact?type=partnership">
+              <AnimatedButton variant="primary" className="gap-2 px-8 py-4">
+                Apply to Become a Reseller <ArrowRight className="h-5 w-5" />
+              </AnimatedButton>
+            </Link>
           </div>
-        </div>
-
-        {/* ── Client logo strip ── */}
-        <div className="mb-20">
-          <p className="text-xs font-bold uppercase tracking-widest text-montana-muted/60 text-center mb-8">
-            Trusted by organisations across South Africa
-          </p>
-          <div className="flex flex-wrap items-center justify-center gap-6 md:gap-10">
-            {clientLogos.map(({ src, alt }) => (
-              <div
-                key={alt}
-                className="h-10 flex items-center grayscale opacity-50 hover:opacity-80 hover:grayscale-0 transition-all duration-300"
-              >
-                <Image
-                  src={src}
-                  alt={alt}
-                  width={100}
-                  height={40}
-                  className="h-8 w-auto object-contain"
-                />
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* ── CTA ── */}
-        <GlassCard className="p-10 md:p-14">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
-            <div>
-              <h2 className="font-display text-2xl md:text-3xl font-bold text-white mb-4">
-                Ready to join the network?
-              </h2>
-              <p className="text-montana-muted leading-relaxed mb-6">
-                Reach out to our partnerships team. We&apos;ll walk you through the programme, answer your questions, and get you onboarded quickly.
-              </p>
-              <div className="space-y-3">
-                <a href="tel:+27871883843" className="flex items-center gap-3 text-montana-muted hover:text-white transition-colors group">
-                  <div className="flex h-9 w-9 items-center justify-center border border-white/10 group-hover:border-montana-pink/40 transition-colors">
-                    <Phone className="h-4 w-4 text-montana-pink" />
-                  </div>
-                  <span className="text-sm">+27 (0)87 188 3843</span>
-                </a>
-                <a href="mailto:support@montanadc.com" className="flex items-center gap-3 text-montana-muted hover:text-white transition-colors group">
-                  <div className="flex h-9 w-9 items-center justify-center border border-white/10 group-hover:border-montana-pink/40 transition-colors">
-                    <Mail className="h-4 w-4 text-montana-pink" />
-                  </div>
-                  <span className="text-sm">support@montanadc.com</span>
-                </a>
-              </div>
-            </div>
-            <div className="flex flex-col gap-4">
-              <Link href="/contact?enquiryType=partnership">
-                <AnimatedButton variant="primary" className="w-full py-4">
-                  Submit Partnership Enquiry
-                  <ArrowRight className="h-4 w-4 ml-2" />
-                </AnimatedButton>
-              </Link>
-              <Link href="/services">
-                <AnimatedButton variant="outline" className="w-full">
-                  Browse the Portfolio First
-                </AnimatedButton>
-              </Link>
-            </div>
+          <div className="flex flex-col sm:flex-row gap-6 justify-center text-sm text-montana-muted">
+            <a href="tel:+27871883843" className="flex items-center gap-2 hover:text-white transition-colors">
+              <Phone className="h-4 w-4 text-montana-pink" /> +27 (0)87 188 3843
+            </a>
+            <a href="mailto:support@montanadc.com" className="flex items-center gap-2 hover:text-white transition-colors">
+              <Mail className="h-4 w-4 text-montana-pink" /> support@montanadc.com
+            </a>
           </div>
         </GlassCard>
 

@@ -61,7 +61,7 @@ export default function ServicesPage() {
             <GlassCard className="flex flex-col h-full">
               <div className="flex items-center gap-3 mb-6">
                 <Server className="h-6 w-6 text-white" />
-                <h3 className="text-2xl font-bold text-white">IBM Enterprise Backup</h3>
+                <h3 className="text-2xl font-bold text-white">Enterprise Backup</h3>
               </div>
               <p className="text-montana-muted mb-6 flex-1">
                 Bespoke, consultative architecture designed for complex, multi-cloud, and hybrid environments. Tailored to meet stringent RPO and RTO requirements.
@@ -76,9 +76,9 @@ export default function ServicesPage() {
                   <div className="text-sm text-white/90">Absolute operational continuity for mission-critical enterprise workloads.</div>
                 </div>
               </div>
-              <Link href="/pos?service=ibm-backup" className="mt-auto">
+              <Link href="/contact?type=enterprise-backup" className="mt-auto">
                 <AnimatedButton variant="outline" className="w-full group">
-                  Configure IBM Solution <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                  Enquire About Enterprise Backup <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
                 </AnimatedButton>
               </Link>
             </GlassCard>
@@ -87,7 +87,7 @@ export default function ServicesPage() {
             <GlassCard className="flex flex-col h-full">
               <div className="flex items-center gap-3 mb-6">
                 <Database className="h-6 w-6 text-white" />
-                <h3 className="text-2xl font-bold text-white">Druva SaaS & Endpoint</h3>
+                <h3 className="text-2xl font-bold text-white">SaaS & Endpoint Backup</h3>
               </div>
               <p className="text-montana-muted mb-6 flex-1">
                 Structured, scalable, and productised cloud backup. Ideal for rapid deployment across Microsoft 365, Google Workspace, Salesforce, and distributed endpoints.
@@ -123,28 +123,32 @@ export default function ServicesPage() {
             Protecting your data means more than backing it up. Ransomware targets backups first — and unmanaged data retention creates its own compliance and cost exposure.
           </p>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Ransomware */}
+          {/* Ransomware — premium tier of SaaS & Endpoint Backup */}
           <GlassCard className="flex flex-col h-full border-montana-magenta/30">
-            <div className="flex items-center gap-3 mb-6">
+            <div className="flex items-center gap-3 mb-2">
               <ShieldAlert className="h-6 w-6 text-montana-magenta" />
               <h3 className="text-2xl font-bold text-white">Ransomware Protection</h3>
             </div>
+            <div className="inline-flex items-center gap-1.5 mb-5">
+              <span className="text-xs font-bold text-montana-magenta uppercase tracking-wider bg-montana-magenta/10 border border-montana-magenta/30 px-2 py-0.5 rounded-full">Premium add-on</span>
+              <span className="text-xs text-montana-muted">via SaaS &amp; Endpoint Backup</span>
+            </div>
             <p className="text-montana-muted mb-6 flex-1">
-              Ransomware targets your backups first. We implement immutable storage and AI-driven anomaly detection to ensure you always have a clean, isolated copy of your data.
+              Available as the premium protection tier within our SaaS &amp; Endpoint Backup offering (powered by Druva). Activates immutable air-gapped storage, AI anomaly detection, and guaranteed clean-copy recovery — ensuring backups themselves cannot be encrypted or deleted by attackers.
             </p>
             <div className="space-y-4 mb-8">
               <div className="bg-montana-magenta/5 p-4 rounded border border-montana-magenta/20">
                 <div className="text-xs font-bold text-montana-magenta uppercase mb-1">Protects Against</div>
-                <div className="text-sm text-white/90">Targeted ransomware attacks, backup encryption, and extortion attempts.</div>
+                <div className="text-sm text-white/90">Targeted ransomware attacks, backup encryption, and double-extortion attempts.</div>
               </div>
               <div className="bg-montana-magenta/5 p-4 rounded border border-montana-magenta/20">
                 <div className="text-xs font-bold text-montana-magenta uppercase mb-1">Business Outcome</div>
-                <div className="text-sm text-white/90">Eliminates the need to pay ransoms by guaranteeing clean, rapid data recovery.</div>
+                <div className="text-sm text-white/90">Eliminates the need to pay ransoms — guaranteed clean, rapid data recovery every time.</div>
               </div>
             </div>
-            <Link href="/contact" className="mt-auto">
+            <Link href="/pos?service=druva-m365" className="mt-auto">
               <AnimatedButton variant="outline" className="w-full group">
-                Discuss Protection Strategy <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                Configure SaaS &amp; Endpoint Backup <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
               </AnimatedButton>
             </Link>
           </GlassCard>
@@ -168,7 +172,7 @@ export default function ServicesPage() {
                 <div className="text-sm text-white/90">Optimized storage spend and streamlined legal discovery processes.</div>
               </div>
             </div>
-            <Link href="/contact" className="mt-auto">
+            <Link href="/contact?type=archiving" className="mt-auto">
               <AnimatedButton variant="outline" className="w-full group">
                 Discuss Archive Strategy <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
               </AnimatedButton>
@@ -289,9 +293,11 @@ export default function ServicesPage() {
                   </AnimatedButton>
                 </Link>
               </div>
-              <div className="w-full md:w-1/3 aspect-square relative overflow-hidden border border-white/10 bg-montana-surface/50 flex items-center justify-center">
-                <Lock className="h-24 w-24 text-white/20" />
-                <div className="absolute inset-0 bg-gradient-to-tr from-montana-pink/20 to-transparent mix-blend-overlay" />
+              <div className="w-full md:w-1/3 aspect-square relative overflow-hidden border border-montana-pink/30 bg-montana-surface/50 flex flex-col items-center justify-center gap-3">
+                <div className="absolute inset-0 bg-gradient-to-tr from-montana-pink/20 to-transparent" />
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-40 w-40 rounded-full bg-montana-magenta opacity-20 blur-[60px]" />
+                <Lock className="relative h-28 w-28 text-montana-pink drop-shadow-[0_0_20px_#F24567]" strokeWidth={1.5} />
+                <span className="relative text-lg font-bold tracking-[0.2em] text-montana-pink uppercase drop-shadow-[0_0_10px_#F24567]">PQC</span>
               </div>
             </div>
           </GlassCard>
@@ -301,7 +307,7 @@ export default function ServicesPage() {
         <div className="text-center mt-10 md:mt-16 bg-montana-surface/30 border border-white/10 p-8 md:p-12">
           <h2 className="font-display text-3xl font-bold text-white mb-4">Ready to architect your resilience strategy?</h2>
           <p className="text-montana-muted max-w-2xl mx-auto mb-8">
-            Whether you know exactly what you need or want a guided assessment, our platform makes it simple to build a secure, compliant data architecture.
+            Whether you know exactly what you need or want a guided assessment, our solutions makes it simple to build a secure, compliant data architecture.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/pos">

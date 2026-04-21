@@ -1,33 +1,44 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useSearchParams } from "next/navigation";
 import * as z from "zod";
 import { GlassCard } from "@/components/ui/glass-card";
 import { AnimatedButton } from "@/components/ui/animated-button";
-import { Phone, Mail, Facebook, Linkedin, MapPin, Clock, Shield, MessageSquare, Building2 } from "lucide-react";
+import { Phone, Mail, Facebook, Linkedin, Clock, Shield, MessageSquare, Building2 } from "lucide-react";
 import Link from "next/link";
+
+const ENQUIRY_VALUES = [
+  "enterprise-backup",
+  "archiving",
+  "quantum",
+  "guardium",
+  "existing-client",
+  "partnership",
+  "compliance",
+  "general",
+] as const;
+
+type EnquiryValue = typeof ENQUIRY_VALUES[number];
 
 const contactSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
   email: z.string().email("Please enter a valid email address"),
   company: z.string().min(1, "Company name is required"),
-  enquiryType: z.enum(["new-solution", "existing-client", "partnership", "compliance", "general"]),
+  enquiryType: z.enum(ENQUIRY_VALUES),
   message: z.string().min(10, "Message must be at least 10 characters"),
 });
 
 type ContactFormValues = z.infer<typeof contactSchema>;
 
-const enquiryTypes = [
-  { value: "new-solution", label: "New Solution Enquiry" },
-  { value: "existing-client", label: "Existing Client Support" },
-  { value: "partnership", label: "Channel Partnership" },
-  { value: "compliance", label: "POPIA / Compliance Consulting" },
-  { value: "general", label: "General Enquiry" },
-];
-
-export default function ContactPage() {
+function ContactFormInner() {
+  const searchParams = useSearchParams();
+  const rawType = searchParams.get("type") ?? "";
+  const defaultType: EnquiryValue = (ENQUIRY_VALUES as readonly string[]).includes(rawType)
+    ? (rawType as EnquiryValue)
+    : "general";
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -39,6 +50,7 @@ export default function ContactPage() {
     formState: { errors },
   } = useForm<ContactFormValues>({
     resolver: zodResolver(contactSchema),
+    defaultValues: { enquiryType: defaultType },
   });
 
   const onSubmit = async (data: ContactFormValues) => {
@@ -183,12 +195,16 @@ export default function ContactPage() {
               </div>
             </div>
 
-            {/* Confidentiality note */}
+            {/* Privacy note */}
             <div className="p-4 border border-white/5 bg-white/[0.02]">
               <div className="flex items-start gap-3">
                 <Shield className="h-4 w-4 text-montana-pink mt-0.5 shrink-0" />
                 <p className="text-xs text-montana-muted leading-relaxed">
-                  All communications are strictly confidential. We adhere to POPIA and will never share your information with third parties.
+                  Please refer to our{" "}
+                  <Link href="/privacy" className="text-montana-pink hover:underline">privacy policy</Link>
+                  {" "}and{" "}
+                  <Link href="/paia" className="text-montana-pink hover:underline">PAIA manual</Link>
+                  {" "}for more information.
                 </p>
               </div>
             </div>
@@ -271,9 +287,18 @@ export default function ContactPage() {
                         className="w-full border border-white/10 bg-montana-surface/80 px-4 py-3 text-sm text-white focus:border-montana-pink focus:outline-none transition-colors appearance-none"
                       >
                         <option value="" disabled>Select a category</option>
-                        {enquiryTypes.map(t => (
-                          <option key={t.value} value={t.value}>{t.label}</option>
-                        ))}
+                        <optgroup label="Product Enquiries">
+                          <option value="enterprise-backup">Enterprise Backup</option>
+                          <option value="archiving">Archiving &amp; Lifecycle</option>
+                          <option value="quantum">Quantum Security (PQC)</option>
+                          <option value="guardium">IBM Guardium</option>
+                        </optgroup>
+                        <optgroup label="Other">
+                          <option value="existing-client">Existing Client Support</option>
+                          <option value="partnership">Channel Partnership</option>
+                          <option value="compliance">POPIA / Compliance Consulting</option>
+                          <option value="general">General Enquiry</option>
+                        </optgroup>
                       </select>
                       {errors.enquiryType && <p className="text-xs text-red-400">Please select an enquiry type</p>}
                     </div>
@@ -311,5 +336,13 @@ export default function ContactPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function ContactPage() {
+  return (
+    <Suspense fallback={<div className="pt-24 pb-16 bg-montana-bg min-h-screen" />}>
+      <ContactFormInner />
+    </Suspense>
   );
 }

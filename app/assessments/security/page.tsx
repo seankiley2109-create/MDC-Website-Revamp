@@ -435,6 +435,15 @@ export default function SecurityAssessment() {
             {/* Questions — left 3 columns */}
             <div className="lg:col-span-3">
               <GlassCard className="p-8 md:p-10">
+                {/* Sign-up storage note — shown only to unauthenticated users */}
+                {!isAuthChecking && !authedProfile && (
+                  <div className="mb-6 flex items-start gap-3 border border-amber-500/20 bg-amber-500/5 p-3 rounded">
+                    <span className="text-amber-400 text-sm shrink-0 mt-0.5">💡</span>
+                    <p className="text-xs text-montana-muted leading-relaxed">
+                      <Link href="/sign-up" className="text-amber-400 font-semibold hover:underline">Create a free account</Link> — your assessment results will be saved to your profile for future reference.
+                    </p>
+                  </div>
+                )}
                 {/* Progress */}
                 <div className="mb-8">
                   <div className="flex justify-between items-end mb-2">
@@ -600,17 +609,18 @@ export default function SecurityAssessment() {
           <div className="animate-in fade-in slide-in-from-bottom-8 duration-700">
             <GlassCard className={`p-8 md:p-12 mb-12 border-t-4 ${borderClass}`}>
               <div className="text-center mb-12">
-                <div className="relative inline-block mb-8">
-                  <div className={`inline-flex h-32 w-32 items-center justify-center rounded-full bg-montana-surface border-4 ${borderClass} shadow-[0_0_30px_rgba(0,0,0,0.3)]`}>
-                    {totalScore <= 7 && <XCircle className={`h-16 w-16 ${colorClass}`} />}
-                    {totalScore > 7 && totalScore <= 14 && <AlertTriangle className={`h-16 w-16 ${colorClass}`} />}
-                    {totalScore > 14 && <CheckCircle className={`h-16 w-16 ${colorClass}`} />}
+                <div className="relative inline-block mb-6">
+                  <div className={`inline-flex h-40 w-40 items-center justify-center rounded-full bg-montana-surface border-4 ${borderClass} shadow-[0_0_40px_rgba(0,0,0,0.4)]`}>
+                    {totalScore <= 7 && <XCircle className={`h-20 w-20 ${colorClass}`} />}
+                    {totalScore > 7 && totalScore <= 14 && <AlertTriangle className={`h-20 w-20 ${colorClass}`} />}
+                    {totalScore > 14 && <CheckCircle className={`h-20 w-20 ${colorClass}`} />}
                   </div>
                 </div>
 
-                <h2 className="font-display text-5xl font-bold text-white mb-4">
-                  Score: {totalScore} <span className="text-2xl text-white/40">/ 20</span>
+                <h2 className="font-display text-7xl md:text-8xl font-bold text-white mb-2">
+                  {totalScore}
                 </h2>
+                <p className="text-xl text-white/40 mb-4">out of 20</p>
 
                 <div className={`inline-flex items-center px-6 py-2 rounded-full ${bgClass} bg-opacity-10 border ${borderClass} mb-6`}>
                   <Activity className={`h-4 w-4 mr-2 ${colorClass}`} />
@@ -624,21 +634,22 @@ export default function SecurityAssessment() {
                 </p>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 border-t border-white/10 pt-8">
-                <div className="text-center p-4">
-                  <div className="text-3xl font-bold text-white mb-1">
+              {/* Stat breakdown — responsive grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 border-t border-white/10 pt-8">
+                <div className="text-center p-4 sm:border-r border-white/10">
+                  <div className="text-4xl font-bold text-white mb-1">
                     {Object.values(answers).filter((v) => v === 2).length}
                   </div>
                   <div className="text-xs text-montana-muted uppercase tracking-wider">Fully Implemented</div>
                 </div>
-                <div className="text-center p-4 border-x border-white/10">
-                  <div className="text-3xl font-bold text-white mb-1">
+                <div className="text-center p-4 sm:border-r border-white/10">
+                  <div className="text-4xl font-bold text-white mb-1">
                     {Object.values(answers).filter((v) => v === 1).length}
                   </div>
                   <div className="text-xs text-montana-muted uppercase tracking-wider">Partial / Gaps</div>
                 </div>
                 <div className="text-center p-4">
-                  <div className="text-3xl font-bold text-red-400 mb-1">
+                  <div className="text-4xl font-bold text-red-400 mb-1">
                     {Object.values(answers).filter((v) => v === 0).length}
                   </div>
                   <div className="text-xs text-montana-muted uppercase tracking-wider">Critical Gaps</div>
@@ -655,8 +666,8 @@ export default function SecurityAssessment() {
                 </p>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
-                <GlassCard className="p-6 flex flex-col hover:border-white/30 transition-colors">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-12">
+                <GlassCard className="p-6 flex flex-col hover:border-white/30 transition-colors min-h-[200px]">
                   <Database className="h-8 w-8 text-montana-pink mb-4" />
                   <h4 className="font-bold text-white mb-2">Druva SaaS & Endpoint Backup</h4>
                   <p className="text-sm text-montana-muted flex-1 mb-4">Automated M365, Google Workspace, and endpoint backup with instant recovery.</p>
@@ -665,16 +676,16 @@ export default function SecurityAssessment() {
                   </Link>
                 </GlassCard>
 
-                <GlassCard className="p-6 flex flex-col hover:border-white/30 transition-colors">
+                <GlassCard className="p-6 flex flex-col hover:border-white/30 transition-colors min-h-[200px]">
                   <ShieldAlert className="h-8 w-8 text-red-400 mb-4" />
                   <h4 className="font-bold text-white mb-2">Ransomware Protection</h4>
-                  <p className="text-sm text-montana-muted flex-1 mb-4">Immutable storage, AI anomaly detection, and air-gapped recovery vaults.</p>
+                  <p className="text-sm text-montana-muted flex-1 mb-4">Premium tier of Druva: immutable storage, AI anomaly detection, and air-gapped recovery.</p>
                   <Link href="/pos?tab=enterprise">
                     <AnimatedButton variant="outline" className="w-full text-xs py-2">View Solution</AnimatedButton>
                   </Link>
                 </GlassCard>
 
-                <GlassCard className="p-6 flex flex-col hover:border-white/30 transition-colors">
+                <GlassCard className="p-6 flex flex-col hover:border-white/30 transition-colors min-h-[200px]">
                   <Monitor className="h-8 w-8 text-amber-400 mb-4" />
                   <h4 className="font-bold text-white mb-2">MaaS360 MDM / UEM</h4>
                   <p className="text-sm text-montana-muted flex-1 mb-4">Unified endpoint management, device compliance, and threat defence.</p>
@@ -683,7 +694,7 @@ export default function SecurityAssessment() {
                   </Link>
                 </GlassCard>
 
-                <GlassCard className="p-6 flex flex-col hover:border-white/30 transition-colors">
+                <GlassCard className="p-6 flex flex-col hover:border-white/30 transition-colors min-h-[200px]">
                   <Server className="h-8 w-8 text-montana-pink mb-4" />
                   <h4 className="font-bold text-white mb-2">IBM Enterprise Backup</h4>
                   <p className="text-sm text-montana-muted flex-1 mb-4">Bespoke architecture for complex, high-volume data protection environments.</p>
@@ -693,12 +704,19 @@ export default function SecurityAssessment() {
                 </GlassCard>
               </div>
 
-              <div className="text-center">
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Link href="/pos?tab=cloud">
                   <AnimatedButton variant="primary" className="gap-2 px-8 py-4 text-lg">
                     Build Your Custom Solution <ArrowRight className="h-5 w-5" />
                   </AnimatedButton>
                 </Link>
+                <button
+                  type="button"
+                  onClick={() => { setCurrentStep(0); setAnswers({}); }}
+                  className="px-8 py-4 text-sm font-medium text-montana-muted border border-white/10 hover:border-white/30 hover:text-white transition-colors"
+                >
+                  Retake Assessment
+                </button>
               </div>
             </div>
           </div>

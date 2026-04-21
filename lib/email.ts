@@ -7,14 +7,17 @@ import { Resend } from 'resend';
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 export const SUPPORT_EMAIL = 'support@montanadc.com';
-export const FROM_ADDRESS = 'onboarding@resend.dev'; // when verified replace: Montana Data Company <support@montanadc.com>
+export const FROM_ADDRESS = 'Montana Data Company <hello@montanadc.com>';
 
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
 
 export type EnquiryType =
-  | 'new-solution'
+  | 'enterprise-backup'
+  | 'archiving'
+  | 'quantum'
+  | 'guardium'
   | 'existing-client'
   | 'partnership'
   | 'compliance'

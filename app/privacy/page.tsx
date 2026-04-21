@@ -1,7 +1,8 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { Shield, Mail, MapPin, ExternalLink } from 'lucide-react';
+import { Shield, Mail, MapPin, ExternalLink, Download } from 'lucide-react';
 import { GlassCard } from '@/components/ui/glass-card';
+import { PrintButton } from './print-button';
 
 export const metadata: Metadata = {
   title: 'Privacy Statement',
@@ -55,9 +56,10 @@ export default function PrivacyPage() {
           <h1 className="font-display text-4xl md:text-5xl font-bold tracking-tight text-white mb-4">
             Privacy Statement
           </h1>
-          <p className="text-montana-muted">
+          <p className="text-montana-muted mb-6">
             Montana Data Company (Pty) Ltd &mdash; effective as published on this website.
           </p>
+          <PrintButton />
         </div>
 
         <GlassCard className="p-8 md:p-12 mb-8">
@@ -172,14 +174,64 @@ export default function PrivacyPage() {
             </Sub>
           </Section>
 
-          <Section number="8" title="Supporting Terms and Conditions">
+          <Section number="8" title="Third-Party Data Processors">
+            <Sub label="8.1">
+              Montana engages the following third-party data processors to deliver its website, platform, and services. Each processor operates under a data processing agreement and is bound by applicable data protection legislation. By using our website and services, you consent to the transfer of your personal information to these processors as described below, in accordance with POPIA Chapter 9.
+            </Sub>
+            <div className="overflow-x-auto mt-4">
+              <table className="w-full text-xs text-montana-muted border-collapse">
+                <thead>
+                  <tr className="border-b border-white/10">
+                    <th className="text-left py-2 pr-4 text-white/50 font-bold uppercase tracking-wider">Processor</th>
+                    <th className="text-left py-2 pr-4 text-white/50 font-bold uppercase tracking-wider">Purpose</th>
+                    <th className="text-left py-2 pr-4 text-white/50 font-bold uppercase tracking-wider">Data Stored</th>
+                    <th className="text-left py-2 text-white/50 font-bold uppercase tracking-wider">Region / Standard</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-white/5">
+                  <tr>
+                    <td className="py-2 pr-4 text-white font-medium">Supabase</td>
+                    <td className="py-2 pr-4">Database & authentication</td>
+                    <td className="py-2 pr-4">Profile data, assessment results, purchase history</td>
+                    <td className="py-2">EU (Frankfurt) · ISO 27001 · SOC 2</td>
+                  </tr>
+                  <tr>
+                    <td className="py-2 pr-4 text-white font-medium">Paystack</td>
+                    <td className="py-2 pr-4">Payment processing</td>
+                    <td className="py-2 pr-4">Transaction records, billing details (no card data stored by Montana)</td>
+                    <td className="py-2">PCI DSS Level 1 compliant</td>
+                  </tr>
+                  <tr>
+                    <td className="py-2 pr-4 text-white font-medium">Resend</td>
+                    <td className="py-2 pr-4">Transactional email delivery</td>
+                    <td className="py-2 pr-4">Name, email address, enquiry content</td>
+                    <td className="py-2">EU · SOC 2 Type II</td>
+                  </tr>
+                  <tr>
+                    <td className="py-2 pr-4 text-white font-medium">Monday.com</td>
+                    <td className="py-2 pr-4">CRM & lead management</td>
+                    <td className="py-2 pr-4">Contact details, enquiry type, assessment outcomes</td>
+                    <td className="py-2">EU · ISO 27001 · SOC 2</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <Sub label="8.2">
+              Montana does not sell your personal information to any third party. Data shared with processors is limited to what is strictly necessary to deliver the relevant service.
+            </Sub>
+            <Sub label="8.3">
+              You may request details of any processing agreement or request that your personal information be deleted by contacting us at <a href="mailto:info@montanadc.com" className="text-montana-pink hover:underline">info@montanadc.com</a>.
+            </Sub>
+          </Section>
+
+          <Section number="10" title="Supporting Terms and Conditions">
             <p>
               This privacy statement can be read in conjunction with privacy matters and conditions for lawful processing of personal information contained in various supporting documents on Montana&apos;s corporate website:{' '}
               <a href="https://www.montanadc.com" className="text-montana-pink hover:underline">www.montanadc.com</a>.
             </p>
           </Section>
 
-          <Section number="9" title="Use of Cookies">
+          <Section number="11" title="Use of Cookies">
             <Sub label="9.1">
               Montana may use &ldquo;cookies&rdquo; to enhance your experience as a customer. Your web browser places cookies on your hard drive for record-keeping purposes and sometimes to track information about you. You may choose to set your web browser to refuse cookies or to be notified when cookies are being sent. Note that some parts of the website may not function properly if you do so.
             </Sub>
@@ -201,7 +253,7 @@ export default function PrivacyPage() {
             </Sub>
           </Section>
 
-          <Section number="10" title="Google Analytics Use of Cookies">
+          <Section number="12" title="Google Analytics Use of Cookies">
             <Sub label="10.1">
               On our website we use &ldquo;Google Analytics&rdquo;, a web analytics service of Google Inc. Google Analytics uses cookies on your device which assists in evaluating the use of our website.
             </Sub>
@@ -222,7 +274,7 @@ export default function PrivacyPage() {
             </Sub>
           </Section>
 
-          <Section number="11" title="Links to Montana Social Media Pages">
+          <Section number="13" title="Links to Montana Social Media Pages">
             <Sub label="11.1">
               Montana has links to their Social Media pages (LinkedIn and Facebook). If you visit these websites the Privacy Policy and Terms and Conditions of the specific platform apply.
             </Sub>
@@ -231,7 +283,7 @@ export default function PrivacyPage() {
             </Sub>
           </Section>
 
-          <Section number="12" title="Data Subject Rights">
+          <Section number="14" title="Data Subject Rights">
             <p>Subject to POPIA provisions, you have the right to:</p>
             <ul className="space-y-2 mt-2">
               <ListItem>Request access to your personal information.</ListItem>

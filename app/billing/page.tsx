@@ -349,17 +349,17 @@ export default async function BillingPage({
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
           {[
             {
-              label: 'Account Status',
+              label: 'Profile Status',
               value: <PlanBadge status={planStatus} />,
               icon: CheckCircle,
             },
             {
-              label: 'Monthly Commitment',
+              label: 'Active Since',
               value: <span className="text-lg font-bold text-white">{formatZAR(monthlyCommitment)}</span>,
               icon: CreditCard,
             },
             {
-              label: 'Contract End',
+              label: 'Customer Since',
               value: <span className="text-sm font-semibold text-white">{formatDate(profile?.current_period_end)}</span>,
               icon: Calendar,
             },

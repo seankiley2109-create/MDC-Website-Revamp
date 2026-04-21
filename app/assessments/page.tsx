@@ -1,6 +1,6 @@
 import { GlassCard } from "@/components/ui/glass-card";
 import { AnimatedButton } from "@/components/ui/animated-button";
-import { Shield, ShieldAlert, FileText, Lock, ArrowRight, AlertTriangle } from "lucide-react";
+import { Shield, ShieldAlert, FileText, Lock, ArrowRight, AlertTriangle, Info } from "lucide-react";
 import Link from "next/link";
 
 export default function AssessmentsPage() {
@@ -19,6 +19,14 @@ export default function AssessmentsPage() {
           </h1>
           <p className="text-lg md:text-xl text-montana-muted leading-relaxed max-w-2xl mx-auto">
             Most organisations don&apos;t know their true risk level until it&apos;s too late. Take one of our free assessments to uncover critical gaps in under 5 minutes.
+          </p>
+        </div>
+
+        {/* Mini-assessment disclaimer */}
+        <div className="mb-10 border border-amber-500/20 bg-amber-500/5 p-5 flex items-start gap-4">
+          <Info className="h-5 w-5 text-amber-400 shrink-0 mt-0.5" />
+          <p className="text-sm text-montana-muted leading-relaxed">
+            <span className="font-semibold text-white">Please note:</span> These are mini pre-assessments designed to give you a brief snapshot of your current risk exposure and compliance readiness. They are not full professional assessments and should not be relied upon as a substitute for a comprehensive audit or legal advice.
           </p>
         </div>
 
@@ -76,7 +84,7 @@ export default function AssessmentsPage() {
                 <span className="text-xs text-montana-muted">10 questions &middot; ~3 minutes</span>
                 <Link href="/assessments/security">
                   <AnimatedButton variant="primary" className="gap-2">
-                    Start Assessment <ArrowRight className="h-4 w-4" />
+                    Start Pre-Assessment <ArrowRight className="h-4 w-4" />
                   </AnimatedButton>
                 </Link>
               </div>
@@ -118,7 +126,7 @@ export default function AssessmentsPage() {
                 <span className="text-xs text-montana-muted">10 questions &middot; ~3 minutes</span>
                 <Link href="/assessments/popia">
                   <AnimatedButton variant="primary" className="gap-2">
-                    Start Assessment <ArrowRight className="h-4 w-4" />
+                    Start Pre-Assessment <ArrowRight className="h-4 w-4" />
                   </AnimatedButton>
                 </Link>
               </div>
@@ -131,8 +139,11 @@ export default function AssessmentsPage() {
           <p className="text-sm text-montana-muted mb-1">
             All assessment data is encrypted and handled in accordance with POPIA.
           </p>
+          <p className="text-sm text-montana-muted mb-1">
+            Your results are confidential, we will never share your information with third parties. 
+          </p>
           <p className="text-sm text-montana-muted">
-            Your results are confidential — we will never share your information with third parties.
+            For information on how Personally Identifiable Information (PII) is managed, refer to our privacy statement or PAIA manuals. 
           </p>
         </div>
 

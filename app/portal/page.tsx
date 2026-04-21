@@ -26,6 +26,7 @@ import { GlassCard }             from '@/components/ui/glass-card';
 import { AnimatedButton }        from '@/components/ui/animated-button';
 import { SupportForm }           from './support-form';
 import { ProfileForm }           from './profile-form';
+import { ContactDetailsForm }    from './contact-details-form';
 import type { Profile, PlanStatus } from '@/lib/supabase/types';
 import type { Metadata }         from 'next';
 import {
@@ -337,7 +338,7 @@ export default async function PortalPage() {
         {/* ── 2. Stats bar ──────────────────────────────────────────────────── */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 py-6 mb-2">
           <GlassCard className="p-4">
-            <p className="text-xs text-montana-muted uppercase tracking-wider mb-1.5">Account Status</p>
+            <p className="text-xs text-montana-muted uppercase tracking-wider mb-1.5">Profile Status</p>
             <div className="flex items-center gap-2">
               {statusCfg.icon}
               <span className={`text-base font-bold ${statusCfg.color}`}>{statusCfg.label}</span>
@@ -345,21 +346,29 @@ export default async function PortalPage() {
           </GlassCard>
 
           <GlassCard className="p-4">
-            <p className="text-xs text-montana-muted uppercase tracking-wider mb-1.5">Monthly Commitment</p>
+            <p className="text-xs text-montana-muted uppercase tracking-wider mb-1.5">Active Since</p>
             <div className="flex items-center gap-2">
-              <CreditCard className="h-4 w-4 text-montana-pink shrink-0" />
-              <span className="text-base font-bold text-white font-mono">
-                {purchases.length > 0 ? `${formatZAR(monthlyCommitment)}/mo` : '—'}
+              <Clock className="h-4 w-4 text-montana-pink shrink-0" />
+              <span className="text-base font-bold text-white">
+                {(profile as Record<string, unknown>).created_at
+                  ? new Date((profile as Record<string, unknown>).created_at as string).toLocaleDateString('en-ZA', { month: 'short', year: 'numeric' })
+                  : '—'}
               </span>
             </div>
           </GlassCard>
 
           <GlassCard className="p-4">
-            <p className="text-xs text-montana-muted uppercase tracking-wider mb-1.5">Contract End</p>
+            <p className="text-xs text-montana-muted uppercase tracking-wider mb-1.5">Customer Since</p>
             <div className="flex items-center gap-2">
               <Clock className="h-4 w-4 text-montana-muted shrink-0" />
               <span className="text-base font-bold text-white">
-                {formatDate(profile.current_period_end)}
+                {purchases.length > 0
+                  ? formatDate(purchases.reduce<string | null>((earliest, p) => {
+                      if (!p.purchased_at) return earliest;
+                      if (!earliest) return p.purchased_at;
+                      return p.purchased_at < earliest ? p.purchased_at : earliest;
+                    }, null))
+                  : '—'}
               </span>
             </div>
           </GlassCard>
@@ -510,12 +519,20 @@ export default async function PortalPage() {
                 <StatusBadge status={status} />
               </div>
               <div>
-                <p className="text-xs text-montana-muted mb-1">Contract End</p>
-                <p className="text-sm font-semibold text-white">{formatDate(profile.current_period_end)}</p>
+                <p className="text-xs text-montana-muted mb-1">Customer Since</p>
+                <p className="text-sm font-semibold text-white">
+                  {purchases.length > 0
+                    ? formatDate(purchases.reduce<string | null>((earliest, p) => {
+                        if (!p.purchased_at) return earliest;
+                        if (!earliest) return p.purchased_at;
+                        return p.purchased_at < earliest ? p.purchased_at : earliest;
+                      }, null))
+                    : '—'}
+                </p>
               </div>
               {monthlyCommitment > 0 && (
                 <div>
-                  <p className="text-xs text-montana-muted mb-1">Monthly Commitment</p>
+                  <p className="text-xs text-montana-muted mb-1">Active Since</p>
                   <p className="text-sm font-semibold text-white font-mono">
                     {formatZAR(monthlyCommitment)}/mo
                     <span className="text-xs font-normal text-montana-muted ml-1">ex VAT</span>
@@ -639,7 +656,28 @@ export default async function PortalPage() {
           />
         </GlassCard>
 
-        {/* ── 6. Support ────────────────────────────────────────────────────── */}
+        {/* ── 6. Contact Details ────────────────────────────────────────────── */}
+        <GlassCard className="p-6 md:p-8 mb-6">
+          <div className="flex items-center gap-2 mb-2">
+            <FileCheck className="h-5 w-5 text-montana-pink" />
+            <h2 className="text-base font-semibold text-white">Contact Details</h2>
+          </div>
+          <p className="text-sm text-montana-muted mb-6">
+            Optional — used for invoice delivery, service communications, and on-site support.
+          </p>
+          <ContactDetailsForm
+            initialData={{
+              email:        (profile as Record<string, unknown>).email as string ?? '',
+              phone:        (profile as Record<string, unknown>).phone as string ?? '',
+              addressLine1: (profile as Record<string, unknown>).address_line1 as string ?? '',
+              city:         (profile as Record<string, unknown>).city as string ?? '',
+              province:     (profile as Record<string, unknown>).province as string ?? '',
+              postalCode:   (profile as Record<string, unknown>).postal_code as string ?? '',
+            }}
+          />
+        </GlassCard>
+
+        {/* ── 7. Support ────────────────────────────────────────────────────── */}
         <GlassCard className="p-6 md:p-8">
           <div className="flex items-center gap-2 mb-6">
             <Shield className="h-5 w-5 text-montana-pink" />

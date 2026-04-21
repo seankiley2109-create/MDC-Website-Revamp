@@ -7,7 +7,7 @@ const schema = z.object({
   name:        z.string().min(2),
   email:       z.string().email(),
   company:     z.string().min(1),
-  enquiryType: z.enum(['new-solution', 'existing-client', 'partnership', 'compliance', 'general']),
+  enquiryType: z.enum(['enterprise-backup', 'archiving', 'quantum', 'guardium', 'existing-client', 'partnership', 'compliance', 'general']),
   message:     z.string().min(10),
 });
 
@@ -37,8 +37,6 @@ export async function POST(request: Request) {
       createContactLead(payload),
     ]);
 
-    // Email is non-critical until Resend domain is verified — log failures but don't block the user.
-    // TODO: Once montanadc.com is verified in Resend, consider making email the critical path again.
     if (emailResult.status === 'rejected') {
       console.error('[contact] Email send threw:', emailResult.reason);
     } else if (!emailResult.value.success) {

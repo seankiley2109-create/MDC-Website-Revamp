@@ -415,6 +415,15 @@ export default function PopiaAssessment() {
             {/* Questions — left 3 columns */}
             <div className="lg:col-span-3">
               <GlassCard className="p-8 md:p-10">
+                {/* Sign-up storage note — shown only to unauthenticated users */}
+                {!isAuthChecking && !authedProfile && (
+                  <div className="mb-6 flex items-start gap-3 border border-amber-500/20 bg-amber-500/5 p-3 rounded">
+                    <span className="text-amber-400 text-sm shrink-0 mt-0.5">💡</span>
+                    <p className="text-xs text-montana-muted leading-relaxed">
+                      <Link href="/sign-up" className="text-amber-400 font-semibold hover:underline">Create a free account</Link> — your assessment results will be saved to your profile for future reference.
+                    </p>
+                  </div>
+                )}
                 {/* Progress */}
                 <div className="mb-8">
                   <div className="flex justify-between items-end mb-2">
@@ -580,11 +589,11 @@ export default function PopiaAssessment() {
           <div className="animate-in fade-in slide-in-from-bottom-8 duration-700">
             <GlassCard className={`p-8 md:p-12 mb-12 border-t-4 ${borderClass}`}>
               <div className="text-center mb-12">
-                <div className="relative inline-block mb-8">
-                  <div className={`inline-flex h-32 w-32 items-center justify-center rounded-full bg-montana-surface border-4 ${borderClass} shadow-[0_0_30px_rgba(0,0,0,0.3)]`}>
-                    {totalScore <= 8 && <XCircle className={`h-16 w-16 ${colorClass}`} />}
-                    {totalScore > 8 && totalScore <= 14 && <AlertTriangle className={`h-16 w-16 ${colorClass}`} />}
-                    {totalScore > 14 && <CheckCircle className={`h-16 w-16 ${colorClass}`} />}
+                <div className="relative inline-block mb-6">
+                  <div className={`inline-flex h-40 w-40 items-center justify-center rounded-full bg-montana-surface border-4 ${borderClass} shadow-[0_0_40px_rgba(0,0,0,0.4)]`}>
+                    {totalScore <= 8 && <XCircle className={`h-20 w-20 ${colorClass}`} />}
+                    {totalScore > 8 && totalScore <= 14 && <AlertTriangle className={`h-20 w-20 ${colorClass}`} />}
+                    {totalScore > 14 && <CheckCircle className={`h-20 w-20 ${colorClass}`} />}
                   </div>
                   {totalScore > 14 && (
                     <div className="absolute -bottom-4 -right-4 bg-montana-bg rounded-full p-2 border border-green-500/30 shadow-xl">
@@ -595,9 +604,10 @@ export default function PopiaAssessment() {
                   )}
                 </div>
 
-                <h2 className="font-display text-5xl font-bold text-white mb-4">
-                  Score: {totalScore} <span className="text-2xl text-white/40">/ 20</span>
+                <h2 className="font-display text-7xl md:text-8xl font-bold text-white mb-2">
+                  {totalScore}
                 </h2>
+                <p className="text-xl text-white/40 mb-4">out of 20</p>
 
                 <div className={`inline-flex items-center px-6 py-2 rounded-full ${bgClass} bg-opacity-10 border ${borderClass} mb-6`}>
                   <Activity className={`h-4 w-4 mr-2 ${colorClass}`} />
@@ -611,21 +621,22 @@ export default function PopiaAssessment() {
                 </p>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 border-t border-white/10 pt-8">
-                <div className="text-center p-4">
-                  <div className="text-3xl font-bold text-white mb-1">
+              {/* Stat breakdown — responsive grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 border-t border-white/10 pt-8">
+                <div className="text-center p-4 sm:border-r border-white/10">
+                  <div className="text-4xl font-bold text-white mb-1">
                     {Object.values(answers).filter((v) => v === 2).length}
                   </div>
                   <div className="text-xs text-montana-muted uppercase tracking-wider">Fully Compliant</div>
                 </div>
-                <div className="text-center p-4 border-x border-white/10">
-                  <div className="text-3xl font-bold text-white mb-1">
+                <div className="text-center p-4 sm:border-r border-white/10">
+                  <div className="text-4xl font-bold text-white mb-1">
                     {Object.values(answers).filter((v) => v === 1).length}
                   </div>
                   <div className="text-xs text-montana-muted uppercase tracking-wider">Partial Controls</div>
                 </div>
                 <div className="text-center p-4">
-                  <div className="text-3xl font-bold text-montana-pink mb-1">
+                  <div className="text-4xl font-bold text-montana-pink mb-1">
                     {Object.values(answers).filter((v) => v === 0).length}
                   </div>
                   <div className="text-xs text-montana-muted uppercase tracking-wider">Critical Gaps</div>
@@ -642,7 +653,7 @@ export default function PopiaAssessment() {
                 </p>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
                 {POPIA_SERVICES.slice(0, 3).map((svc) => {
                   const isRecommended = svc.code === "SE-PA002";
                   const posUrl = `/pos?tab=consulting&services=${svc.code}`;
@@ -650,7 +661,7 @@ export default function PopiaAssessment() {
                     <GlassCard
                       key={svc.code}
                       glow={isRecommended}
-                      className={`p-8 flex flex-col relative ${isRecommended ? "border-montana-pink/50 shadow-2xl shadow-montana-pink/10 md:-translate-y-4" : "hover:border-white/30 transition-colors"}`}
+                      className={`p-8 flex flex-col relative min-h-[260px] ${isRecommended ? "border-montana-pink/50 shadow-2xl shadow-montana-pink/10 lg:-translate-y-4" : "hover:border-white/30 transition-colors"}`}
                     >
                       {isRecommended && (
                         <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-montana-pink text-white text-xs font-bold px-4 py-1.5 rounded-full tracking-wider">
@@ -687,12 +698,19 @@ export default function PopiaAssessment() {
                 })}
               </div>
 
-              <div className="text-center">
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Link href="/pos?tab=consulting">
                   <AnimatedButton variant="outline" className="gap-2 px-8 py-4">
                     View All POPIA Services <ArrowRight className="h-5 w-5" />
                   </AnimatedButton>
                 </Link>
+                <button
+                  type="button"
+                  onClick={() => { setCurrentStep(0); setAnswers({}); }}
+                  className="px-8 py-4 text-sm font-medium text-montana-muted border border-white/10 hover:border-white/30 hover:text-white transition-colors"
+                >
+                  Retake Assessment
+                </button>
               </div>
             </div>
           </div>
