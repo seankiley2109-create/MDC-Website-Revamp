@@ -164,11 +164,14 @@ function sectionHeading(text: string): string {
 // ---------------------------------------------------------------------------
 
 const enquiryLabels: Record<EnquiryType, string> = {
-  'new-solution':    'New Solution Enquiry',
-  'existing-client': 'Existing Client Support',
-  'partnership':     'Channel Partnership',
-  'compliance':      'POPIA / Compliance Consulting',
-  'general':         'General Enquiry',
+  'enterprise-backup': 'Enterprise Backup',
+  'archiving':         'Archiving & Lifecycle',
+  'quantum':           'Quantum Security (PQC)',
+  'guardium':          'IBM Guardium',
+  'existing-client':   'Existing Client Support',
+  'partnership':       'Channel Partnership',
+  'compliance':        'POPIA / Compliance Consulting',
+  'general':           'General Enquiry',
 };
 
 // ---------------------------------------------------------------------------

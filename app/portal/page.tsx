@@ -350,8 +350,8 @@ export default async function PortalPage() {
             <div className="flex items-center gap-2">
               <Clock className="h-4 w-4 text-montana-pink shrink-0" />
               <span className="text-base font-bold text-white">
-                {(profile as Record<string, unknown>).created_at
-                  ? new Date((profile as Record<string, unknown>).created_at as string).toLocaleDateString('en-ZA', { month: 'short', year: 'numeric' })
+                {(profile as unknown as Record<string, unknown>).created_at
+                  ? new Date((profile as unknown as Record<string, unknown>).created_at as string).toLocaleDateString('en-ZA', { month: 'short', year: 'numeric' })
                   : '—'}
               </span>
             </div>
@@ -667,12 +667,12 @@ export default async function PortalPage() {
           </p>
           <ContactDetailsForm
             initialData={{
-              email:        (profile as Record<string, unknown>).email as string ?? '',
-              phone:        (profile as Record<string, unknown>).phone as string ?? '',
-              addressLine1: (profile as Record<string, unknown>).address_line1 as string ?? '',
-              city:         (profile as Record<string, unknown>).city as string ?? '',
-              province:     (profile as Record<string, unknown>).province as string ?? '',
-              postalCode:   (profile as Record<string, unknown>).postal_code as string ?? '',
+              email:        (profile as unknown as Record<string, unknown>).email as string ?? '',
+              phone:        (profile as unknown as Record<string, unknown>).phone as string ?? '',
+              addressLine1: (profile as unknown as Record<string, unknown>).address_line1 as string ?? '',
+              city:         (profile as unknown as Record<string, unknown>).city as string ?? '',
+              province:     (profile as unknown as Record<string, unknown>).province as string ?? '',
+              postalCode:   (profile as unknown as Record<string, unknown>).postal_code as string ?? '',
             }}
           />
         </GlassCard>
