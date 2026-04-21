@@ -28,7 +28,7 @@ export default function AboutPage() {
             Engineered for <span className="text-montana-gradient">Resilience.</span>
           </h1>
           <p className="text-lg md:text-xl text-montana-muted leading-relaxed max-w-3xl mx-auto">
-            Montana Data Company is a South African enterprise data resilience firm built on one conviction: your data is the most critical asset your organisation owns — and protecting it requires more than software. It requires strategy, governance, and an unwavering commitment to operational continuity.
+            Montana Data Company is a South African enterprise data resilience firm built on one foundational principle: your data is the most critical asset your organisation owns — and protecting it requires more than software. It requires strategy, governance, and an unwavering commitment to operational continuity.
           </p>
         </div>
 
@@ -45,8 +45,8 @@ export default function AboutPage() {
             <p className="text-xs text-montana-muted">SaaS &amp; endpoint cloud backup</p>
           </div>
           <div className="border border-montana-magenta/20 bg-montana-magenta/5 p-6 text-center">
-            <div className="text-2xl font-bold text-white mb-1">88</div>
-            <div className="text-xs text-montana-magenta font-bold uppercase tracking-wider mb-2">POPIA Controls</div>
+            <div className="text-2xl font-bold text-white mb-1">8</div>
+            <div className="text-xs text-montana-magenta font-bold uppercase tracking-wider mb-2">POPIA Conditions</div>
             <p className="text-xs text-montana-muted">Comprehensive compliance framework</p>
           </div>
           <div className="border border-white/10 bg-white/[0.02] p-6 text-center">
@@ -71,7 +71,7 @@ export default function AboutPage() {
                 Montana Data Company operates at the intersection of cloud backup, endpoint management, and compliance consulting — delivering complete resilience frameworks that standalone products cannot provide alone. Every engagement is structured around your recovery time objectives, your regulatory obligations, and your specific risk tolerance.
               </p>
               <p>
-                We partner exclusively with IBM, Druva, and MaaS360 because they represent the best available capability in their respective domains. Our clients don&apos;t pay for vendor diversity — they pay for the right solution, implemented correctly, with the governance to match.
+                We partner exclusively with IBM, Druva, and other industry leading technology providers because they offer best of breed solutions in their respective domains. Our clients don&apos;t pay for vendor diversity — they pay for the right solution, implemented correctly, with the governance to match.
               </p>
             </div>
           </div>
@@ -81,9 +81,9 @@ export default function AboutPage() {
               <ul className="space-y-4">
                 {[
                   { title: "Cloud Backup & Recovery", desc: "Druva SaaS backup for M365, Google Workspace, Salesforce, and distributed endpoints." },
-                  { title: "Enterprise Data Protection", desc: "IBM-architected bespoke backup for complex, high-volume multi-cloud environments." },
+                  { title: "Enterprise Data Protection", desc: "IBM-architected bespoke backup for complex, high-volume multi-cloud and on-prem environments." },
                   { title: "Endpoint & Device Management", desc: "MaaS360 UEM for unified control across all corporate and BYOD devices." },
-                  { title: "POPIA Compliance Consulting", desc: "From gap analysis to Information Officer registration and staff training." },
+                  { title: "POPIA Compliance Consulting", desc: "From gap analysis and compliance remediation to Information Officer registration and on-going staff training." },
                   { title: "Cyber Resilience Architecture", desc: "Ransomware protection, immutable storage, and quantum security alignment." },
                 ].map((item) => (
                   <li key={item.title} className="flex items-start gap-3">
@@ -104,7 +104,7 @@ export default function AboutPage() {
           <div className="mb-12 text-center">
             <h2 className="font-display text-3xl font-bold text-white mb-4">The Montana Difference</h2>
             <p className="text-montana-muted max-w-2xl mx-auto">
-              We don&apos;t just sell products. We build resilient frameworks that ensure your business can withstand any disruption.
+              We don&apos;t just sell products and solutions. We build resilient frameworks that ensure your business can withstand any disruption.
             </p>
           </div>
 
@@ -145,7 +145,7 @@ export default function AboutPage() {
               </div>
               <h3 className="font-display text-xl font-bold text-white">Enterprise-Grade Security</h3>
               <p className="text-montana-muted leading-relaxed">
-                We partner with IBM, Druva, and Red Hat to deliver military-grade encryption, immutable backups, and zero-trust architectures — the same security posture used by global financial institutions.
+                We partner with industry leading technology partners to deliver military-grade encryption, immutable backups, and zero-trust architectures — the same security posture used by global financial institutions.
               </p>
             </GlassCard>
           </div>
@@ -160,8 +160,8 @@ export default function AboutPage() {
             {([
               { Icon: Server,     name: "IBM",        desc: "Enterprise Backup & Guardium",  color: "text-montana-pink",    bg: "bg-montana-pink/10",    border: "border-montana-pink/20"    },
               { Icon: Database,   name: "Druva",      desc: "SaaS & Endpoint Backup",        color: "text-montana-orange",  bg: "bg-montana-orange/10",  border: "border-montana-orange/20"  },
-              { Icon: Smartphone, name: "IBM MaaS360",desc: "Unified Endpoint Management",   color: "text-montana-magenta", bg: "bg-montana-magenta/10", border: "border-montana-magenta/20" },
-              { Icon: Zap,        name: "Red Hat",    desc: "Infrastructure & Integration",  color: "text-white/70",        bg: "bg-white/5",            border: "border-white/10"           },
+              { Icon: Smartphone, name: "BCX",desc: "Digital Transformation & ICT Services",   color: "text-montana-magenta", bg: "bg-montana-magenta/10", border: "border-montana-magenta/20" },
+              { Icon: Zap,        name: "Cloutility",    desc: "BaaS Management & Automation",  color: "text-white/70",        bg: "bg-white/5",            border: "border-white/10"           },
             ] as const).map(({ Icon, name, desc, color, bg, border }) => (
               <div key={name} className={`border ${border} bg-montana-surface/30 p-6 text-center`}>
                 <div className={`inline-flex h-12 w-12 items-center justify-center rounded-sm ${bg} border ${border} mb-4 mx-auto`}>

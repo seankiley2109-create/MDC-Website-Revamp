@@ -9,7 +9,7 @@ import { Shield, Server, Lock, FileWarning, Smartphone, Database } from "lucide-
 const OFFERINGS = [
   {
     id: "ibm",
-    name: "IBM Enterprise Backup",
+    name: "Enterprise Backup",
     icon: Server,
     does: "Bespoke, consultative data protection architecture.",
     matters: "Ensures operational continuity for complex, multi-cloud environments.",
@@ -20,7 +20,7 @@ const OFFERINGS = [
   },
   {
     id: "druva",
-    name: "Druva SaaS & Endpoint",
+    name: "SaaS & Endpoint Backup",
     icon: Database,
     does: "Productised, scalable cloud backup for distributed workforces.",
     matters: "Secures Microsoft 365, Salesforce, and remote endpoints instantly.",
@@ -42,7 +42,7 @@ const OFFERINGS = [
   },
   {
     id: "popia",
-    name: "POPIA & Governance",
+    name: "POPIA & Governance Consulting",
     icon: FileWarning,
     does: "Strategic alignment of data practices with privacy laws.",
     matters: "Transforms compliance from a legal burden into a security baseline.",
@@ -55,7 +55,7 @@ const OFFERINGS = [
     id: "maas360",
     name: "MaaS360 MDM / UEM",
     icon: Smartphone,
-    does: "Unified endpoint management and threat defense.",
+    does: "Unified Endpoint Management and threat defense.",
     matters: "Secures corporate data across all mobile devices and BYOD.",
     risk: "Unmanaged devices are the fastest route to a data breach.",
     color: "text-montana-orange",
@@ -120,7 +120,7 @@ export function Hero() {
         <div className="flex-1 text-center lg:text-left z-10">
           <div className="inline-flex items-center border border-white/10 bg-montana-surface/80 backdrop-blur-sm px-4 py-1.5 text-xs font-bold tracking-widest text-montana-muted uppercase mb-8">
             <span className="flex h-2 w-2 bg-montana-pink mr-3 shadow-[0_0_8px_#F24567]"></span>
-            Enterprise Data Resilience Platform
+            Enterprise Data Resilience Solutions
           </div>
           <h1 className="font-display text-4xl md:text-7xl font-bold tracking-tight text-white mb-6 leading-[1.1]">
             Protect, recover, and govern with{" "}

@@ -59,7 +59,7 @@ export function WhyMontana() {
               <div className="absolute top-0 right-0 -mt-16 -mr-16 h-64 w-64 rounded-full bg-montana-magenta opacity-10 blur-[80px]" />
               <h3 className="font-display text-2xl font-bold text-white mb-4">Our Approach</h3>
               <p className="text-montana-muted mb-6 leading-relaxed">
-                We believe effective data protection starts with understanding business reality, not just technical requirements.
+                We believe effective data protection starts with understanding your business reality, not just technical requirements.
               </p>
               <p className="text-montana-muted mb-6 leading-relaxed">
                 That is why our approach begins with risk, continuity, governance, and operational need. From there, we design and deliver the right mix of backup, recovery, transfer, security, and advisory support to create a solution that is fit for purpose, scalable, and practical to manage.

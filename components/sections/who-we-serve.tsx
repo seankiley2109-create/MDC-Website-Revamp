@@ -61,7 +61,7 @@ export function WhoWeServe() {
         <div className="text-center">
           <Link href="/pos">
             <AnimatedButton variant="outline" className="px-8 py-3">
-              Find Your Solution
+              Build Your Solution
             </AnimatedButton>
           </Link>
         </div>

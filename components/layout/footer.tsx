@@ -15,7 +15,7 @@ export function Footer() {
                 alt="Montana Data Company"
                 width={220}
                 height={80}
-                className="h-14 md:h-20 w-auto object-contain mb-4"
+                className="h-32 md:h-36 w-auto object-contain mb-4"
               />
             </Link>
             <p className="text-sm text-montana-muted max-w-sm">
@@ -29,8 +29,9 @@ export function Footer() {
             <ul className="space-y-3 text-sm">
               <li><Link href="/services" className="text-montana-muted hover:text-white transition-colors">Services</Link></li>
               <li><Link href="/resources" className="text-montana-muted hover:text-white transition-colors">Resources</Link></li>
-              <li><Link href="/about" className="text-montana-muted hover:text-white transition-colors">About Us</Link></li>
+              <li><Link href="/assessments" className="text-montana-muted hover:text-white transition-colors">Assessments</Link></li>
               <li><Link href="/partners" className="text-montana-muted hover:text-white transition-colors">Partners</Link></li>
+              <li><Link href="/about" className="text-montana-muted hover:text-white transition-colors">About</Link></li>
               <li><Link href="/contact" className="text-montana-muted hover:text-white transition-colors">Contact</Link></li>
             </ul>
           </div>
@@ -81,7 +82,6 @@ export function Footer() {
           </p>
           <div className="flex flex-wrap gap-x-8 gap-y-2 text-xs text-montana-muted order-1 md:order-2">
             <Link href="/privacy" className="hover:text-montana-pink transition-colors">Privacy Policy</Link>
-            <Link href="/terms" className="hover:text-montana-pink transition-colors">Terms &amp; Conditions</Link>
             <Link href="/paia" className="hover:text-montana-pink transition-colors">PAIA</Link>
             <Link href="/contact" className="hover:text-montana-pink transition-colors">Contact Us</Link>
           </div>

@@ -17,7 +17,7 @@ export function TechStack() {
     <section id="tech-stack" className="py-16 md:py-24 border-y border-white/5 bg-montana-bg overflow-hidden">
       <div className="mx-auto max-w-7xl px-6 mb-8 md:mb-12 text-center">
         <h2 className="text-sm font-mono font-semibold tracking-widest text-montana-muted uppercase">
-          Powered by Industry Leaders
+          Powered by Industry Leading Technology
         </h2>
       </div>
       
