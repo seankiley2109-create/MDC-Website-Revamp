@@ -14,7 +14,7 @@ import { redirect }                 from 'next/navigation';
 import Link                         from 'next/link';
 import { createServerClient }       from '@/lib/supabase/server';
 import type { Profile }             from '@/lib/supabase/types';
-import { GlassCard }                from '@/components/ui/glass-card';
+import { SpotlightCard } from '@/components/ui/spotlight-card';
 import {
   CreditCard, AlertCircle, CheckCircle, Clock, XCircle,
   Package, Plus, Receipt, ArrowRight, Calendar, Tag,
@@ -440,7 +440,7 @@ export default async function BillingPage({
 
             {purchaseGroups.length === 0 ? (
               /* Empty state */
-              <GlassCard className="p-10 flex flex-col items-center text-center gap-4">
+              <SpotlightCard customSize className="p-10 flex flex-col items-center text-center gap-4">
                 <div className="flex h-14 w-14 items-center justify-center bg-montana-surface border border-white/10">
                   <ShoppingBag className="h-6 w-6 text-montana-muted/40" />
                 </div>
@@ -457,10 +457,10 @@ export default async function BillingPage({
                   Build Your Solution
                   <ArrowRight className="h-4 w-4" />
                 </Link>
-              </GlassCard>
+              </SpotlightCard>
             ) : (
               purchaseGroups.map((group, gi) => (
-                <GlassCard key={group.reference ?? group.orderId ?? `legacy-${gi}`} className="overflow-hidden">
+                <SpotlightCard customSize key={group.reference ?? group.orderId ?? `legacy-${gi}`} className="overflow-hidden">
                   {/* Group header */}
                   <div className="flex items-center justify-between px-5 py-3 border-b border-white/5 bg-white/[0.02]">
                     <div className="flex items-center gap-3">
@@ -527,7 +527,7 @@ export default async function BillingPage({
                       <span className="text-sm font-bold text-white">{formatZAR(group.groupTotal)}</span>
                     </div>
                   )}
-                </GlassCard>
+                </SpotlightCard>
               ))
             )}
 
@@ -547,7 +547,7 @@ export default async function BillingPage({
           <div className="space-y-4">
 
             {/* Monthly summary */}
-            <GlassCard className="p-5">
+            <SpotlightCard customSize className="p-5">
               <h3 className="text-xs font-bold uppercase tracking-wider text-montana-muted/60 mb-4 flex items-center gap-2">
                 <CreditCard className="h-3.5 w-3.5" />
                 Monthly Summary
@@ -580,10 +580,10 @@ export default async function BillingPage({
                 <span className="text-xs text-montana-muted/60 uppercase tracking-wider">Est. monthly</span>
                 <span className="text-xl font-bold text-white">{formatZAR(monthlyCommitment)}</span>
               </div>
-            </GlassCard>
+            </SpotlightCard>
 
             {/* Sage invoicing note */}
-            <GlassCard className="p-5">
+            <SpotlightCard customSize className="p-5">
               <h3 className="text-xs font-bold uppercase tracking-wider text-montana-muted/60 mb-3 flex items-center gap-2">
                 <Receipt className="h-3.5 w-3.5" />
                 About Invoicing
@@ -594,10 +594,10 @@ export default async function BillingPage({
               <p className="text-xs text-montana-muted/70 leading-relaxed">
                 For billing queries, updated payment details, or to cancel a service, contact us directly.
               </p>
-            </GlassCard>
+            </SpotlightCard>
 
             {/* Support */}
-            <GlassCard className="p-5">
+            <SpotlightCard customSize className="p-5">
               <h3 className="text-xs font-bold uppercase tracking-wider text-montana-muted/60 mb-3">Need Help?</h3>
               <p className="text-xs text-montana-muted/70 leading-relaxed mb-3">
                 Contact our team for billing support, service changes, or account queries.
@@ -616,7 +616,7 @@ export default async function BillingPage({
                   +27 (0)87 188 3843
                 </a>
               </div>
-            </GlassCard>
+            </SpotlightCard>
 
           </div>
         </div>

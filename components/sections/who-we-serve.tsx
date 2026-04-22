@@ -1,4 +1,4 @@
-import { GlassCard } from "@/components/ui/glass-card";
+import { SpotlightCard } from "@/components/ui/spotlight-card";
 import { TrendingUp, Building2, Users, Scale } from "lucide-react";
 import Link from "next/link";
 import { AnimatedButton } from "@/components/ui/animated-button";
@@ -43,7 +43,7 @@ export function WhoWeServe() {
           {audiences.map((audience, index) => {
             const Icon = audience.icon;
             return (
-              <GlassCard key={index} className="flex flex-col sm:flex-row items-start gap-5">
+              <SpotlightCard customSize key={index} className="flex flex-col sm:flex-row items-start gap-5">
                 <div className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-sm bg-montana-surface border border-white/10">
                   <Icon className="h-6 w-6 text-montana-pink" />
                 </div>
@@ -53,7 +53,7 @@ export function WhoWeServe() {
                     {audience.description}
                   </p>
                 </div>
-              </GlassCard>
+              </SpotlightCard>
             );
           })}
         </div>

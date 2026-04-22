@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { GlassCard } from "@/components/ui/glass-card";
+import { SpotlightCard } from "@/components/ui/spotlight-card";
 import { AnimatedButton } from "@/components/ui/animated-button";
 import { Shield, Target, Globe, Users, Server, Database, Smartphone, CheckCircle, Zap } from "lucide-react";
 import Link from "next/link";
@@ -76,7 +76,7 @@ export default function AboutPage() {
             </div>
           </div>
           <div>
-            <GlassCard glow className="p-8 border-montana-pink/20">
+            <SpotlightCard customSize className="p-8 border-montana-pink/20">
               <div className="text-xs font-bold tracking-widest text-montana-muted uppercase mb-6">What We Deliver</div>
               <ul className="space-y-4">
                 {[
@@ -95,7 +95,7 @@ export default function AboutPage() {
                   </li>
                 ))}
               </ul>
-            </GlassCard>
+            </SpotlightCard>
           </div>
         </div>
 
@@ -109,7 +109,7 @@ export default function AboutPage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <GlassCard className="flex flex-col gap-4">
+            <SpotlightCard customSize className="flex flex-col gap-4">
               <div className="inline-flex h-12 w-12 items-center justify-center rounded-sm bg-montana-magenta/10 border border-montana-pink/20">
                 <Target className="h-6 w-6 text-montana-pink" />
               </div>
@@ -117,9 +117,9 @@ export default function AboutPage() {
               <p className="text-montana-muted leading-relaxed">
                 We start with your business objectives — compliance requirements, recovery time objectives (RTO), and risk tolerance — and engineer the technology around those requirements, not the other way around.
               </p>
-            </GlassCard>
+            </SpotlightCard>
 
-            <GlassCard className="flex flex-col gap-4">
+            <SpotlightCard customSize className="flex flex-col gap-4">
               <div className="inline-flex h-12 w-12 items-center justify-center rounded-sm bg-montana-orange/10 border border-montana-orange/20">
                 <Users className="h-6 w-6 text-montana-orange" />
               </div>
@@ -127,9 +127,9 @@ export default function AboutPage() {
               <p className="text-montana-muted leading-relaxed">
                 Whether you are a direct enterprise client or a channel partner seeking white-label solutions, our multi-tenant architecture scales with your delivery model — from single-site SME to multi-entity group.
               </p>
-            </GlassCard>
+            </SpotlightCard>
 
-            <GlassCard className="flex flex-col gap-4">
+            <SpotlightCard customSize className="flex flex-col gap-4">
               <div className="inline-flex h-12 w-12 items-center justify-center rounded-sm bg-montana-magenta/10 border border-montana-magenta/20">
                 <Globe className="h-6 w-6 text-montana-magenta" />
               </div>
@@ -137,9 +137,9 @@ export default function AboutPage() {
               <p className="text-montana-muted leading-relaxed">
                 With deep roots in South Africa, we understand the nuances of POPIA and local data governance. Every backup, every replica, and every recovery point is stored on South African soil — no exceptions.
               </p>
-            </GlassCard>
+            </SpotlightCard>
 
-            <GlassCard className="flex flex-col gap-4">
+            <SpotlightCard customSize className="flex flex-col gap-4">
               <div className="inline-flex h-12 w-12 items-center justify-center rounded-sm bg-montana-pink/10 border border-montana-pink/20">
                 <Shield className="h-6 w-6 text-montana-pink" />
               </div>
@@ -147,7 +147,7 @@ export default function AboutPage() {
               <p className="text-montana-muted leading-relaxed">
                 We partner with industry leading technology partners to deliver military-grade encryption, immutable backups, and zero-trust architectures — the same security posture used by global financial institutions.
               </p>
-            </GlassCard>
+            </SpotlightCard>
           </div>
         </div>
 
@@ -176,7 +176,7 @@ export default function AboutPage() {
 
         {/* CTA Section */}
         <div className="py-16 md:py-24 text-center">
-          <GlassCard glow className="max-w-3xl mx-auto p-8 md:p-12">
+          <SpotlightCard customSize className="max-w-3xl mx-auto p-8 md:p-12">
             <h2 className="font-display text-3xl font-bold text-white mb-4">Ready to build your resilience strategy?</h2>
             <p className="text-montana-muted mb-8">
               Speak with our advisory team to discuss your infrastructure, compliance, and recovery requirements, or start building your solution now.
@@ -193,7 +193,7 @@ export default function AboutPage() {
                 </AnimatedButton>
               </Link>
             </div>
-          </GlassCard>
+          </SpotlightCard>
         </div>
 
       </div>

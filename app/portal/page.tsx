@@ -22,7 +22,7 @@ import {
   Plus, Package,
 } from 'lucide-react';
 import { createServerClient }    from '@/lib/supabase/server';
-import { GlassCard }             from '@/components/ui/glass-card';
+import { SpotlightCard } from '@/components/ui/spotlight-card';
 import { AnimatedButton }        from '@/components/ui/animated-button';
 import { SupportForm }           from './support-form';
 import { ProfileForm }           from './profile-form';
@@ -337,15 +337,15 @@ export default async function PortalPage() {
 
         {/* ── 2. Stats bar ──────────────────────────────────────────────────── */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 py-6 mb-2">
-          <GlassCard className="p-4">
+          <SpotlightCard customSize className="p-4">
             <p className="text-xs text-montana-muted uppercase tracking-wider mb-1.5">Profile Status</p>
             <div className="flex items-center gap-2">
               {statusCfg.icon}
               <span className={`text-base font-bold ${statusCfg.color}`}>{statusCfg.label}</span>
             </div>
-          </GlassCard>
+          </SpotlightCard>
 
-          <GlassCard className="p-4">
+          <SpotlightCard customSize className="p-4">
             <p className="text-xs text-montana-muted uppercase tracking-wider mb-1.5">Active Since</p>
             <div className="flex items-center gap-2">
               <Clock className="h-4 w-4 text-montana-pink shrink-0" />
@@ -355,9 +355,9 @@ export default async function PortalPage() {
                   : '—'}
               </span>
             </div>
-          </GlassCard>
+          </SpotlightCard>
 
-          <GlassCard className="p-4">
+          <SpotlightCard customSize className="p-4">
             <p className="text-xs text-montana-muted uppercase tracking-wider mb-1.5">Customer Since</p>
             <div className="flex items-center gap-2">
               <Clock className="h-4 w-4 text-montana-muted shrink-0" />
@@ -371,9 +371,9 @@ export default async function PortalPage() {
                   : '—'}
               </span>
             </div>
-          </GlassCard>
+          </SpotlightCard>
 
-          <GlassCard className="p-4">
+          <SpotlightCard customSize className="p-4">
             <p className="text-xs text-montana-muted uppercase tracking-wider mb-1.5">Products</p>
             <div className="flex items-center gap-2">
               <Package className="h-4 w-4 text-montana-pink shrink-0" />
@@ -383,14 +383,14 @@ export default async function PortalPage() {
                   : 'None yet'}
               </span>
             </div>
-          </GlassCard>
+          </SpotlightCard>
         </div>
 
         {/* ── 3. Active Products + Billing sidebar ──────────────────────────── */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
 
           {/* Active Products — 2/3 width */}
-          <GlassCard className="lg:col-span-2 p-6 md:p-8">
+          <SpotlightCard customSize className="lg:col-span-2 p-6 md:p-8">
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-2">
                 <Activity className="h-5 w-5 text-montana-pink" />
@@ -504,10 +504,10 @@ export default async function PortalPage() {
                 </span>
               </div>
             )}
-          </GlassCard>
+          </SpotlightCard>
 
           {/* Billing sidebar — 1/3 width */}
-          <GlassCard className="p-6 md:p-8 flex flex-col">
+          <SpotlightCard customSize className="p-6 md:p-8 flex flex-col">
             <div className="flex items-center gap-2 mb-5">
               <CreditCard className="h-5 w-5 text-montana-pink" />
               <h2 className="text-base font-semibold text-white">Billing</h2>
@@ -564,11 +564,11 @@ export default async function PortalPage() {
                 <ChevronRight className="h-4 w-4" />
               </Link>
             </div>
-          </GlassCard>
+          </SpotlightCard>
         </div>
 
         {/* ── 4. Security Snapshot ──────────────────────────────────────────── */}
-        <GlassCard className="p-6 md:p-8 mb-6">
+        <SpotlightCard customSize className="p-6 md:p-8 mb-6">
           <div className="flex items-center justify-between mb-5 flex-wrap gap-3">
             <div className="flex items-center gap-2">
               <BarChart3 className="h-5 w-5 text-montana-pink" />
@@ -635,10 +635,10 @@ export default async function PortalPage() {
               )}
             </div>
           </div>
-        </GlassCard>
+        </SpotlightCard>
 
         {/* ── 5. Organisation Profile ───────────────────────────────────────── */}
-        <GlassCard className="p-6 md:p-8 mb-6">
+        <SpotlightCard customSize className="p-6 md:p-8 mb-6">
           <div className="flex items-center gap-2 mb-2">
             <FileCheck className="h-5 w-5 text-montana-pink" />
             <h2 className="text-base font-semibold text-white">Organisation Profile</h2>
@@ -654,10 +654,10 @@ export default async function PortalPage() {
               industry:    profile.industry     ?? '',
             }}
           />
-        </GlassCard>
+        </SpotlightCard>
 
         {/* ── 6. Contact Details ────────────────────────────────────────────── */}
-        <GlassCard className="p-6 md:p-8 mb-6">
+        <SpotlightCard customSize className="p-6 md:p-8 mb-6">
           <div className="flex items-center gap-2 mb-2">
             <FileCheck className="h-5 w-5 text-montana-pink" />
             <h2 className="text-base font-semibold text-white">Contact Details</h2>
@@ -675,16 +675,16 @@ export default async function PortalPage() {
               postalCode:   (profile as unknown as Record<string, unknown>).postal_code as string ?? '',
             }}
           />
-        </GlassCard>
+        </SpotlightCard>
 
         {/* ── 7. Support ────────────────────────────────────────────────────── */}
-        <GlassCard className="p-6 md:p-8">
+        <SpotlightCard customSize className="p-6 md:p-8">
           <div className="flex items-center gap-2 mb-6">
             <Shield className="h-5 w-5 text-montana-pink" />
             <h2 className="text-base font-semibold text-white">Raise a Support Ticket</h2>
           </div>
           <SupportForm />
-        </GlassCard>
+        </SpotlightCard>
 
       </div>
     </main>

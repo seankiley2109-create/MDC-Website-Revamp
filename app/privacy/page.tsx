@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Shield, Mail, MapPin, ExternalLink, Download } from 'lucide-react';
-import { GlassCard } from '@/components/ui/glass-card';
+import { SpotlightCard } from '@/components/ui/spotlight-card';
 import { PrintButton } from './print-button';
 
 export const metadata: Metadata = {
@@ -62,7 +62,7 @@ export default function PrivacyPage() {
           <PrintButton />
         </div>
 
-        <GlassCard className="p-8 md:p-12 mb-8">
+        <SpotlightCard customSize className="p-8 md:p-12 mb-8">
 
           <Section number="1" title="Introduction">
             <Sub label="1.1">
@@ -355,7 +355,7 @@ export default function PrivacyPage() {
             </Link>
           </div>
 
-        </GlassCard>
+        </SpotlightCard>
       </div>
     </div>
   );

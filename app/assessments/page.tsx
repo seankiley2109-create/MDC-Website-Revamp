@@ -1,4 +1,4 @@
-import { GlassCard } from "@/components/ui/glass-card";
+import { SpotlightCard } from "@/components/ui/spotlight-card";
 import { AnimatedButton } from "@/components/ui/animated-button";
 import { Shield, ShieldAlert, FileText, Lock, ArrowRight, AlertTriangle, Info } from "lucide-react";
 import Link from "next/link";
@@ -50,7 +50,7 @@ export default function AssessmentsPage() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-16">
 
           {/* Security & Resilience Assessment */}
-          <GlassCard className="p-0 overflow-hidden flex flex-col">
+          <SpotlightCard customSize className="p-0 overflow-hidden flex flex-col">
             <div className="bg-gradient-to-r from-red-500/10 to-montana-magenta/10 border-b border-white/10 p-8">
               <div className="flex items-center gap-4 mb-4">
                 <div className="inline-flex h-14 w-14 items-center justify-center rounded-full bg-red-500/10 border border-red-500/30">
@@ -89,10 +89,10 @@ export default function AssessmentsPage() {
                 </Link>
               </div>
             </div>
-          </GlassCard>
+          </SpotlightCard>
 
           {/* POPIA Compliance Assessment */}
-          <GlassCard className="p-0 overflow-hidden flex flex-col">
+          <SpotlightCard customSize className="p-0 overflow-hidden flex flex-col">
             <div className="bg-gradient-to-r from-montana-magenta/10 to-amber-500/10 border-b border-white/10 p-8">
               <div className="flex items-center gap-4 mb-4">
                 <div className="inline-flex h-14 w-14 items-center justify-center rounded-full bg-montana-magenta/10 border border-montana-pink/30">
@@ -131,7 +131,7 @@ export default function AssessmentsPage() {
                 </Link>
               </div>
             </div>
-          </GlassCard>
+          </SpotlightCard>
         </div>
 
         {/* Trust Bar */}

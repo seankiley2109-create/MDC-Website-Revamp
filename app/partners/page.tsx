@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { GlassCard } from '@/components/ui/glass-card';
+import { SpotlightCard } from '@/components/ui/spotlight-card';
 import { AnimatedButton } from '@/components/ui/animated-button';
 import {
   Handshake, TrendingUp, Users, Zap,
@@ -183,7 +183,7 @@ export default function PartnersPage() {
             {benefits.map((b) => {
               const Icon = b.icon;
               return (
-                <GlassCard key={b.title} className="p-6 flex flex-col gap-4">
+                <SpotlightCard customSize key={b.title} className="p-6 flex flex-col gap-4">
                   <div className="inline-flex h-12 w-12 items-center justify-center rounded-sm bg-montana-surface border border-white/10">
                     <Icon className="h-6 w-6 text-montana-pink" />
                   </div>
@@ -191,7 +191,7 @@ export default function PartnersPage() {
                     <h3 className="font-bold text-white mb-2">{b.title}</h3>
                     <p className="text-sm text-montana-muted leading-relaxed">{b.body}</p>
                   </div>
-                </GlassCard>
+                </SpotlightCard>
               );
             })}
           </div>
@@ -209,11 +209,11 @@ export default function PartnersPage() {
             {products.map((p) => {
               const Icon = p.icon;
               return (
-                <GlassCard key={p.title} className={`p-6 flex flex-col gap-3 border ${p.border} hover:border-opacity-60 transition-colors`}>
+                <SpotlightCard customSize key={p.title} className={`p-6 flex flex-col gap-3 border ${p.border} hover:border-opacity-60 transition-colors`}>
                   <Icon className={`h-7 w-7 ${p.accent}`} />
                   <h3 className="font-bold text-white">{p.title}</h3>
                   <p className="text-sm text-montana-muted leading-relaxed">{p.body}</p>
-                </GlassCard>
+                </SpotlightCard>
               );
             })}
           </div>
@@ -230,9 +230,8 @@ export default function PartnersPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
             {tiers.map((tier) => (
-              <GlassCard
+              <SpotlightCard customSize
                 key={tier.name}
-                glow={tier.featured}
                 className={`p-8 flex flex-col h-full relative ${tier.featured ? 'border-montana-pink/50 md:-translate-y-4' : ''}`}
               >
                 {tier.featured && (
@@ -258,13 +257,13 @@ export default function PartnersPage() {
                     {tier.cta} <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
                   </AnimatedButton>
                 </Link>
-              </GlassCard>
+              </SpotlightCard>
             ))}
           </div>
         </div>
 
         {/* CTA */}
-        <GlassCard className="p-8 md:p-12 text-center border-montana-pink/20">
+        <SpotlightCard customSize className="p-8 md:p-12 text-center border-montana-pink/20">
           <h2 className="font-display text-3xl font-bold text-white mb-4">Ready to get started?</h2>
           <p className="text-montana-muted max-w-xl mx-auto mb-8">
             Get in touch with our partnerships team to discuss your goals and find the right programme for your business.
@@ -284,7 +283,7 @@ export default function PartnersPage() {
               <Mail className="h-4 w-4 text-montana-pink" /> support@montanadc.com
             </a>
           </div>
-        </GlassCard>
+        </SpotlightCard>
 
       </div>
     </div>

@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, useRef, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import type { CartLineItem } from "@/app/api/subscribe/route";
 import Link from "next/link";
-import { GlassCard } from "@/components/ui/glass-card";
+import { SpotlightCard } from "@/components/ui/spotlight-card";
 import { AnimatedButton } from "@/components/ui/animated-button";
 import {
   Cloud, Monitor, HardDrive, Smartphone,
@@ -208,7 +208,7 @@ function ServiceConfigCard({
 
   return (
     <div ref={cardRef}>
-    <GlassCard className={`transition-all ${inCart ? "border-montana-pink/40 bg-montana-magenta/5" : ""} ${isFocused && !inCart ? "border-white/40 ring-1 ring-white/20" : ""}`}>
+    <SpotlightCard customSize className={`transition-all ${inCart ? "border-montana-pink/40 bg-montana-magenta/5" : ""} ${isFocused && !inCart ? "border-white/40 ring-1 ring-white/20" : ""}`}>
       {/* Header */}
       <div className="flex items-start justify-between gap-4 mb-5">
         <div className="flex items-center gap-3">
@@ -420,7 +420,7 @@ function ServiceConfigCard({
           Select options above to see pricing.
         </div>
       )}
-    </GlassCard>
+    </SpotlightCard>
     </div>
   );
 }
@@ -450,16 +450,16 @@ function CartPanel({
 
   if (cart.length === 0) {
     return (
-      <GlassCard className="p-6 text-center">
+      <SpotlightCard customSize className="p-6 text-center">
         <ShoppingCart className="h-8 w-8 text-white/20 mx-auto mb-3" />
         <p className="text-sm text-montana-muted">Your cart is empty.</p>
         <p className="text-xs text-montana-muted/70 mt-1">Configure a product above and click Add to Cart.</p>
-      </GlassCard>
+      </SpotlightCard>
     );
   }
 
   return (
-    <GlassCard className="border-montana-pink/20">
+    <SpotlightCard customSize className="border-montana-pink/20">
       <div className="flex items-center justify-between mb-4 pb-3 border-b border-white/10">
         <h3 className="font-bold text-white text-sm uppercase tracking-wider">Your Order</h3>
         <span className="text-xs text-montana-muted">{cart.length} item{cart.length !== 1 ? "s" : ""}</span>
@@ -527,7 +527,7 @@ function CartPanel({
           You&apos;ll be prompted to sign in or create an account.
         </p>
       )}
-    </GlassCard>
+    </SpotlightCard>
   );
 }
 
@@ -583,13 +583,13 @@ function ConsultingSection({ preselected = [] }: { preselected?: string[] }) {
 
   if (submitted) {
     return (
-      <GlassCard className="text-center py-16 max-w-lg mx-auto">
+      <SpotlightCard customSize className="text-center py-16 max-w-lg mx-auto">
         <CheckCircle2 className="h-12 w-12 text-montana-pink mx-auto mb-4" />
         <h3 className="font-display text-2xl font-bold text-white mb-3">Enquiry Received</h3>
         <p className="text-montana-muted max-w-sm mx-auto">
           A consultant will contact you within 1 business day to confirm your booking and payment details.
         </p>
-      </GlassCard>
+      </SpotlightCard>
     );
   }
 
@@ -655,7 +655,7 @@ function ConsultingSection({ preselected = [] }: { preselected?: string[] }) {
       })}
 
       {selected.size > 0 && (
-        <GlassCard className="border-montana-pink/20 mt-8">
+        <SpotlightCard customSize className="border-montana-pink/20 mt-8">
           <h4 className="font-bold text-white mb-4 text-sm uppercase tracking-wider">Booking Details</h4>
 
           {/* Selected summary */}
@@ -706,7 +706,7 @@ function ConsultingSection({ preselected = [] }: { preselected?: string[] }) {
           <AnimatedButton onClick={handleSubmit} disabled={submitting} className="w-full justify-center">
             {submitting ? "Sending..." : "Submit Booking Enquiry"}
           </AnimatedButton>
-        </GlassCard>
+        </SpotlightCard>
       )}
     </div>
   );
@@ -727,7 +727,7 @@ function EnterpriseSection() {
         {ENTERPRISE_SERVICES.map(service => {
           const Icon = service.icon;
           return (
-            <GlassCard key={service.id} className="flex flex-col">
+            <SpotlightCard customSize key={service.id} className="flex flex-col">
               <div className="flex items-center gap-3 mb-4">
                 <div className="inline-flex h-10 w-10 items-center justify-center bg-montana-surface border border-white/10">
                   <Icon className="h-5 w-5 text-montana-pink" />
@@ -745,12 +745,12 @@ function EnterpriseSection() {
                   Request Consultation <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
                 </AnimatedButton>
               </Link>
-            </GlassCard>
+            </SpotlightCard>
           );
         })}
       </div>
 
-      <GlassCard className="mt-8 p-8 border-white/5 text-center">
+      <SpotlightCard customSize className="mt-8 p-8 border-white/5 text-center">
         <p className="text-montana-muted mb-4 max-w-xl mx-auto">
           Not sure which solution fits your environment? Our engineers will assess your infrastructure and recommend the right architecture.
         </p>
@@ -759,7 +759,7 @@ function EnterpriseSection() {
             Book a Free Discovery Call
           </AnimatedButton>
         </Link>
-      </GlassCard>
+      </SpotlightCard>
     </div>
   );
 }

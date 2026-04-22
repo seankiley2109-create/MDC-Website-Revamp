@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { GlassCard } from "@/components/ui/glass-card";
+import { SpotlightCard } from "@/components/ui/spotlight-card";
 import { AnimatedButton } from "@/components/ui/animated-button";
 import { AwarenessCards, type AwarenessFact } from "@/components/assessments/awareness-cards";
 import {
@@ -434,7 +434,7 @@ export default function SecurityAssessment() {
           <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 items-start">
             {/* Questions — left 3 columns */}
             <div className="lg:col-span-3">
-              <GlassCard className="p-8 md:p-10">
+              <SpotlightCard customSize className="p-8 md:p-10">
                 {/* Sign-up storage note — shown only to unauthenticated users */}
                 {!isAuthChecking && !authedProfile && (
                   <div className="mb-6 flex items-start gap-3 border border-amber-500/20 bg-amber-500/5 p-3 rounded">
@@ -512,7 +512,7 @@ export default function SecurityAssessment() {
                     ← Previous Question
                   </button>
                 </div>
-              </GlassCard>
+              </SpotlightCard>
             </div>
 
             {/* Awareness Cards — right 2 columns; below question on mobile, right column on desktop */}
@@ -541,7 +541,7 @@ export default function SecurityAssessment() {
         {currentStep === 10 && pendingFinalAnswers === null && (
           <div className="relative overflow-hidden rounded-2xl animate-in fade-in zoom-in duration-500">
             <div className="filter blur-xl opacity-30 pointer-events-none select-none">
-              <GlassCard className="p-12">
+              <SpotlightCard customSize className="p-12">
                 <div className="flex justify-center mb-8">
                   <div className="h-32 w-32 rounded-full bg-red-500" />
                 </div>
@@ -552,11 +552,11 @@ export default function SecurityAssessment() {
                   <div className="h-48 bg-white/10 rounded" />
                   <div className="h-48 bg-white/10 rounded" />
                 </div>
-              </GlassCard>
+              </SpotlightCard>
             </div>
 
             <div className="absolute inset-0 flex items-center justify-center p-6 bg-montana-bg/40 backdrop-blur-md">
-              <GlassCard className="w-full max-w-md p-8 border-red-500/30 shadow-2xl shadow-red-500/10">
+              <SpotlightCard customSize className="w-full max-w-md p-8 border-red-500/30 shadow-2xl shadow-red-500/10">
                 <div className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-red-500/20 border border-red-500/30 mb-6 mx-auto flex">
                   <Lock className="h-8 w-8 text-red-400" />
                 </div>
@@ -599,7 +599,7 @@ export default function SecurityAssessment() {
                     By submitting, you agree to our privacy policy. Your results are confidential.
                   </p>
                 </form>
-              </GlassCard>
+              </SpotlightCard>
             </div>
           </div>
         )}
@@ -607,7 +607,7 @@ export default function SecurityAssessment() {
         {/* Phase 3: Results Dashboard */}
         {currentStep === 11 && (
           <div className="animate-in fade-in slide-in-from-bottom-8 duration-700">
-            <GlassCard className={`p-8 md:p-12 mb-12 border-t-4 ${borderClass}`}>
+            <SpotlightCard customSize className={`p-8 md:p-12 mb-12 border-t-4 ${borderClass}`}>
               <div className="text-center mb-12">
                 <div className="relative inline-block mb-6">
                   <div className={`inline-flex h-40 w-40 items-center justify-center rounded-full bg-montana-surface border-4 ${borderClass} shadow-[0_0_40px_rgba(0,0,0,0.4)]`}>
@@ -655,7 +655,7 @@ export default function SecurityAssessment() {
                   <div className="text-xs text-montana-muted uppercase tracking-wider">Critical Gaps</div>
                 </div>
               </div>
-            </GlassCard>
+            </SpotlightCard>
 
             {/* Product Mapping / Upsell */}
             <div>
@@ -667,41 +667,41 @@ export default function SecurityAssessment() {
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-12">
-                <GlassCard className="p-6 flex flex-col hover:border-white/30 transition-colors min-h-[200px]">
+                <SpotlightCard customSize className="p-6 flex flex-col hover:border-white/30 transition-colors min-h-[200px]">
                   <Database className="h-8 w-8 text-montana-pink mb-4" />
                   <h4 className="font-bold text-white mb-2">Druva SaaS & Endpoint Backup</h4>
                   <p className="text-sm text-montana-muted flex-1 mb-4">Automated M365, Google Workspace, and endpoint backup with instant recovery.</p>
                   <Link href="/pos?tab=cloud&service=druva-m365">
                     <AnimatedButton variant="outline" className="w-full text-xs py-2">Configure</AnimatedButton>
                   </Link>
-                </GlassCard>
+                </SpotlightCard>
 
-                <GlassCard className="p-6 flex flex-col hover:border-white/30 transition-colors min-h-[200px]">
+                <SpotlightCard customSize className="p-6 flex flex-col hover:border-white/30 transition-colors min-h-[200px]">
                   <ShieldAlert className="h-8 w-8 text-red-400 mb-4" />
                   <h4 className="font-bold text-white mb-2">Ransomware Protection</h4>
                   <p className="text-sm text-montana-muted flex-1 mb-4">Premium tier of Druva: immutable storage, AI anomaly detection, and air-gapped recovery.</p>
                   <Link href="/pos?tab=enterprise">
                     <AnimatedButton variant="outline" className="w-full text-xs py-2">View Solution</AnimatedButton>
                   </Link>
-                </GlassCard>
+                </SpotlightCard>
 
-                <GlassCard className="p-6 flex flex-col hover:border-white/30 transition-colors min-h-[200px]">
+                <SpotlightCard customSize className="p-6 flex flex-col hover:border-white/30 transition-colors min-h-[200px]">
                   <Monitor className="h-8 w-8 text-amber-400 mb-4" />
                   <h4 className="font-bold text-white mb-2">MaaS360 MDM / UEM</h4>
                   <p className="text-sm text-montana-muted flex-1 mb-4">Unified endpoint management, device compliance, and threat defence.</p>
                   <Link href="/pos?tab=cloud&service=maas360">
                     <AnimatedButton variant="outline" className="w-full text-xs py-2">Configure</AnimatedButton>
                   </Link>
-                </GlassCard>
+                </SpotlightCard>
 
-                <GlassCard className="p-6 flex flex-col hover:border-white/30 transition-colors min-h-[200px]">
+                <SpotlightCard customSize className="p-6 flex flex-col hover:border-white/30 transition-colors min-h-[200px]">
                   <Server className="h-8 w-8 text-montana-pink mb-4" />
                   <h4 className="font-bold text-white mb-2">IBM Enterprise Backup</h4>
                   <p className="text-sm text-montana-muted flex-1 mb-4">Bespoke architecture for complex, high-volume data protection environments.</p>
                   <Link href="/pos?tab=enterprise">
                     <AnimatedButton variant="outline" className="w-full text-xs py-2">View Solution</AnimatedButton>
                   </Link>
-                </GlassCard>
+                </SpotlightCard>
               </div>
 
               <div className="flex flex-col sm:flex-row gap-4 justify-center">

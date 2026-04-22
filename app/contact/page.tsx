@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useSearchParams } from "next/navigation";
 import * as z from "zod";
-import { GlassCard } from "@/components/ui/glass-card";
+import { SpotlightCard } from "@/components/ui/spotlight-card";
 import { AnimatedButton } from "@/components/ui/animated-button";
 import { Phone, Mail, Facebook, Linkedin, Clock, Shield, MessageSquare, Building2 } from "lucide-react";
 import Link from "next/link";
@@ -212,7 +212,7 @@ function ContactFormInner() {
 
           {/* Right Column — Form */}
           <div className="lg:col-span-8">
-            <GlassCard className="p-5 md:p-10">
+            <SpotlightCard customSize className="p-5 md:p-10">
               {isSuccess ? (
                 <div className="text-center py-16">
                   <div className="inline-flex h-20 w-20 items-center justify-center rounded-full bg-green-500/10 border border-green-500/20 mb-6">
@@ -331,7 +331,7 @@ function ContactFormInner() {
                   </AnimatedButton>
                 </form>
               )}
-            </GlassCard>
+            </SpotlightCard>
           </div>
         </div>
       </div>

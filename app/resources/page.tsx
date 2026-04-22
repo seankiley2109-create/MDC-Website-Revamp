@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { GlassCard } from "@/components/ui/glass-card";
+import { SpotlightCard } from "@/components/ui/spotlight-card";
 import { AnimatedButton } from "@/components/ui/animated-button";
 import { FileText, Shield, Lock, Database, ArrowRight, Download, BookOpen, CheckSquare } from "lucide-react";
 import Link from "next/link";
@@ -153,7 +153,7 @@ export default function ResourcesPage() {
                   {category.items.map((item) => {
                     const TypeIcon = typeIcons[item.type] || FileText;
                     return (
-                      <GlassCard key={item.title} className="flex flex-col h-full group hover:border-montana-pink/40 transition-all">
+                      <SpotlightCard customSize key={item.title} className="flex flex-col h-full group hover:border-montana-pink/40 transition-all">
                         <div className="flex items-center gap-2 mb-4">
                           <div className="flex items-center gap-1.5 px-2.5 py-1 bg-white/5 border border-white/10 rounded-sm">
                             <TypeIcon className={`h-3 w-3 ${category.color}`} />
@@ -169,7 +169,7 @@ export default function ResourcesPage() {
                             {item.cta}
                           </AnimatedButton>
                         </Link>
-                      </GlassCard>
+                      </SpotlightCard>
                     );
                   })}
                 </div>

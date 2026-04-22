@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { FileText, Download, Shield, Scale, ClipboardList } from 'lucide-react';
-import { GlassCard } from '@/components/ui/glass-card';
+import { SpotlightCard } from '@/components/ui/spotlight-card';
 import { AnimatedButton } from '@/components/ui/animated-button';
 
 export const metadata: Metadata = {
@@ -57,7 +57,7 @@ export default function PAIAPage() {
         </div>
 
         {/* What is PAIA */}
-        <GlassCard className="p-8 mb-8">
+        <SpotlightCard customSize className="p-8 mb-8">
           <div className="flex items-start gap-4">
             <div className="flex h-10 w-10 shrink-0 items-center justify-center bg-montana-pink/10 border border-montana-pink/20">
               <Shield className="h-5 w-5 text-montana-pink" />
@@ -73,12 +73,12 @@ export default function PAIAPage() {
               </p>
             </div>
           </div>
-        </GlassCard>
+        </SpotlightCard>
 
         {/* Documents */}
         <div className="space-y-4 mb-8">
           {documents.map(({ icon: Icon, label, title, description, file, filename }) => (
-            <GlassCard key={file} className="p-6 md:p-8">
+            <SpotlightCard customSize key={file} className="p-6 md:p-8">
               <div className="flex flex-col sm:flex-row sm:items-start gap-6">
                 <div className="flex h-12 w-12 shrink-0 items-center justify-center bg-white/5 border border-white/10">
                   <Icon className="h-5 w-5 text-montana-pink" />
@@ -103,12 +103,12 @@ export default function PAIAPage() {
                   </div>
                 </div>
               </div>
-            </GlassCard>
+            </SpotlightCard>
           ))}
         </div>
 
         {/* Information Officer contact */}
-        <GlassCard className="p-8">
+        <SpotlightCard customSize className="p-8">
           <h2 className="font-display font-bold text-white mb-4">Information Officer</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 text-sm text-montana-muted">
             <div className="space-y-2">
@@ -132,7 +132,7 @@ export default function PAIAPage() {
             <Link href="/terms" className="text-sm text-montana-pink hover:underline">Terms &amp; Conditions</Link>
             <Link href="/contact" className="text-sm text-montana-muted hover:text-white transition-colors">Contact Us</Link>
           </div>
-        </GlassCard>
+        </SpotlightCard>
 
       </div>
     </div>

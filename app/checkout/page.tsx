@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useRouter }                        from 'next/navigation';
 import { useForm }                          from 'react-hook-form';
-import { GlassCard }                        from '@/components/ui/glass-card';
+import { SpotlightCard } from '@/components/ui/spotlight-card';
 import { AnimatedButton }                   from '@/components/ui/animated-button';
 import { createBrowserClient }              from '@/lib/supabase/browser';
 import { processOrder }                     from '@/app/actions/order';
@@ -143,7 +143,7 @@ export default function CheckoutPage() {
         <h1 className="text-2xl font-semibold text-white">Complete your order</h1>
 
         {/* Contact Details */}
-        <GlassCard className="p-6 flex flex-col gap-5">
+        <SpotlightCard customSize className="p-6 flex flex-col gap-5">
           <h2 className="text-sm font-semibold text-white/50 uppercase tracking-wider">Contact Details</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Field label="First Name" required error={errors.firstName?.message}>
@@ -178,10 +178,10 @@ export default function CheckoutPage() {
               type="tel"
             />
           </Field>
-        </GlassCard>
+        </SpotlightCard>
 
         {/* Company & Tax */}
-        <GlassCard className="p-6 flex flex-col gap-5">
+        <SpotlightCard customSize className="p-6 flex flex-col gap-5">
           <h2 className="text-sm font-semibold text-white/50 uppercase tracking-wider">Company & Tax</h2>
           <Field label="Company Name" required error={errors.company?.message}>
             <input
@@ -197,10 +197,10 @@ export default function CheckoutPage() {
               placeholder="4680123456 (optional)"
             />
           </Field>
-        </GlassCard>
+        </SpotlightCard>
 
         {/* Billing Address */}
-        <GlassCard className="p-6 flex flex-col gap-5">
+        <SpotlightCard customSize className="p-6 flex flex-col gap-5">
           <h2 className="text-sm font-semibold text-white/50 uppercase tracking-wider">Billing Address</h2>
           <Field label="Street Address" required error={errors.address1?.message}>
             <input
@@ -252,10 +252,10 @@ export default function CheckoutPage() {
               />
             </Field>
           </div>
-        </GlassCard>
+        </SpotlightCard>
 
         {/* Notes & Discount */}
-        <GlassCard className="p-6 flex flex-col gap-5">
+        <SpotlightCard customSize className="p-6 flex flex-col gap-5">
           <h2 className="text-sm font-semibold text-white/50 uppercase tracking-wider">Additional Details</h2>
           <Field label="Discount / Voucher Code" error={errors.discountCode?.message}>
             <input
@@ -272,7 +272,7 @@ export default function CheckoutPage() {
               placeholder="Any special requirements or provisioning notes\u2026"
             />
           </Field>
-        </GlassCard>
+        </SpotlightCard>
 
         {/* Error */}
         {serverError && (
@@ -304,7 +304,7 @@ export default function CheckoutPage() {
 
       {/* ── Right: Order Summary ─────────────────────────────────────────────── */}
       <div className="flex flex-col gap-4">
-        <GlassCard className="p-6 flex flex-col gap-4 sticky top-28">
+        <SpotlightCard customSize className="p-6 flex flex-col gap-4 sticky top-28">
           <h2 className="text-sm font-semibold text-white/50 uppercase tracking-wider flex items-center gap-2">
             <ShoppingCart className="h-4 w-4" />
             Order Summary
@@ -331,7 +331,7 @@ export default function CheckoutPage() {
             <CheckCircle2 className="h-3.5 w-3.5 text-green-400 mt-0.5 shrink-0" />
             Secure payment via Paystack. You will be redirected after submitting.
           </div>
-        </GlassCard>
+        </SpotlightCard>
       </div>
 
     </div>

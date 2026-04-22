@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { GlassCard } from '@/components/ui/glass-card';
+import { SpotlightCard } from '@/components/ui/spotlight-card';
 import SignInForm from './sign-in-form';
 
 export const metadata: Metadata = {
@@ -27,9 +27,9 @@ export default async function SignInPage({
           <p className="text-sm text-montana-muted">Access your Montana Data Company account.</p>
         </div>
 
-        <GlassCard className="p-6 md:p-8">
+        <SpotlightCard customSize className="p-6 md:p-8">
           <SignInForm redirectTo={redirectTo} serverError={error} />
-        </GlassCard>
+        </SpotlightCard>
 
         <p className="text-center text-sm text-montana-muted mt-6">
           Don&apos;t have an account?{' '}

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { GlassCard } from "@/components/ui/glass-card";
+import { SpotlightCard } from "@/components/ui/spotlight-card";
 import { AnimatedButton } from "@/components/ui/animated-button";
 import { Database, ShieldCheck, FileText, Server, Smartphone, Lock, Archive, ShieldAlert, Activity, ArrowRight } from "lucide-react";
 import Link from "next/link";
@@ -58,7 +58,7 @@ export default function ServicesPage() {
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* IBM */}
-            <GlassCard className="flex flex-col h-full">
+            <SpotlightCard customSize className="flex flex-col h-full">
               <div className="flex items-center gap-3 mb-6">
                 <Server className="h-6 w-6 text-white" />
                 <h3 className="text-2xl font-bold text-white">Enterprise Backup</h3>
@@ -81,10 +81,10 @@ export default function ServicesPage() {
                   Enquire About Enterprise Backup <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
                 </AnimatedButton>
               </Link>
-            </GlassCard>
+            </SpotlightCard>
 
             {/* Druva */}
-            <GlassCard className="flex flex-col h-full">
+            <SpotlightCard customSize className="flex flex-col h-full">
               <div className="flex items-center gap-3 mb-6">
                 <Database className="h-6 w-6 text-white" />
                 <h3 className="text-2xl font-bold text-white">SaaS & Endpoint Backup</h3>
@@ -107,7 +107,7 @@ export default function ServicesPage() {
                   Configure Druva Solution <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
                 </AnimatedButton>
               </Link>
-            </GlassCard>
+            </SpotlightCard>
           </div>
         </div>
 
@@ -124,7 +124,7 @@ export default function ServicesPage() {
           </p>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Ransomware — premium tier of SaaS & Endpoint Backup */}
-          <GlassCard className="flex flex-col h-full border-montana-magenta/30">
+          <SpotlightCard customSize className="flex flex-col h-full border-montana-magenta/30">
             <div className="flex items-center gap-3 mb-2">
               <ShieldAlert className="h-6 w-6 text-montana-magenta" />
               <h3 className="text-2xl font-bold text-white">Ransomware Protection</h3>
@@ -151,10 +151,10 @@ export default function ServicesPage() {
                 Configure SaaS &amp; Endpoint Backup <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
               </AnimatedButton>
             </Link>
-          </GlassCard>
+          </SpotlightCard>
 
           {/* Archive */}
-          <GlassCard className="flex flex-col h-full">
+          <SpotlightCard customSize className="flex flex-col h-full">
             <div className="flex items-center gap-3 mb-6">
               <Archive className="h-6 w-6 text-white" />
               <h3 className="text-2xl font-bold text-white">Archive & Lifecycle</h3>
@@ -177,7 +177,7 @@ export default function ServicesPage() {
                 Discuss Archive Strategy <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
               </AnimatedButton>
             </Link>
-          </GlassCard>
+          </SpotlightCard>
         </div>
         </div>
 
@@ -192,7 +192,7 @@ export default function ServicesPage() {
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {/* MaaS360 */}
-            <GlassCard className="flex flex-col">
+            <SpotlightCard customSize className="flex flex-col">
               <Smartphone className="h-8 w-8 text-montana-orange mb-4" />
               <h3 className="text-xl font-bold text-white mb-3">MaaS360 (MDM / UEM)</h3>
               <p className="text-montana-muted text-sm mb-6 flex-1">
@@ -213,10 +213,10 @@ export default function ServicesPage() {
                   Secure Endpoints
                 </AnimatedButton>
               </Link>
-            </GlassCard>
+            </SpotlightCard>
 
             {/* Guardium */}
-            <GlassCard className="flex flex-col">
+            <SpotlightCard customSize className="flex flex-col">
               <Activity className="h-8 w-8 text-montana-pink mb-4" />
               <h3 className="text-xl font-bold text-white mb-3">IBM Guardium</h3>
               <p className="text-montana-muted text-sm mb-6 flex-1">
@@ -237,10 +237,10 @@ export default function ServicesPage() {
                   Request Guardium Demo
                 </AnimatedButton>
               </Link>
-            </GlassCard>
+            </SpotlightCard>
 
             {/* POPIA */}
-            <GlassCard className="flex flex-col">
+            <SpotlightCard customSize className="flex flex-col">
               <FileText className="h-8 w-8 text-montana-magenta mb-4" />
               <h3 className="text-xl font-bold text-white mb-3">POPIA Consulting</h3>
               <p className="text-montana-muted text-sm mb-6 flex-1">
@@ -261,13 +261,13 @@ export default function ServicesPage() {
                   Start Assessment
                 </AnimatedButton>
               </Link>
-            </GlassCard>
+            </SpotlightCard>
           </div>
         </div>
 
         {/* 4. Future-Proofing */}
         <div className="mb-14 md:mb-24">
-          <GlassCard glow className="p-8 md:p-12 border-montana-pink/30">
+          <SpotlightCard customSize className="p-8 md:p-12 border-montana-pink/30">
             <div className="flex flex-col md:flex-row gap-8 items-center">
               <div className="flex-1">
                 <div className="inline-flex items-center px-3 py-1 rounded-full bg-montana-pink/10 text-montana-pink text-xs font-bold uppercase tracking-wider mb-4 border border-montana-pink/20">
@@ -300,7 +300,7 @@ export default function ServicesPage() {
                 <span className="relative text-lg font-bold tracking-[0.2em] text-montana-pink uppercase drop-shadow-[0_0_10px_#F24567]">PQC</span>
               </div>
             </div>
-          </GlassCard>
+          </SpotlightCard>
         </div>
 
         {/* CTA */}

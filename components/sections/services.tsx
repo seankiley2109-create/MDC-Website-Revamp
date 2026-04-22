@@ -1,4 +1,4 @@
-import { GlassCard } from "@/components/ui/glass-card";
+import { SpotlightCard } from "@/components/ui/spotlight-card";
 import { AnimatedButton } from "@/components/ui/animated-button";
 import { Database, ShieldCheck, FileText, Server, ShieldAlert, Archive, Activity, Lock } from "lucide-react";
 import Link from "next/link";
@@ -157,7 +157,7 @@ export function Services() {
           {services.map((service, index) => {
             const Icon = service.icon;
             return (
-              <GlassCard key={index} className="p-6 md:p-8 group hover:border-montana-pink/50 transition-colors flex flex-col h-full">
+              <SpotlightCard key={index} customSize className="p-6 md:p-8 flex flex-col h-full w-full group">
                 <div className="mb-6 inline-flex h-12 w-12 items-center justify-center rounded-sm bg-montana-surface border border-white/10 group-hover:bg-montana-magenta/10 group-hover:border-montana-pink/30 transition-colors">
                   <Icon className="h-6 w-6 text-montana-pink" />
                 </div>
@@ -165,7 +165,7 @@ export function Services() {
                 <p className="text-sm text-montana-muted leading-relaxed flex-1">
                   {service.description}
                 </p>
-              </GlassCard>
+              </SpotlightCard>
             );
           })}
         </div>
