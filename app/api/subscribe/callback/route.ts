@@ -22,9 +22,10 @@
  *                            (informational — Sage is the billing authority)
  */
 
-import { NextRequest, NextResponse } from 'next/server';
-import { createServiceRoleClient }   from '@/lib/supabase/server';
-import type { CartLineItem }         from '@/app/api/subscribe/route';
+import { NextRequest, NextResponse }             from 'next/server';
+import { createServiceRoleClient }               from '@/lib/supabase/server';
+import { updateOrderPaymentStatus }              from '@/lib/monday';
+import type { CartLineItem }                     from '@/app/api/subscribe/route';
 
 // ─── Paystack verify response shape ──────────────────────────────────────────
 
@@ -39,6 +40,7 @@ interface PaystackVerifyData {
   };
   metadata: {
     user_id?:       string;
+    order_id?:      string;
     contract_term?: string;
     cart?:          CartLineItem[];
     /** Legacy field — retained for backward compat */
@@ -181,6 +183,36 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
           `[subscribe/callback] Profile updated for user: ${userId} — ` +
           `stacked ${newEntries.length} new entries (total now ${mergedEntries.length})`,
         );
+      }
+
+      // Stamp paystack_reference onto the purchases row and update Monday.com status
+      const orderId = verifyData.metadata?.order_id;
+      if (orderId) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const { data: purchaseRow } = await (supabase.from('purchases') as any)
+          .select('monday_item_id')
+          .eq('order_id', orderId)
+          .eq('user_id', userId)
+          .single();
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const { error: purchaseErr } = await (supabase.from('purchases') as any)
+          .update({ paystack_reference: reference })
+          .eq('order_id', orderId)
+          .eq('user_id', userId);
+        if (purchaseErr) {
+          console.error('[subscribe/callback] Failed to stamp paystack_reference on purchases:', purchaseErr.message);
+        }
+
+        const mondayItemId = (purchaseRow as { monday_item_id?: string } | null)?.monday_item_id;
+        if (mondayItemId) {
+          try {
+            await updateOrderPaymentStatus(mondayItemId, 'completed');
+            console.log('[subscribe/callback] Monday.com order status → completed:', mondayItemId);
+          } catch (err) {
+            console.error('[subscribe/callback] Failed to update Monday.com order status:', err);
+          }
+        }
       }
     } catch (err) {
       console.error('[subscribe/callback] Unexpected error writing profile:', err);

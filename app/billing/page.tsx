@@ -60,10 +60,22 @@ interface ResolvedLine {
 }
 
 interface PurchaseGroup {
-  reference:    string | null;   // null = legacy
+  reference:    string | null;
+  orderId?:     string;           // from purchases table; shown when reference is null
   purchasedAt:  string;
   lines:        ResolvedLine[];
   groupTotal:   number;
+  isPaid?:      boolean;          // true once paystack_reference is stamped by callback
+}
+
+/** Shape of a row from the `purchases` table */
+interface PurchaseRow {
+  order_id:           string;
+  cart:               unknown;
+  gross_total:        number;
+  nett_total:         number;
+  paystack_reference: string | null;
+  created_at:         string;
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -220,6 +232,48 @@ function groupByReference(lines: ResolvedLine[]): PurchaseGroup[] {
   );
 }
 
+/**
+ * Builds PurchaseGroup[] directly from the `purchases` table rows.
+ * This is the preferred path — the cart JSON has accurate quantities
+ * written at checkout time, before any Paystack callback issues.
+ */
+function buildGroupsFromPurchaseRows(rows: PurchaseRow[]): PurchaseGroup[] {
+  return rows
+    .map(row => {
+      const rawCart = Array.isArray(row.cart) ? row.cart as Record<string, unknown>[] : [];
+      const lines: ResolvedLine[] = rawCart
+        .filter(l => l.product_code !== 'DISCOUNT')
+        .map(l => {
+          const planId = typeof l.plan_id === 'string' ? l.plan_id : '';
+          const unit   = typeof l.unit    === 'string' ? l.unit    : 'unit';
+          const bp: 'monthly' | 'annual' | 'once-off' =
+            planId.endsWith('-annual') ? 'annual' :
+            unit === 'once'           ? 'once-off' :
+            'monthly';
+          return {
+            displayName:   shortLabel(typeof l.name         === 'string' ? l.name         : String(l.name ?? '')),
+            sageCode:      typeof l.product_code === 'string' ? l.product_code : '—',
+            unit,
+            quantity:      typeof l.quantity   === 'number' ? l.quantity   : 1,
+            unitPrice:     typeof l.unit_price === 'number' ? l.unit_price : 0,
+            lineTotal:     typeof l.line_total === 'number' ? l.line_total : 0,
+            billingPeriod: bp,
+            purchasedAt:   row.created_at,
+            reference:     row.paystack_reference,
+          };
+        });
+      return {
+        reference:   row.paystack_reference,
+        orderId:     row.order_id,
+        purchasedAt: row.created_at,
+        lines,
+        groupTotal:  row.nett_total,
+        isPaid:      row.paystack_reference !== null,
+      };
+    })
+    .filter(g => g.lines.length > 0);
+}
+
 /** Monthly commitment = sum of monthly line totals + annual line totals ÷ 12 */
 function calcMonthlyCommitment(lines: ResolvedLine[]): number {
   return lines.reduce((sum, l) => {
@@ -287,12 +341,32 @@ export default async function BillingPage({
   const planStatus = profile?.plan_status ?? 'inactive';
   const { reason, welcome } = await searchParams;
 
-  // Resolve all purchase entries
-  const normEntries = normaliseEntries(profile?.subscribed_services);
-  const resolvedLines = normEntries.map(resolveLineDisplay);
-  const purchaseGroups = groupByReference(resolvedLines);
+  // Primary source: purchases table (accurate quantities, written at checkout time)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data: purchasesRaw } = await (supabase.from('purchases') as any)
+    .select('order_id, cart, gross_total, nett_total, paystack_reference, created_at')
+    .eq('user_id', user.id)
+    .order('created_at', { ascending: false });
+
+  const purchaseRows = (purchasesRaw ?? []) as PurchaseRow[];
+  const newGroups    = buildGroupsFromPurchaseRows(purchaseRows);
+
+  // Legacy fallback: subscribed_services entries whose paystack_reference is NOT
+  // already covered by a purchases row (pre-dates the purchases table).
+  const coveredRefs = new Set(
+    purchaseRows.map(r => r.paystack_reference).filter(Boolean) as string[]
+  );
+  const normEntries   = normaliseEntries(profile?.subscribed_services).filter(
+    e => e.paystack_reference === null || !coveredRefs.has(e.paystack_reference!),
+  );
+  const legacyLines   = normEntries.map(resolveLineDisplay);
+  const legacyGroups  = groupByReference(legacyLines);
+
+  // Combined view — new purchases first, legacy last
+  const purchaseGroups    = [...newGroups, ...legacyGroups];
+  const resolvedLines     = [...newGroups.flatMap(g => g.lines), ...legacyLines];
   const monthlyCommitment = calcMonthlyCommitment(resolvedLines);
-  const totalProducts = normEntries.length;
+  const totalProducts     = resolvedLines.length;
 
   return (
     <div className="pt-24 pb-24 bg-montana-bg min-h-screen">
@@ -345,40 +419,6 @@ export default async function BillingPage({
           </div>
         )}
 
-        {/* ── Stats bar ──────────────────────────────────────────────────── */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
-          {[
-            {
-              label: 'Profile Status',
-              value: <PlanBadge status={planStatus} />,
-              icon: CheckCircle,
-            },
-            {
-              label: 'Active Since',
-              value: <span className="text-lg font-bold text-white">{formatZAR(monthlyCommitment)}</span>,
-              icon: CreditCard,
-            },
-            {
-              label: 'Customer Since',
-              value: <span className="text-sm font-semibold text-white">{formatDate(profile?.current_period_end)}</span>,
-              icon: Calendar,
-            },
-            {
-              label: 'Total Products',
-              value: <span className="text-lg font-bold text-white">{totalProducts}</span>,
-              icon: Package,
-            },
-          ].map(({ label, value, icon: Icon }) => (
-            <GlassCard key={label} className="p-4">
-              <div className="flex items-center gap-2 mb-2">
-                <Icon className="h-3.5 w-3.5 text-montana-muted/60" />
-                <p className="text-[10px] uppercase tracking-wider text-montana-muted/60">{label}</p>
-              </div>
-              {value}
-            </GlassCard>
-          ))}
-        </div>
-
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
           {/* ── Main: purchase history ──────────────────────────────────── */}
@@ -420,17 +460,27 @@ export default async function BillingPage({
               </GlassCard>
             ) : (
               purchaseGroups.map((group, gi) => (
-                <GlassCard key={group.reference ?? `legacy-${gi}`} className="overflow-hidden">
+                <GlassCard key={group.reference ?? group.orderId ?? `legacy-${gi}`} className="overflow-hidden">
                   {/* Group header */}
                   <div className="flex items-center justify-between px-5 py-3 border-b border-white/5 bg-white/[0.02]">
                     <div className="flex items-center gap-3">
                       <Tag className="h-3.5 w-3.5 text-montana-muted/50 shrink-0" />
                       <div>
-                        <p className="text-[11px] text-montana-muted/60 uppercase tracking-wider">
-                          {group.reference ? 'Transaction' : 'Legacy purchases'}
-                        </p>
+                        <div className="flex items-center gap-2">
+                          <p className="text-[11px] text-montana-muted/60 uppercase tracking-wider">
+                            {group.reference ? 'Transaction' : group.orderId ? 'Order' : 'Legacy purchases'}
+                          </p>
+                          {group.orderId && group.isPaid === false && (
+                            <span className="inline-flex items-center text-[9px] font-bold px-1.5 py-0.5 border border-amber-400/30 bg-amber-400/10 text-amber-400 uppercase tracking-wider">
+                              Awaiting payment
+                            </span>
+                          )}
+                        </div>
                         {group.reference && (
                           <p className="text-xs font-mono text-white/60">{group.reference}</p>
+                        )}
+                        {!group.reference && group.orderId && (
+                          <p className="text-xs font-mono text-white/60">{group.orderId}</p>
                         )}
                       </div>
                     </div>
@@ -544,28 +594,6 @@ export default async function BillingPage({
               <p className="text-xs text-montana-muted/70 leading-relaxed">
                 For billing queries, updated payment details, or to cancel a service, contact us directly.
               </p>
-            </GlassCard>
-
-            {/* Plan status */}
-            <GlassCard className="p-5">
-              <div className="flex items-center justify-between mb-3">
-                <h3 className="text-xs font-bold uppercase tracking-wider text-montana-muted/60">Plan Status</h3>
-                <PlanBadge status={planStatus} />
-              </div>
-              {profile?.current_period_end && (
-                <p className="text-xs text-montana-muted/60 mb-4">
-                  Contract end: <span className="text-white/70">{formatDate(profile.current_period_end)}</span>
-                </p>
-              )}
-              {planStatus !== 'active' && (
-                <Link
-                  href="/pos"
-                  className="flex items-center justify-center gap-2 w-full py-2.5 text-sm font-bold bg-montana-pink text-white hover:bg-montana-pink/90 transition-colors"
-                >
-                  Subscribe Now
-                  <ArrowRight className="h-4 w-4" />
-                </Link>
-              )}
             </GlassCard>
 
             {/* Support */}

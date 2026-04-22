@@ -246,6 +246,19 @@ const CREATE_SUBITEM_MUTATION = /* graphql */ `
   }
 `;
 
+const CHANGE_COLUMN_VALUE_MUTATION = /* graphql */ `
+  mutation ChangeColumnValue($boardId: ID!, $itemId: ID!, $columnId: String!, $value: JSON!) {
+    change_column_value(
+      board_id: $boardId
+      item_id: $itemId
+      column_id: $columnId
+      value: $value
+    ) {
+      id
+    }
+  }
+`;
+
 async function mondayGraphQL<T>(
   query: string,
   variables: Record<string, unknown>,
@@ -536,6 +549,36 @@ export async function createOrderItem(
     `${payload.company} — ${payload.firstName} ${payload.lastName}`,
     columns,
   );
+}
+
+export type OrderStatus = 'pending payment' | 'processing' | 'cancelled' | 'refunded' | 'completed';
+
+/**
+ * Updates the orderStatus column on an existing orders board item.
+ * Non-critical — callers should catch and log errors.
+ */
+export async function updateOrderPaymentStatus(
+  mondayItemId: string,
+  status: OrderStatus,
+): Promise<MondayResult> {
+  const boardId = process.env.MONDAY_ORDERS_BOARD_ID;
+  if (!boardId) return { success: true, skipped: true };
+
+  const result = await mondayGraphQL<{ change_column_value: { id: string } }>(
+    CHANGE_COLUMN_VALUE_MUTATION,
+    {
+      boardId,
+      itemId:   mondayItemId,
+      columnId: ORDER_COLS.orderStatus,
+      value:    JSON.stringify(colStatus(status)),
+    },
+  );
+
+  if (result.errors?.length) {
+    return { success: false, error: result.errors.map(e => e.message).join('; ') };
+  }
+
+  return { success: true, itemId: mondayItemId };
 }
 
 /**

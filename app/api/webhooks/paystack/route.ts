@@ -1,6 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { createHmac } from 'crypto';
-import { createServiceRoleClient } from '@/lib/supabase/server';
+import { NextRequest, NextResponse }  from 'next/server';
+import { createHmac }                from 'crypto';
+import { createServiceRoleClient }   from '@/lib/supabase/server';
+import { updateOrderPaymentStatus }  from '@/lib/monday';
 
 // ─── Paystack event shape (minimal) ──────────────────────────────────────────
 
@@ -19,6 +20,7 @@ interface ChargeSuccessData {
   amount: number; // kobo (divide by 100 for ZAR)
   customer: PaystackCustomer;
   subscription?: PaystackSubscription;
+  metadata?: { order_id?: string; [key: string]: unknown };
 }
 
 interface SubscriptionDisableData {
@@ -114,6 +116,26 @@ async function handleChargeSuccess(data: ChargeSuccessData): Promise<void> {
 
   if (error) {
     throw new Error(`Supabase update failed: ${(error as { message: string }).message}`);
+  }
+
+  // Update Monday.com order status (fallback if callback already ran, this is idempotent)
+  const orderId = data.metadata?.order_id;
+  if (orderId) {
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data: purchaseRow } = await (supabase as any)
+        .from('purchases')
+        .select('monday_item_id')
+        .eq('order_id', orderId)
+        .single();
+      const mondayItemId = (purchaseRow as { monday_item_id?: string } | null)?.monday_item_id;
+      if (mondayItemId) {
+        await updateOrderPaymentStatus(mondayItemId, 'completed');
+        console.log('[webhook] Monday.com order status → completed:', mondayItemId);
+      }
+    } catch (err) {
+      console.error('[webhook] Failed to update Monday.com order status:', err);
+    }
   }
 
   // Record in Sage — failure must NOT fail the webhook
