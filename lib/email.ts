@@ -7,6 +7,7 @@ import { Resend } from 'resend';
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 export const SUPPORT_EMAIL = 'support@montanadc.com';
+export const SALES_EMAIL = 'sales@montanadc.com';
 export const FROM_ADDRESS = 'Montana Data Company <hello@montanadc.com>';
 
 // ---------------------------------------------------------------------------
@@ -63,6 +64,41 @@ export interface AssessmentPayload {
 export interface EmailResult {
   success: boolean;
   error?: string;
+}
+
+// ---------------------------------------------------------------------------
+// Support ticket types
+// ---------------------------------------------------------------------------
+
+export type SupportCategory = 'technical' | 'billing' | 'compliance' | 'general';
+
+export interface SupportTicketPayload {
+  name:     string;
+  email:    string;
+  company:  string;
+  subject:  string;
+  category: SupportCategory;
+  priority: 'low' | 'normal' | 'high' | 'critical';
+  message:  string;
+}
+
+// ---------------------------------------------------------------------------
+// Checkout confirmation types
+// ---------------------------------------------------------------------------
+
+export interface CheckoutLineItem {
+  name:       string;
+  quantity:   number;
+  unit_price: number;
+  line_total: number;
+}
+
+export interface CheckoutPayload {
+  customer:     { name: string; email: string; company: string };
+  cart:         CheckoutLineItem[];
+  totalZAR:     number;
+  contractTerm: 'monthly' | 'yearly';
+  reference:    string;
 }
 
 // ---------------------------------------------------------------------------
@@ -182,6 +218,32 @@ function riskColor(level: RiskLevel): string {
   if (level === 'High Risk') return 'red';
   if (level === 'Moderate Risk' || level === 'Medium Risk') return 'amber';
   return 'green';
+}
+
+// ---------------------------------------------------------------------------
+// Support ticket label / colour maps
+// ---------------------------------------------------------------------------
+
+const categoryLabels: Record<SupportCategory, string> = {
+  technical:  'Technical Issue',
+  billing:    'Billing',
+  compliance: 'Compliance & POPIA',
+  general:    'General',
+};
+
+const priorityColors: Record<string, string> = {
+  low:      'green',
+  normal:   'pink',
+  high:     'amber',
+  critical: 'red',
+};
+
+// ---------------------------------------------------------------------------
+// Staff recipient router
+// ---------------------------------------------------------------------------
+
+function resolveStaffRecipient(category: SupportCategory): string {
+  return category === 'technical' ? SUPPORT_EMAIL : SALES_EMAIL;
 }
 
 // ===========================================================================
