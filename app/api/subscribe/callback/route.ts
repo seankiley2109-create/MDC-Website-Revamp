@@ -189,7 +189,10 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
           `stacked ${newEntries.length} new entries (total now ${mergedEntries.length})`,
         );
 
-        // ── Send purchase confirmation email (non-critical) ──────────────────────
+        // ── Send purchase confirmation email (non-critical, first-time only) ──────
+        // alreadyStacked means the webhook processed this reference before us —
+        // skip the email to avoid sending a duplicate confirmation.
+        if (!alreadyStacked) {
         const checkoutCart: CheckoutLineItem[] = (verifyData.metadata?.cart ?? [])
           .filter(l => l.product_code !== 'DISCOUNT')
           .map(l => ({
@@ -223,6 +226,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
         } else if (!emailResult.value.success) {
           console.error('[subscribe/callback] Checkout email failed:', emailResult.value.error);
         }
+        } // end if (!alreadyStacked)
       }
 
       // Stamp paystack_reference onto the purchases row and update Monday.com status

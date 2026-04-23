@@ -55,7 +55,7 @@ export async function POST(request: NextRequest) {
     .single();
   const profile = profileRaw as { full_name: string | null; email: string; company_name: string | null } | null;
 
-  const ticketPayload = {
+  const ticketPayload: SupportTicketPayload = {
     name:     (profile?.full_name  ?? user.email ?? 'Portal User') as string,
     email:    user.email as string,
     company:  (profile?.company_name ?? 'Unknown Organisation') as string,
@@ -80,7 +80,7 @@ export async function POST(request: NextRequest) {
 
   // ── 5. Send routing email (non-critical) ──────────────────────────────────
   const [emailResult] = await Promise.allSettled([
-    sendSupportTicketEmails(ticketPayload as SupportTicketPayload),
+    sendSupportTicketEmails(ticketPayload),
   ]);
   if (emailResult.status === 'rejected') {
     console.error('[api/support] Email send threw:', emailResult.reason);
