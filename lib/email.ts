@@ -785,3 +785,73 @@ export async function sendAssessmentEmails(p: AssessmentPayload): Promise<EmailR
     return { success: false, error: 'Email service unavailable.' };
   }
 }
+
+export async function sendSupportTicketEmails(p: SupportTicketPayload): Promise<EmailResult> {
+  try {
+    const staffRecipient = resolveStaffRecipient(p.category);
+    const [staff, auto] = await Promise.all([
+      resend.emails.send({
+        from:    FROM_ADDRESS,
+        to:      [staffRecipient],
+        replyTo: p.email,
+        subject: `[Support] ${categoryLabels[p.category]} — ${p.subject}`,
+        html:    supportStaffHtml(p),
+      }),
+      resend.emails.send({
+        from:    FROM_ADDRESS,
+        to:      [p.email],
+        replyTo: staffRecipient,
+        subject: 'Support ticket received — Montana Data Company',
+        html:    supportAutoHtml(p),
+      }),
+    ]);
+
+    if (staff.error || auto.error) {
+      console.error('[email] Support ticket email errors:', staff.error, auto.error);
+      return { success: false, error: 'Failed to send one or more support emails.' };
+    }
+
+    return { success: true };
+  } catch (err) {
+    console.error('[email] sendSupportTicketEmails error:', err);
+    return { success: false, error: 'Email service unavailable.' };
+  }
+}
+
+export async function sendCheckoutConfirmationEmails(p: CheckoutPayload): Promise<EmailResult> {
+  try {
+    const [toSales, toSupport, toUser] = await Promise.all([
+      resend.emails.send({
+        from:    FROM_ADDRESS,
+        to:      [SALES_EMAIL],
+        replyTo: p.customer.email,
+        subject: `[Purchase] ${p.customer.company} — R ${p.totalZAR.toLocaleString('en-ZA', { minimumFractionDigits: 2 })} — ${p.reference}`,
+        html:    checkoutStaffHtml(p),
+      }),
+      resend.emails.send({
+        from:    FROM_ADDRESS,
+        to:      [SUPPORT_EMAIL],
+        replyTo: p.customer.email,
+        subject: `[Purchase] ${p.customer.company} — R ${p.totalZAR.toLocaleString('en-ZA', { minimumFractionDigits: 2 })} — ${p.reference}`,
+        html:    checkoutStaffHtml(p),
+      }),
+      resend.emails.send({
+        from:    FROM_ADDRESS,
+        to:      [p.customer.email],
+        replyTo: SUPPORT_EMAIL,
+        subject: 'Your purchase is confirmed — Montana Data Company',
+        html:    checkoutAutoHtml(p),
+      }),
+    ]);
+
+    if (toSales.error || toSupport.error || toUser.error) {
+      console.error('[email] Checkout email errors:', toSales.error, toSupport.error, toUser.error);
+      return { success: false, error: 'Failed to send one or more checkout emails.' };
+    }
+
+    return { success: true };
+  } catch (err) {
+    console.error('[email] sendCheckoutConfirmationEmails error:', err);
+    return { success: false, error: 'Email service unavailable.' };
+  }
+}
