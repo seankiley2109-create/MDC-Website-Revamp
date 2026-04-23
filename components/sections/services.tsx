@@ -1,5 +1,6 @@
 import { SpotlightCard } from "@/components/ui/spotlight-card";
 import { AnimatedButton } from "@/components/ui/animated-button";
+import { CircularFlowDiagram } from "@/components/sections/circular-flow-diagram";
 import { Database, ShieldCheck, FileText, Server, ShieldAlert, Archive, Activity, Lock } from "lucide-react";
 import Link from "next/link";
 
@@ -46,87 +47,6 @@ const services = [
   }
 ];
 
-function CircularFlowDiagram() {
-  // 5 nodes arranged in a circle. Using viewBox 200x200, centre 100,100, radius 72.
-  const nodes = [
-    { label: "Protect",  angle: -90 },
-    { label: "Recover",  angle: -90 + 72 },
-    { label: "Transfer", angle: -90 + 144 },
-    { label: "Secure",   angle: -90 + 216 },
-    { label: "Govern",   angle: -90 + 288 },
-  ];
-  const r = 72; // orbit radius
-  const cx = 100;
-  const cy = 100;
-
-  const toRad = (deg: number) => (deg * Math.PI) / 180;
-  const pts = nodes.map((n) => ({
-    x: cx + r * Math.cos(toRad(n.angle)),
-    y: cy + r * Math.sin(toRad(n.angle)),
-    label: n.label,
-  }));
-
-  // Build arc paths between consecutive nodes (curved slightly outward)
-  const arcs = pts.map((p, i) => {
-    const next = pts[(i + 1) % pts.length];
-    const mx = (p.x + next.x) / 2;
-    const my = (p.y + next.y) / 2;
-    // Pull control point toward the centre slightly for inward curve
-    const cpx = mx + (cx - mx) * 0.25;
-    const cpy = my + (cy - my) * 0.25;
-    return `M ${p.x} ${p.y} Q ${cpx} ${cpy} ${next.x} ${next.y}`;
-  });
-
-  const colors = ["#F24567", "#E8357A", "#C92575", "#F24567", "#E8357A"];
-
-  return (
-    <div className="h-full w-full border border-white/10 bg-montana-surface/50 p-4 relative overflow-hidden flex items-center justify-center min-h-[260px]">
-      <div className="absolute top-0 right-0 -mt-16 -mr-16 h-64 w-64 rounded-full bg-montana-magenta opacity-10 blur-[80px]" />
-      <svg viewBox="0 0 200 200" className="w-full max-w-[280px] h-auto" aria-label="Circular resilience flow: Protect, Recover, Transfer, Secure, Govern">
-        <defs>
-          <marker id="arrowhead" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
-            <path d="M0,0 L6,3 L0,6 Z" fill="#F24567" opacity="0.8" />
-          </marker>
-        </defs>
-        {/* Centre label */}
-        <text x="100" y="97" textAnchor="middle" fill="#ffffff" fontSize="7" fontWeight="600" opacity="0.5">DATA</text>
-        <text x="100" y="106" textAnchor="middle" fill="#ffffff" fontSize="7" fontWeight="600" opacity="0.5">RESILIENCE</text>
-
-        {/* Arc connectors */}
-        {arcs.map((d, i) => (
-          <path
-            key={i}
-            d={d}
-            fill="none"
-            stroke={colors[i]}
-            strokeWidth="1.2"
-            strokeOpacity="0.6"
-            markerEnd="url(#arrowhead)"
-          />
-        ))}
-
-        {/* Nodes */}
-        {pts.map((p, i) => (
-          <g key={i}>
-            <circle cx={p.x} cy={p.y} r="16" fill="#1a1a2e" stroke={colors[i]} strokeWidth="1.5" strokeOpacity="0.9" />
-            <circle cx={p.x} cy={p.y} r="16" fill={colors[i]} fillOpacity="0.08" />
-            <text
-              x={p.x}
-              y={p.y + 3.5}
-              textAnchor="middle"
-              fill="#ffffff"
-              fontSize="6.5"
-              fontWeight="700"
-              letterSpacing="0.02em"
-            >
-              {p.label}
-            </text>
-          </g>
-        ))}
-      </svg>
-    </div>
-  );
-}
 
 export function Services() {
   return (
