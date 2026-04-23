@@ -199,6 +199,10 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
             line_total: l.line_total,
           }));
 
+        if (checkoutCart.length === 0) {
+          console.warn('[subscribe/callback] Checkout email: cart is empty for reference', reference);
+        }
+
         const checkoutPayload: CheckoutPayload = {
           customer: {
             name:    existingProfile?.full_name    ?? verifyData.customer.email,
