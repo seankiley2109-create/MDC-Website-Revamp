@@ -712,13 +712,13 @@ export async function sendContactEmails(p: ContactPayload): Promise<EmailResult>
     ]);
 
     if (staff.error || auto.error) {
-      console.error('Contact email errors:', staff.error, auto.error);
+      console.error('[email] Contact email errors:', staff.error, auto.error);
       return { success: false, error: 'Failed to send one or more emails.' };
     }
 
     return { success: true };
   } catch (err) {
-    console.error('sendContactEmails error:', err);
+    console.error('[email] sendContactEmails error:', err);
     return { success: false, error: 'Email service unavailable.' };
   }
 }
@@ -743,13 +743,13 @@ export async function sendPOSEmails(p: POSPayload): Promise<EmailResult> {
     ]);
 
     if (staff.error || auto.error) {
-      console.error('POS email errors:', staff.error, auto.error);
+      console.error('[email] POS email errors:', staff.error, auto.error);
       return { success: false, error: 'Failed to send one or more emails.' };
     }
 
     return { success: true };
   } catch (err) {
-    console.error('sendPOSEmails error:', err);
+    console.error('[email] sendPOSEmails error:', err);
     return { success: false, error: 'Email service unavailable.' };
   }
 }
@@ -775,13 +775,13 @@ export async function sendAssessmentEmails(p: AssessmentPayload): Promise<EmailR
     ]);
 
     if (staff.error || auto.error) {
-      console.error('Assessment email errors:', staff.error, auto.error);
+      console.error('[email] Assessment email errors:', staff.error, auto.error);
       return { success: false, error: 'Failed to send one or more emails.' };
     }
 
     return { success: true };
   } catch (err) {
-    console.error('sendAssessmentEmails error:', err);
+    console.error('[email] sendAssessmentEmails error:', err);
     return { success: false, error: 'Email service unavailable.' };
   }
 }
@@ -820,19 +820,20 @@ export async function sendSupportTicketEmails(p: SupportTicketPayload): Promise<
 
 export async function sendCheckoutConfirmationEmails(p: CheckoutPayload): Promise<EmailResult> {
   try {
+    const staffSubject = `[Purchase] ${p.customer.company} — R ${p.totalZAR.toLocaleString('en-ZA', { minimumFractionDigits: 2 })} — ${p.reference}`;
     const [toSales, toSupport, toUser] = await Promise.all([
       resend.emails.send({
         from:    FROM_ADDRESS,
         to:      [SALES_EMAIL],
         replyTo: p.customer.email,
-        subject: `[Purchase] ${p.customer.company} — R ${p.totalZAR.toLocaleString('en-ZA', { minimumFractionDigits: 2 })} — ${p.reference}`,
+        subject: staffSubject,
         html:    checkoutStaffHtml(p),
       }),
       resend.emails.send({
         from:    FROM_ADDRESS,
         to:      [SUPPORT_EMAIL],
         replyTo: p.customer.email,
-        subject: `[Purchase] ${p.customer.company} — R ${p.totalZAR.toLocaleString('en-ZA', { minimumFractionDigits: 2 })} — ${p.reference}`,
+        subject: staffSubject,
         html:    checkoutStaffHtml(p),
       }),
       resend.emails.send({
