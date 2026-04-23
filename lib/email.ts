@@ -550,7 +550,7 @@ function supportStaffHtml(p: SupportTicketPayload): string {
       fieldRow('Company',  p.company) +
       fieldRow('Subject',  p.subject) +
       fieldRow('Category', badge(categoryLabels[p.category], p.category === 'technical' ? 'pink' : 'amber')) +
-      fieldRow('Priority', badge(p.priority.charAt(0).toUpperCase() + p.priority.slice(1), priorityColors[p.priority] ?? 'pink')) +
+      fieldRow('Priority', badge(p.priority.charAt(0).toUpperCase() + p.priority.slice(1), priorityColors[p.priority])) +
       fieldRow('Submitted', new Date().toLocaleString('en-ZA', { dateStyle: 'full', timeStyle: 'short', timeZone: 'Africa/Johannesburg' }))
     )}
 
@@ -568,6 +568,8 @@ function supportStaffHtml(p: SupportTicketPayload): string {
 // ===========================================================================
 
 function supportAutoHtml(p: SupportTicketPayload): string {
+  // p.message is intentionally excluded — free-text may contain PII; staff
+  // have the full message in the staff notification sent to the routed mailbox.
   const body = `
     <p style="margin:0 0 20px;font-size:15px;color:#3f3f46;">Hi ${p.name},</p>
     <p style="margin:0 0 20px;font-size:15px;color:#3f3f46;">Thank you for contacting Montana Data Company. We have received your support ticket and will respond within <strong>one business day</strong>.</p>
