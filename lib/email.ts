@@ -72,13 +72,15 @@ export interface EmailResult {
 
 export type SupportCategory = 'technical' | 'billing' | 'compliance' | 'general';
 
+export type SupportPriority = 'low' | 'normal' | 'high' | 'critical';
+
 export interface SupportTicketPayload {
   name:     string;
   email:    string;
   company:  string;
   subject:  string;
   category: SupportCategory;
-  priority: 'low' | 'normal' | 'high' | 'critical';
+  priority: SupportPriority;
   message:  string;
 }
 
@@ -231,7 +233,7 @@ const categoryLabels: Record<SupportCategory, string> = {
   general:    'General',
 };
 
-const priorityColors: Record<string, string> = {
+const priorityColors: Record<SupportPriority, string> = {
   low:      'green',
   normal:   'pink',
   high:     'amber',
