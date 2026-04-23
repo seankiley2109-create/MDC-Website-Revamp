@@ -589,6 +589,106 @@ function supportAutoHtml(p: SupportTicketPayload): string {
 }
 
 // ===========================================================================
+// CHECKOUT — Staff Notification
+// ===========================================================================
+
+function checkoutStaffHtml(p: CheckoutPayload): string {
+  const cartRows = p.cart
+    .map(l => `<tr>
+      <td style="padding:10px 12px;font-size:14px;color:#18181b;border-bottom:1px solid #e4e4e7;">${l.name}</td>
+      <td style="padding:10px 12px;font-size:14px;color:#3f3f46;border-bottom:1px solid #e4e4e7;text-align:center;">${l.quantity}</td>
+      <td style="padding:10px 12px;font-size:14px;color:#3f3f46;border-bottom:1px solid #e4e4e7;text-align:right;">R ${l.unit_price.toLocaleString('en-ZA', { minimumFractionDigits: 2 })}</td>
+      <td style="padding:10px 12px;font-size:14px;font-weight:700;color:#f24567;border-bottom:1px solid #e4e4e7;text-align:right;">R ${l.line_total.toLocaleString('en-ZA', { minimumFractionDigits: 2 })}</td>
+    </tr>`)
+    .join('');
+
+  const body = `
+    <p style="margin:0 0 24px;font-size:15px;color:#3f3f46;">A new subscription purchase has been completed via Paystack.</p>
+
+    ${sectionHeading('Customer Details')}
+    ${dataTable(
+      fieldRow('Name',          p.customer.name) +
+      fieldRow('Email',         `<a href="mailto:${p.customer.email}" style="color:#f24567;">${p.customer.email}</a>`) +
+      fieldRow('Company',       p.customer.company) +
+      fieldRow('Contract Term', p.contractTerm === 'yearly' ? 'Annual' : 'Monthly') +
+      fieldRow('Reference',     p.reference) +
+      fieldRow('Submitted',     new Date().toLocaleString('en-ZA', { dateStyle: 'full', timeStyle: 'short', timeZone: 'Africa/Johannesburg' }))
+    )}
+
+    ${sectionHeading('Purchased Services')}
+    <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f9f9fa;border:1px solid #e4e4e7;border-radius:6px;overflow:hidden;margin:0 0 24px;">
+      <tr style="background:#f24567;">
+        <th style="padding:10px 12px;font-size:12px;font-weight:700;color:#fff;text-align:left;text-transform:uppercase;letter-spacing:1px;">Service</th>
+        <th style="padding:10px 12px;font-size:12px;font-weight:700;color:#fff;text-align:center;text-transform:uppercase;letter-spacing:1px;">Qty</th>
+        <th style="padding:10px 12px;font-size:12px;font-weight:700;color:#fff;text-align:right;text-transform:uppercase;letter-spacing:1px;">Unit Price</th>
+        <th style="padding:10px 12px;font-size:12px;font-weight:700;color:#fff;text-align:right;text-transform:uppercase;letter-spacing:1px;">Total</th>
+      </tr>
+      ${cartRows}
+      <tr style="background:#f4f4f5;">
+        <td colspan="3" style="padding:12px;font-size:13px;font-weight:700;color:#18181b;text-align:right;text-transform:uppercase;letter-spacing:1px;">Grand Total</td>
+        <td style="padding:12px;font-size:15px;font-weight:700;color:#f24567;text-align:right;">R ${p.totalZAR.toLocaleString('en-ZA', { minimumFractionDigits: 2 })}</td>
+      </tr>
+    </table>
+
+    ${divider()}
+    <p style="margin:0;text-align:center;">${ctaButton('Contact ' + p.customer.name, `mailto:${p.customer.email}?subject=Your Montana Data Company Purchase — ${p.reference}`)}</p>
+  `;
+  return shell('New Subscription Purchase', body);
+}
+
+// ===========================================================================
+// CHECKOUT — Auto-Responder
+// ===========================================================================
+
+function checkoutAutoHtml(p: CheckoutPayload): string {
+  const cartRows = p.cart
+    .map(l => `<tr>
+      <td style="padding:10px 12px;font-size:14px;color:#18181b;border-bottom:1px solid #e4e4e7;">${l.name}</td>
+      <td style="padding:10px 12px;font-size:14px;color:#3f3f46;border-bottom:1px solid #e4e4e7;text-align:center;">${l.quantity}</td>
+      <td style="padding:10px 12px;font-size:14px;font-weight:700;color:#f24567;border-bottom:1px solid #e4e4e7;text-align:right;">R ${l.line_total.toLocaleString('en-ZA', { minimumFractionDigits: 2 })}</td>
+    </tr>`)
+    .join('');
+
+  const body = `
+    <p style="margin:0 0 20px;font-size:15px;color:#3f3f46;">Hi ${p.customer.name},</p>
+    <p style="margin:0 0 20px;font-size:15px;color:#3f3f46;">Your payment has been confirmed. Welcome to Montana Data Company — your services are now being provisioned.</p>
+
+    ${sectionHeading('Your Purchase')}
+    <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f9f9fa;border:1px solid #e4e4e7;border-radius:6px;overflow:hidden;margin:0 0 24px;">
+      <tr style="background:#18181b;">
+        <th style="padding:10px 12px;font-size:12px;font-weight:700;color:#fff;text-align:left;text-transform:uppercase;letter-spacing:1px;">Service</th>
+        <th style="padding:10px 12px;font-size:12px;font-weight:700;color:#fff;text-align:center;text-transform:uppercase;letter-spacing:1px;">Qty</th>
+        <th style="padding:10px 12px;font-size:12px;font-weight:700;color:#fff;text-align:right;text-transform:uppercase;letter-spacing:1px;">Total</th>
+      </tr>
+      ${cartRows}
+    </table>
+    ${dataTable(
+      fieldRow('Grand Total',    `R ${p.totalZAR.toLocaleString('en-ZA', { minimumFractionDigits: 2 })}`) +
+      fieldRow('Billing Cycle',  p.contractTerm === 'yearly' ? 'Annual' : 'Monthly') +
+      fieldRow('Reference',      p.reference)
+    )}
+
+    ${sectionHeading('What Happens Next')}
+    <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 28px;">
+      ${[
+        'Our engineering team will provision your services within one business day.',
+        'You will receive login credentials or onboarding instructions via email.',
+        'A dedicated Montana Data engineer is available to assist with setup.',
+      ].map((step, i) => `<tr>
+        <td style="padding:8px 12px 8px 0;vertical-align:top;width:32px;">
+          <div style="width:28px;height:28px;background:#f24567;border-radius:50%;text-align:center;line-height:28px;font-size:13px;font-weight:700;color:#fff;">${i + 1}</div>
+        </td>
+        <td style="padding:8px 0;font-size:14px;color:#3f3f46;vertical-align:top;line-height:1.6;">${step}</td>
+      </tr>`).join('')}
+    </table>
+
+    ${divider()}
+    <p style="margin:0;font-size:14px;color:#71717a;">Questions? Call us on <a href="tel:+27871883843" style="color:#f24567;">+27 (0)87 188 3843</a> or reply to this email.</p>
+  `;
+  return shell('Purchase Confirmed — Montana Data Company', body);
+}
+
+// ===========================================================================
 // Public send functions
 // ===========================================================================
 
