@@ -528,6 +528,65 @@ function assessmentAutoHtml(p: AssessmentPayload): string {
 }
 
 // ===========================================================================
+// SUPPORT TICKET — Staff Notification
+// ===========================================================================
+
+function supportStaffHtml(p: SupportTicketPayload): string {
+  const popiaBanner = p.category === 'compliance'
+    ? `<div style="background:#fffbeb;border:1px solid #fde68a;border-radius:6px;padding:14px 20px;margin:0 0 24px;font-size:13px;color:#92400e;font-weight:600;">
+        ⚠️ This ticket may contain PII — handle in accordance with POPIA.
+      </div>`
+    : '';
+
+  const body = `
+    <p style="margin:0 0 24px;font-size:15px;color:#3f3f46;">A new support ticket has been submitted through the Montana Data Company portal.</p>
+
+    ${popiaBanner}
+
+    ${sectionHeading('Ticket Details')}
+    ${dataTable(
+      fieldRow('Name',     p.name) +
+      fieldRow('Email',    `<a href="mailto:${p.email}" style="color:#f24567;">${p.email}</a>`) +
+      fieldRow('Company',  p.company) +
+      fieldRow('Subject',  p.subject) +
+      fieldRow('Category', badge(categoryLabels[p.category], p.category === 'technical' ? 'pink' : 'amber')) +
+      fieldRow('Priority', badge(p.priority.charAt(0).toUpperCase() + p.priority.slice(1), priorityColors[p.priority] ?? 'pink')) +
+      fieldRow('Submitted', new Date().toLocaleString('en-ZA', { dateStyle: 'full', timeStyle: 'short', timeZone: 'Africa/Johannesburg' }))
+    )}
+
+    ${sectionHeading('Message')}
+    <div style="background:#f9f9fa;border:1px solid #e4e4e7;border-radius:6px;padding:16px 20px;font-size:14px;color:#3f3f46;line-height:1.7;margin:0 0 28px;white-space:pre-wrap;">${p.message}</div>
+
+    ${divider()}
+    <p style="margin:0;text-align:center;">${ctaButton('Reply to ' + p.name, `mailto:${p.email}?subject=Re: ${encodeURIComponent(p.subject)}`)}</p>
+  `;
+  return shell(`Support Ticket: ${p.subject}`, body);
+}
+
+// ===========================================================================
+// SUPPORT TICKET — Auto-Responder
+// ===========================================================================
+
+function supportAutoHtml(p: SupportTicketPayload): string {
+  const body = `
+    <p style="margin:0 0 20px;font-size:15px;color:#3f3f46;">Hi ${p.name},</p>
+    <p style="margin:0 0 20px;font-size:15px;color:#3f3f46;">Thank you for contacting Montana Data Company. We have received your support ticket and will respond within <strong>one business day</strong>.</p>
+
+    ${sectionHeading('Your Ticket')}
+    ${dataTable(
+      fieldRow('Subject',   p.subject) +
+      fieldRow('Category',  categoryLabels[p.category]) +
+      fieldRow('Priority',  p.priority.charAt(0).toUpperCase() + p.priority.slice(1)) +
+      fieldRow('Submitted', new Date().toLocaleString('en-ZA', { dateStyle: 'full', timeStyle: 'short', timeZone: 'Africa/Johannesburg' }))
+    )}
+
+    ${divider()}
+    <p style="margin:0;font-size:14px;color:#71717a;">If your issue is urgent, please call us on <a href="tel:+27871883843" style="color:#f24567;">+27 (0)87 188 3843</a>.</p>
+  `;
+  return shell('Support Ticket Received', body);
+}
+
+// ===========================================================================
 // Public send functions
 // ===========================================================================
 
