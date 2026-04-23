@@ -631,7 +631,7 @@ function checkoutStaffHtml(p: CheckoutPayload): string {
     </table>
 
     ${divider()}
-    <p style="margin:0;text-align:center;">${ctaButton('Contact ' + p.customer.name, `mailto:${p.customer.email}?subject=Your Montana Data Company Purchase — ${p.reference}`)}</p>
+    <p style="margin:0;text-align:center;">${ctaButton('Contact ' + p.customer.name, `mailto:${p.customer.email}?subject=${encodeURIComponent(`Your Montana Data Company Purchase — ${p.reference}`)}`)}</p>
   `;
   return shell('New Subscription Purchase', body);
 }
