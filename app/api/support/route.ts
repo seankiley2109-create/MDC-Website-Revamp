@@ -78,20 +78,14 @@ export async function POST(request: NextRequest) {
     console.log('[api/support] Ticket created:', mondayResult.value.itemId);
   }
 
-  // ── 5. Send routing email ──────────────────────────────────────────────────
-  const emailPayload: SupportTicketPayload = {
-    name:     ticketPayload.name,
-    email:    ticketPayload.email,
-    company:  ticketPayload.company,
-    subject,
-    category,
-    priority,
-    message,
-  };
-
-  const emailResult = await sendSupportTicketEmails(emailPayload);
-  if (!emailResult.success) {
-    console.error('[api/support] Email send failed:', emailResult.error);
+  // ── 5. Send routing email (non-critical) ──────────────────────────────────
+  const [emailResult] = await Promise.allSettled([
+    sendSupportTicketEmails(ticketPayload as SupportTicketPayload),
+  ]);
+  if (emailResult.status === 'rejected') {
+    console.error('[api/support] Email send threw:', emailResult.reason);
+  } else if (!emailResult.value.success) {
+    console.error('[api/support] Email send failed:', emailResult.value.error);
   }
 
   // Non-critical — always return success so the user knows their message arrived.
