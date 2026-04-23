@@ -11,6 +11,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { createServerClient } from '@/lib/supabase/server';
 import { createSupportTicket } from '@/lib/monday';
+import { sendSupportTicketEmails, type SupportTicketPayload } from '@/lib/email';
 
 const schema = z.object({
   subject:  z.string().min(5,  'Subject must be at least 5 characters.').max(200),
@@ -75,6 +76,22 @@ export async function POST(request: NextRequest) {
     console.error('[api/support] monday.com error:', mondayResult.value.error);
   } else if (!mondayResult.value.skipped) {
     console.log('[api/support] Ticket created:', mondayResult.value.itemId);
+  }
+
+  // ── 5. Send routing email ──────────────────────────────────────────────────
+  const emailPayload: SupportTicketPayload = {
+    name:     ticketPayload.name,
+    email:    ticketPayload.email,
+    company:  ticketPayload.company,
+    subject,
+    category,
+    priority,
+    message,
+  };
+
+  const emailResult = await sendSupportTicketEmails(emailPayload);
+  if (!emailResult.success) {
+    console.error('[api/support] Email send failed:', emailResult.error);
   }
 
   // Non-critical — always return success so the user knows their message arrived.
