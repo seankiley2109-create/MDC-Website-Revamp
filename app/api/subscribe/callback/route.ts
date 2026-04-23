@@ -26,6 +26,7 @@ import { NextRequest, NextResponse }             from 'next/server';
 import { createServiceRoleClient }               from '@/lib/supabase/server';
 import { updateOrderPaymentStatus }              from '@/lib/monday';
 import type { CartLineItem }                     from '@/app/api/subscribe/route';
+import { sendCheckoutConfirmationEmails, type CheckoutPayload, type CheckoutLineItem } from '@/lib/email';
 
 // ─── Paystack verify response shape ──────────────────────────────────────────
 
@@ -149,13 +150,17 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       // Fetch existing entries to append rather than overwrite
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const { data: existing } = await (supabase.from('profiles') as any)
-        .select('subscribed_services, subscribed_quantity')
+        .select('subscribed_services, subscribed_quantity, full_name, company_name')
         .eq('id', userId)
         .single();
 
-      const existingEntries = normaliseExisting(
-        (existing as { subscribed_services?: unknown } | null)?.subscribed_services,
-      );
+      const existingProfile = existing as {
+        subscribed_services?: unknown;
+        full_name?:           string | null;
+        company_name?:        string | null;
+      } | null;
+
+      const existingEntries = normaliseExisting(existingProfile?.subscribed_services);
 
       // De-dupe: skip if this reference is already stacked (webhook beat us)
       const alreadyStacked = existingEntries.some(
@@ -183,6 +188,37 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
           `[subscribe/callback] Profile updated for user: ${userId} — ` +
           `stacked ${newEntries.length} new entries (total now ${mergedEntries.length})`,
         );
+
+        // ── Send purchase confirmation email (non-critical) ──────────────────────
+        const checkoutCart: CheckoutLineItem[] = (verifyData.metadata?.cart ?? [])
+          .filter(l => l.product_code !== 'DISCOUNT')
+          .map(l => ({
+            name:       l.name,
+            quantity:   l.quantity,
+            unit_price: l.unit_price,
+            line_total: l.line_total,
+          }));
+
+        const checkoutPayload: CheckoutPayload = {
+          customer: {
+            name:    existingProfile?.full_name    ?? verifyData.customer.email,
+            email:   verifyData.customer.email,
+            company: existingProfile?.company_name ?? 'Unknown Organisation',
+          },
+          cart:         checkoutCart,
+          totalZAR:     verifyData.metadata?.total_zar ?? verifyData.amount / 100,
+          contractTerm,
+          reference,
+        };
+
+        const [emailResult] = await Promise.allSettled([
+          sendCheckoutConfirmationEmails(checkoutPayload),
+        ]);
+        if (emailResult.status === 'rejected') {
+          console.error('[subscribe/callback] Checkout email threw:', emailResult.reason);
+        } else if (!emailResult.value.success) {
+          console.error('[subscribe/callback] Checkout email failed:', emailResult.value.error);
+        }
       }
 
       // Stamp paystack_reference onto the purchases row and update Monday.com status
