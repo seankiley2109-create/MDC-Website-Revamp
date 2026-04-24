@@ -16,7 +16,13 @@
       "Bash(git checkout *)",
       "Bash(git add *)",
       "Bash(git commit *)",
-      "Bash(npm uninstall *)"
+      "Bash(npm uninstall *)",
+      "Bash(node -e \"const pkg = require\\('./node_modules/react-email/package.json'\\); console.log\\('react-email:', pkg.version\\)\")",
+      "Bash(node -e \"const pkg = require\\('./node_modules/@react-email/components/package.json'\\); console.log\\('@react-email/components:', pkg.version\\)\")",
+      "Bash(node -e \"const m = require\\('react-email'\\); console.log\\(Object.keys\\(m\\).slice\\(0,20\\)\\)\")",
+      "Bash(node -e \"const m = require\\('react-email'\\); console.log\\(Object.keys\\(m\\)\\)\")",
+      "Bash(npx email *)",
+      "Bash(kill %1)"
     ]
   }
 }

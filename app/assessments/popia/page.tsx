@@ -1,17 +1,16 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import { SpotlightCard } from "@/components/ui/spotlight-card";
 import { AnimatedButton } from "@/components/ui/animated-button";
 import { AwarenessCards, type AwarenessFact } from "@/components/assessments/awareness-cards";
 import {
   Shield, FileText, UserCheck, AlertTriangle,
-  XCircle, CheckCircle, Award, Lock, ArrowRight,
-  Activity, DollarSign, Scale, Eye, Users, Clock,
+  Lock, Scale, Eye, Users, Clock, DollarSign,
 } from "lucide-react";
 import Link from "next/link";
 import { createBrowserClient } from "@/lib/supabase/browser";
-import { POPIA_SERVICES } from "@/lib/popia-services";
 
 const questions = [
   {
@@ -223,6 +222,37 @@ const questions = [
   },
 ];
 
+function buildResultsUrl(finalAnswers: Record<number, number>, score: number): string {
+  const risk = score <= 8 ? "High Risk" : score <= 14 ? "Medium Risk" : "Low Risk";
+  const compliant = Object.values(finalAnswers).filter((v) => v === 2).length;
+  const partial = Object.values(finalAnswers).filter((v) => v === 1).length;
+  const critical = Object.values(finalAnswers).filter((v) => v === 0).length;
+
+  const catScores: Record<string, { total: number; count: number }> = {};
+  questions.forEach((q, i) => {
+    const s = finalAnswers[i] ?? 0;
+    if (!catScores[q.category]) catScores[q.category] = { total: 0, count: 0 };
+    catScores[q.category].total += s;
+    catScores[q.category].count += 1;
+  });
+  const gaps = Object.entries(catScores)
+    .filter(([, v]) => v.total / v.count < 2)
+    .sort(([, a], [, b]) => a.total / a.count - b.total / b.count)
+    .slice(0, 3)
+    .map(([cat]) => cat)
+    .join(",");
+
+  const params = new URLSearchParams({
+    score: String(score),
+    risk,
+    compliant: String(compliant),
+    partial: String(partial),
+    critical: String(critical),
+    ...(gaps ? { gaps } : {}),
+  });
+  return `/assessments/popia/results?${params.toString()}`;
+}
+
 type AuthedProfile = {
   full_name: string | null;
   email: string;
@@ -230,6 +260,7 @@ type AuthedProfile = {
 };
 
 export default function PopiaAssessment() {
+  const router = useRouter();
   const [currentStep, setCurrentStep] = useState(0);
   const [answers, setAnswers] = useState<Record<number, number>>({});
   const [leadForm, setLeadForm] = useState({ name: "", company: "", email: "" });
@@ -273,11 +304,13 @@ export default function PopiaAssessment() {
     authedProfile?.email,
   );
 
-  // Silently submit the assessment using profile data and jump to results.
+  // Silently submit the assessment using profile data and navigate to results.
   const autoSubmitFromProfile = useCallback(async (finalAnswers: Record<number, number>) => {
+    const finalScore = Object.values(finalAnswers).reduce((a, b) => a + b, 0);
+    const url = buildResultsUrl(finalAnswers, finalScore);
     if (!authedProfile) {
       console.error("[popia] autoSubmitFromProfile called with no authedProfile — skipping");
-      setCurrentStep(11);
+      router.push(url);
       return;
     }
     const profileLead = {
@@ -286,7 +319,6 @@ export default function PopiaAssessment() {
       email: authedProfile.email,
     };
     setLeadForm(profileLead);
-    const finalScore = Object.values(finalAnswers).reduce((a, b) => a + b, 0);
     try {
       await fetch("/api/assessment", {
         method: "POST",
@@ -301,9 +333,9 @@ export default function PopiaAssessment() {
     } catch (err) {
       console.error("[popia] auto-submit failed:", err);
     } finally {
-      setCurrentStep(11);
+      router.push(url);
     }
-  }, [authedProfile]);
+  }, [authedProfile, router]);
 
   useEffect(() => {
     if (isAuthChecking || !pendingFinalAnswers) return;
@@ -355,34 +387,13 @@ export default function PopiaAssessment() {
           score: totalScore,
         }),
       });
-      setCurrentStep(11);
+      router.push(buildResultsUrl(answers, totalScore));
     } catch (error) {
       console.error(error);
     } finally {
       setIsSubmitting(false);
     }
   };
-
-  // Scoring: 0-4 Yes (0-8 points) = High Risk, 5-7 Yes (10-14) = Medium, 8-10 Yes (16-20) = Low
-  let status = "Low Risk";
-  let message = "Well-positioned. An optimisation audit is recommended to maintain compliance.";
-  let colorClass = "text-green-500";
-  let bgClass = "bg-green-500";
-  let borderClass = "border-green-500";
-
-  if (totalScore <= 8) {
-    status = "High Risk";
-    message = "Immediate intervention advised — critical POPIA compliance gaps detected.";
-    colorClass = "text-red-500";
-    bgClass = "bg-red-500";
-    borderClass = "border-red-500";
-  } else if (totalScore <= 14) {
-    status = "Medium Risk";
-    message = "Remediation required — several compliance gaps need attention.";
-    colorClass = "text-amber-500";
-    bgClass = "bg-amber-500";
-    borderClass = "border-amber-500";
-  }
 
   const maxPossibleSoFar = currentStep * 2;
   const currentScoreSoFar = Object.keys(answers)
@@ -584,136 +595,6 @@ export default function PopiaAssessment() {
           </div>
         )}
 
-        {/* Phase 3: Results Dashboard & Upsell */}
-        {currentStep === 11 && (
-          <div className="animate-in fade-in slide-in-from-bottom-8 duration-700">
-            <SpotlightCard customSize className={`p-8 md:p-12 mb-12 border-t-4 ${borderClass}`}>
-              <div className="text-center mb-12">
-                <div className="relative inline-block mb-6">
-                  <div className={`inline-flex h-40 w-40 items-center justify-center rounded-full bg-montana-surface border-4 ${borderClass} shadow-[0_0_40px_rgba(0,0,0,0.4)]`}>
-                    {totalScore <= 8 && <XCircle className={`h-20 w-20 ${colorClass}`} />}
-                    {totalScore > 8 && totalScore <= 14 && <AlertTriangle className={`h-20 w-20 ${colorClass}`} />}
-                    {totalScore > 14 && <CheckCircle className={`h-20 w-20 ${colorClass}`} />}
-                  </div>
-                  {totalScore > 14 && (
-                    <div className="absolute -bottom-4 -right-4 bg-montana-bg rounded-full p-2 border border-green-500/30 shadow-xl">
-                      <div className="bg-green-500/20 rounded-full p-2">
-                        <Award className="h-8 w-8 text-green-400" />
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                <h2 className="font-display text-7xl md:text-8xl font-bold text-white mb-2">
-                  {totalScore}
-                </h2>
-                <p className="text-xl text-white/40 mb-4">out of 20</p>
-
-                <div className={`inline-flex items-center px-6 py-2 rounded-full ${bgClass} bg-opacity-10 border ${borderClass} mb-6`}>
-                  <Activity className={`h-4 w-4 mr-2 ${colorClass}`} />
-                  <span className={`font-bold uppercase tracking-widest text-sm ${colorClass}`}>
-                    {status}
-                  </span>
-                </div>
-
-                <p className="text-xl text-montana-muted max-w-2xl mx-auto leading-relaxed">
-                  {message}
-                </p>
-              </div>
-
-              {/* Stat breakdown — responsive grid */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 border-t border-white/10 pt-8">
-                <div className="text-center p-4 sm:border-r border-white/10">
-                  <div className="text-4xl font-bold text-white mb-1">
-                    {Object.values(answers).filter((v) => v === 2).length}
-                  </div>
-                  <div className="text-xs text-montana-muted uppercase tracking-wider">Fully Compliant</div>
-                </div>
-                <div className="text-center p-4 sm:border-r border-white/10">
-                  <div className="text-4xl font-bold text-white mb-1">
-                    {Object.values(answers).filter((v) => v === 1).length}
-                  </div>
-                  <div className="text-xs text-montana-muted uppercase tracking-wider">Partial Controls</div>
-                </div>
-                <div className="text-center p-4">
-                  <div className="text-4xl font-bold text-montana-pink mb-1">
-                    {Object.values(answers).filter((v) => v === 0).length}
-                  </div>
-                  <div className="text-xs text-montana-muted uppercase tracking-wider">Critical Gaps</div>
-                </div>
-              </div>
-            </SpotlightCard>
-
-            {/* Recommended Services */}
-            <div>
-              <div className="text-center mb-10">
-                <h3 className="font-display text-3xl font-bold text-white mb-4">Recommended Next Steps</h3>
-                <p className="text-montana-muted max-w-2xl mx-auto">
-                  This 10-question snapshot covers high-level risk areas. Book one of the engagements below to begin your compliance journey.
-                </p>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-                {POPIA_SERVICES.slice(0, 3).map((svc) => {
-                  const isRecommended = svc.code === "SE-PA002";
-                  const posUrl = `/pos?tab=consulting&services=${svc.code}`;
-                  return (
-                    <SpotlightCard customSize
-                      key={svc.code}
-                      className={`p-8 flex flex-col relative min-h-[260px] ${isRecommended ? "border-montana-pink/50 shadow-2xl shadow-montana-pink/10 lg:-translate-y-4" : "hover:border-white/30 transition-colors"}`}
-                    >
-                      {isRecommended && (
-                        <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-montana-pink text-white text-xs font-bold px-4 py-1.5 rounded-full tracking-wider">
-                          RECOMMENDED
-                        </div>
-                      )}
-                      <h4 className="font-bold text-white text-lg mb-1">{svc.name}</h4>
-                      <p className="text-montana-muted text-sm mb-4 flex-1">{svc.description}</p>
-                      <div className="text-2xl font-bold text-white font-mono mb-1">
-                        R{svc.price.toLocaleString()}
-                        <span className="text-sm font-normal text-montana-muted ml-1">
-                          {svc.type === "recurring" ? "/mo" : "once-off"}
-                        </span>
-                      </div>
-                      <div className="text-xs text-montana-muted mb-6">{svc.duration}</div>
-                      <ul className="space-y-2 mb-8 text-sm text-white/80 flex-1">
-                        {svc.includes.map(item => (
-                          <li key={item} className="flex items-start gap-2">
-                            <CheckCircle className="h-4 w-4 text-montana-pink shrink-0 mt-0.5" />
-                            {item}
-                          </li>
-                        ))}
-                      </ul>
-                      <Link href={posUrl}>
-                        <AnimatedButton
-                          variant={isRecommended ? "primary" : "outline"}
-                          className="w-full"
-                        >
-                          {svc.code === "SE-PA002" ? "Book Assessment" : "Select Service"}
-                        </AnimatedButton>
-                      </Link>
-                    </SpotlightCard>
-                  );
-                })}
-              </div>
-
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Link href="/pos?tab=consulting">
-                  <AnimatedButton variant="outline" className="gap-2 px-8 py-4">
-                    View All POPIA Services <ArrowRight className="h-5 w-5" />
-                  </AnimatedButton>
-                </Link>
-                <button
-                  type="button"
-                  onClick={() => { setCurrentStep(0); setAnswers({}); }}
-                  className="px-8 py-4 text-sm font-medium text-montana-muted border border-white/10 hover:border-white/30 hover:text-white transition-colors"
-                >
-                  Retake Assessment
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );

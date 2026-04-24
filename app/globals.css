@@ -11,6 +11,7 @@
   --color-montana-pink: #F24567;
   --color-montana-coral: #F65559;
   --color-montana-orange: #F86C49;
+  --color-montana-teal: #14B8A6;
   
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   --font-display: var(--font-space-grotesk), ui-sans-serif, system-ui, sans-serif;
@@ -46,6 +47,71 @@
 .border-montana-gradient {
   border-image: linear-gradient(135deg, var(--color-montana-magenta), var(--color-montana-pink), var(--color-montana-coral), var(--color-montana-orange)) 1;
 }
+
+/* ─── Animated Button System ─────────────────────────────────────────────── */
+
+.animated-btn {
+  padding: 11px 26px;
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  background: transparent;
+  cursor: pointer;
+  transition: color 0.25s ease, box-shadow 0.25s ease, background 0.25s ease, border-color 0.25s ease;
+}
+
+.animated-btn .btn-arrow {
+  display: inline-block;
+  transition: transform 0.2s ease;
+}
+
+.animated-btn:hover .btn-arrow {
+  transform: translateX(3px);
+}
+
+/* PRIMARY — full brand gradient border + outer glow on hover */
+.animated-btn-primary {
+  color: rgba(255, 255, 255, 0.72);
+  border-color: rgba(255, 255, 255, 0.18);
+}
+.animated-btn-primary:not(:disabled):hover {
+  color: #ffffff;
+  background:
+    linear-gradient(var(--color-montana-bg), var(--color-montana-bg)) padding-box,
+    linear-gradient(135deg, var(--color-montana-magenta), var(--color-montana-pink), var(--color-montana-coral), var(--color-montana-orange)) border-box;
+  border-color: transparent;
+  box-shadow:
+    0 0 28px rgba(242, 69, 103, 0.35),
+    0 0 8px  rgba(221, 41, 125, 0.20),
+    inset 0 0 20px rgba(221, 41, 125, 0.10);
+}
+
+/* SECONDARY — muted gradient border, subtle glow */
+.animated-btn-secondary {
+  color: rgba(255, 255, 255, 0.55);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+.animated-btn-secondary:not(:disabled):hover {
+  color: rgba(255, 255, 255, 0.90);
+  background:
+    linear-gradient(var(--color-montana-bg), var(--color-montana-bg)) padding-box,
+    linear-gradient(135deg, rgba(221, 41, 125, 0.55), rgba(248, 108, 73, 0.55)) border-box;
+  border-color: transparent;
+  box-shadow: 0 0 18px rgba(242, 69, 103, 0.20);
+}
+
+/* GHOST — no border at rest, brand-tinted border on hover */
+.animated-btn-ghost {
+  color: rgba(255, 255, 255, 0.44);
+  border-color: transparent;
+}
+.animated-btn-ghost:not(:disabled):hover {
+  color: rgba(255, 255, 255, 0.82);
+  border-color: rgba(221, 41, 125, 0.30);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────── */
 
 /* Add to the bottom of globals.css */
 @utility bg-grid-pattern {
