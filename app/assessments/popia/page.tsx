@@ -254,6 +254,7 @@ function buildResultsUrl(finalAnswers: Record<number, number>, score: number): s
 }
 
 type AuthedProfile = {
+  id: string;
   full_name: string | null;
   email: string;
   company_name: string | null;
@@ -282,7 +283,7 @@ export default function PopiaAssessment() {
         }
         const { data } = await supabase
           .from("profiles")
-          .select("full_name, email, company_name")
+          .select("id, full_name, email, company_name")
           .eq("id", user.id)
           .single();
         if (!cancelled && data) {
@@ -328,6 +329,7 @@ export default function PopiaAssessment() {
           lead: profileLead,
           answers: finalAnswers,
           score: finalScore,
+          user_id: authedProfile.id,
         }),
       });
     } catch (err) {

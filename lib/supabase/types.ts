@@ -16,7 +16,8 @@ export type DownloadCategory = 'software' | 'compliance' | 'whitepapers' | 'tool
 
 // ── Row shapes ────────────────────────────────────────────────────────────────
 
-export type PopiaRiskLevel = 'low' | 'medium' | 'high';
+export type PopiaRiskLevel    = 'low' | 'medium' | 'high';
+export type SecurityRiskLevel = 'low' | 'moderate' | 'high';
 
 export interface Profile {
   id: string;
@@ -66,6 +67,9 @@ export interface Profile {
   popia_score: number | null;
   popia_risk_level: PopiaRiskLevel | null;
   last_popia_assessment_at: string | null;
+  security_score: number | null;
+  security_risk_level: SecurityRiskLevel | null;
+  last_security_assessment_at: string | null;
   created_at: string;
   updated_at: string;
 }

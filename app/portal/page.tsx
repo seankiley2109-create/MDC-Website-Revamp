@@ -642,12 +642,59 @@ export default async function PortalPage() {
                 <Shield className="h-4 w-4 text-montana-pink shrink-0" />
                 <p className="text-sm font-semibold text-white">Security Assessment</p>
               </div>
-              <p className="text-sm text-montana-muted/70 italic">No Security assessment completed yet.</p>
-              <Link href="/assessments/security">
-                <AnimatedButton variant="outline" className="text-xs py-2 px-4 w-full justify-center">
-                  Start Security Assessment
-                </AnimatedButton>
-              </Link>
+
+              {profile.last_security_assessment_at ? (
+                <>
+                  <div className="space-y-3">
+                    <div>
+                      <p className="text-xs text-montana-muted uppercase tracking-wider mb-1">Completed</p>
+                      <p className="text-sm font-semibold text-white">{formatDate(profile.last_security_assessment_at)}</p>
+                    </div>
+                    {profile.security_score !== null && profile.security_score !== undefined && (
+                      <div>
+                        <p className="text-xs text-montana-muted uppercase tracking-wider mb-1.5">Score</p>
+                        <div className="flex items-end gap-1.5 mb-2">
+                          <span className="text-2xl font-bold text-white">{profile.security_score}</span>
+                          <span className="text-sm text-montana-muted/60 pb-0.5">/ 20</span>
+                        </div>
+                        <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
+                          <div
+                            className={`h-full rounded-full transition-all ${
+                              profile.security_risk_level === 'low'      ? 'bg-emerald-400' :
+                              profile.security_risk_level === 'moderate' ? 'bg-amber-400'   : 'bg-red-400'
+                            }`}
+                            style={{ width: `${(profile.security_score / 20) * 100}%` }}
+                          />
+                        </div>
+                      </div>
+                    )}
+                    {profile.security_risk_level && (
+                      <div className="flex items-center gap-2">
+                        <div className={`h-2.5 w-2.5 rounded-full shrink-0 ${
+                          profile.security_risk_level === 'low'      ? 'bg-emerald-400' :
+                          profile.security_risk_level === 'moderate' ? 'bg-amber-400'   : 'bg-red-400'
+                        }`} />
+                        <span className={`text-sm font-semibold capitalize ${
+                          profile.security_risk_level === 'low'      ? 'text-emerald-400' :
+                          profile.security_risk_level === 'moderate' ? 'text-amber-400'   : 'text-red-400'
+                        }`}>{profile.security_risk_level} Risk</span>
+                      </div>
+                    )}
+                  </div>
+                  <Link href="/assessments/security" className="text-xs text-montana-pink hover:underline mt-auto">
+                    Retake assessment →
+                  </Link>
+                </>
+              ) : (
+                <>
+                  <p className="text-sm text-montana-muted/70 italic">No Security assessment completed yet.</p>
+                  <Link href="/assessments/security">
+                    <AnimatedButton variant="outline" className="text-xs py-2 px-4 w-full justify-center">
+                      Start Security Assessment
+                    </AnimatedButton>
+                  </Link>
+                </>
+              )}
             </div>
 
           </div>

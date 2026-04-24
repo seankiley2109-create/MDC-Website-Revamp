@@ -8,7 +8,7 @@ import {
 } from '@/lib/email';
 import { createAssessmentLead } from '@/lib/monday';
 import { createServerClient, createServiceRoleClient } from '@/lib/supabase/server';
-import type { PopiaRiskLevel }  from '@/lib/supabase/types';
+import type { PopiaRiskLevel, SecurityRiskLevel } from '@/lib/supabase/types';
 
 const schema = z.object({
   type:    z.enum(['security', 'popia']),
@@ -19,6 +19,7 @@ const schema = z.object({
   }),
   answers: z.record(z.string(), z.number()),
   score:   z.number().min(0).max(20),
+  user_id: z.string().uuid().optional(),
 });
 
 function resolveRiskLevel(type: AssessmentType, score: number): RiskLevel {
@@ -44,7 +45,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const { type, lead, answers, score } = parsed.data;
+    const { type, lead, answers, score, user_id } = parsed.data;
 
     const answerValues   = Object.values(answers) as number[];
     const fullyCompliant = answerValues.filter(v => v === 2).length;
@@ -65,57 +66,109 @@ export async function POST(request: Request) {
       criticalGaps,
     };
 
-    // ── Persist POPIA results to Supabase ─────────────────────────────────
-    if (type === 'popia') {
-      const dbRiskLevel: PopiaRiskLevel =
-        riskLevel === 'High Risk'   ? 'high'   :
-        riskLevel === 'Medium Risk' ? 'medium' : 'low';
+    // ── Persist assessment results to Supabase ───────────────────────────
+    try {
+      const supabase = await createServerClient();
+      const { data: { user: sessionUser } } = await supabase.auth.getUser();
+      const serviceRole = createServiceRoleClient();
 
-      const assessmentUpdate = {
-        popia_score:              score,
-        popia_risk_level:         dbRiskLevel,
-        last_popia_assessment_at: new Date().toISOString(),
-        updated_at:               new Date().toISOString(),
-      };
+      if (type === 'popia') {
+        const dbRiskLevel: PopiaRiskLevel =
+          riskLevel === 'High Risk'   ? 'high'   :
+          riskLevel === 'Medium Risk' ? 'medium' : 'low';
 
-      try {
-        // Path A — authenticated user: update by auth user ID (guaranteed match)
-        const supabase   = await createServerClient();
-        const { data: { user } } = await supabase.auth.getUser();
+        const assessmentUpdate = {
+          popia_score:              score,
+          popia_risk_level:         dbRiskLevel,
+          last_popia_assessment_at: new Date().toISOString(),
+          updated_at:               new Date().toISOString(),
+        };
 
-        if (user) {
-          const serviceRole = createServiceRoleClient();
+        if (sessionUser) {
+          // Path A — server-side session: update by auth user ID
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const { error } = await (serviceRole.from('profiles') as any)
             .update(assessmentUpdate)
-            .eq('id', user.id);
-
+            .eq('id', sessionUser.id);
           if (error) {
-            console.error('[assessment] Supabase update (auth) failed:', error.message);
+            console.error('[assessment] POPIA Supabase update (auth) failed:', error.message);
           } else {
-            console.log(`[assessment] Profile updated — user: ${user.id}, score: ${score}, risk: ${dbRiskLevel}`);
+            console.log(`[assessment] POPIA profile updated — user: ${sessionUser.id}, score: ${score}`);
+          }
+        } else if (user_id) {
+          // Path B — client-provided user_id (auth bypass flow): update by ID
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const { error } = await (serviceRole.from('profiles') as any)
+            .update(assessmentUpdate)
+            .eq('id', user_id);
+          if (error) {
+            console.error('[assessment] POPIA Supabase update (user_id) failed:', error.message);
+          } else {
+            console.log(`[assessment] POPIA profile updated — user_id: ${user_id}, score: ${score}`);
           }
         } else {
-          // Path B — anonymous lead: update any existing profile whose email matches.
-          // This syncs the latest assessment for existing clients who aren't logged in.
-          // No-op for brand-new leads (profile doesn't exist yet — monday.com is source of truth).
-          const serviceRole = createServiceRoleClient();
+          // Path C — anonymous: update existing profile by email match if present
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const { error, count } = await (serviceRole.from('profiles') as any)
             .update(assessmentUpdate)
             .eq('email', lead.email)
             .select('id', { count: 'exact', head: true });
-
           if (error) {
-            console.error('[assessment] Supabase update (email match) failed:', error.message);
+            console.error('[assessment] POPIA Supabase update (email match) failed:', error.message);
           } else {
-            console.log(`[assessment] Anonymous lead sync — email: ${lead.email}, rows updated: ${count ?? 0}, score: ${score}`);
+            console.log(`[assessment] POPIA anon sync — email: ${lead.email}, rows: ${count ?? 0}`);
           }
         }
-      } catch (err) {
-        // Non-fatal — lead capture and results page still work
-        console.error('[assessment] Unexpected error saving to profile:', err);
       }
+
+      if (type === 'security') {
+        const dbRiskLevel: SecurityRiskLevel =
+          riskLevel === 'High Risk'     ? 'high'     :
+          riskLevel === 'Moderate Risk' ? 'moderate' : 'low';
+
+        const assessmentUpdate = {
+          security_score:              score,
+          security_risk_level:         dbRiskLevel,
+          last_security_assessment_at: new Date().toISOString(),
+          updated_at:                  new Date().toISOString(),
+        };
+
+        if (sessionUser) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const { error } = await (serviceRole.from('profiles') as any)
+            .update(assessmentUpdate)
+            .eq('id', sessionUser.id);
+          if (error) {
+            console.error('[assessment] Security Supabase update (auth) failed:', error.message);
+          } else {
+            console.log(`[assessment] Security profile updated — user: ${sessionUser.id}, score: ${score}`);
+          }
+        } else if (user_id) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const { error } = await (serviceRole.from('profiles') as any)
+            .update(assessmentUpdate)
+            .eq('id', user_id);
+          if (error) {
+            console.error('[assessment] Security Supabase update (user_id) failed:', error.message);
+          } else {
+            console.log(`[assessment] Security profile updated — user_id: ${user_id}, score: ${score}`);
+          }
+        } else {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const { error, count } = await (serviceRole.from('profiles') as any)
+            .update(assessmentUpdate)
+            .eq('email', lead.email)
+            .select('id', { count: 'exact', head: true });
+          if (error) {
+            console.error('[assessment] Security Supabase update (email match) failed:', error.message);
+          } else {
+            console.log(`[assessment] Security anon sync — email: ${lead.email}, rows: ${count ?? 0}`);
+          }
+        }
+      }
+    } catch (err) {
+      // Non-fatal — lead capture and results page still work
+      console.error('[assessment] Unexpected error saving to profile:', err);
     }
 
     // Run email delivery and CRM creation in parallel
