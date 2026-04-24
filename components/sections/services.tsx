@@ -1,6 +1,6 @@
 import { SpotlightCard } from "@/components/ui/spotlight-card";
 import { AnimatedButton } from "@/components/ui/animated-button";
-import { CircularFlowDiagram } from "@/components/sections/circular-flow-diagram";
+import { NetworkGraph } from "@/components/ui/network-graph";
 import { Database, ShieldCheck, FileText, Server, ShieldAlert, Archive, Activity, Lock } from "lucide-react";
 import Link from "next/link";
 
@@ -63,8 +63,8 @@ export function Services() {
             </p>
           </div>
 
-          {/* Circular flow diagram */}
-          <CircularFlowDiagram />
+          {/* Service architecture network */}
+          <NetworkGraph />
         </div>
 
         <div className="mb-8 md:mb-12">
