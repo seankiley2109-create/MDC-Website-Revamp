@@ -27,6 +27,7 @@ const sizeMap = {
   lg: "w-80 h-96",
 };
 
+// FIX 1: will-change: filter removed — applied dynamically via mouseenter/mouseleave instead
 // Injected once per app via singleton — not once per card instance
 const GLOW_CSS = `
   [data-glow]::before,
@@ -65,7 +66,6 @@ const GLOW_CSS = `
   [data-glow] [data-glow] {
     position: absolute;
     inset: 0;
-    will-change: filter;
     opacity: var(--outer, 1);
     border-radius: calc(var(--radius) * 1px);
     border-width: calc(var(--border-size) * 20);
@@ -92,6 +92,20 @@ const GLOW_CSS = `
 
 let glowStylesInjected = false;
 
+// FIX 2: Single shared module-level pointermove listener — N cards share one document handler
+type PointerCallback = (x: number, y: number) => void;
+const listeners = new Set<PointerCallback>();
+let sharedRafId: number | null = null;
+
+function handleSharedPointerMove(e: PointerEvent) {
+  if (sharedRafId !== null) return;
+  const { clientX: x, clientY: y } = e;
+  sharedRafId = requestAnimationFrame(() => {
+    sharedRafId = null;
+    listeners.forEach((cb) => cb(x, y));
+  });
+}
+
 const SpotlightCard: React.FC<SpotlightCardProps> = ({
   children,
   className = "",
@@ -102,7 +116,7 @@ const SpotlightCard: React.FC<SpotlightCardProps> = ({
   customSize = false,
 }) => {
   const cardRef = useRef<HTMLDivElement>(null);
-  const rafRef = useRef<number | null>(null);
+  const glowRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     // Inject shared CSS once for the whole app
@@ -114,27 +128,33 @@ const SpotlightCard: React.FC<SpotlightCardProps> = ({
     }
 
     // Only wire up pointer tracking on devices with a precise pointer (mouse/trackpad).
-    // Touch devices show a static card; no listener needed and no touchAction blocking scroll.
     if (!window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
 
-    // rAF-throttled pointermove — viewport coords preserved for background-attachment:fixed
-    const syncPointer = (e: PointerEvent) => {
-      if (rafRef.current !== null) return;
-      const { clientX: x, clientY: y } = e;
-      rafRef.current = requestAnimationFrame(() => {
-        rafRef.current = null;
-        if (!cardRef.current) return;
-        cardRef.current.style.setProperty("--x", x.toFixed(2));
-        cardRef.current.style.setProperty("--xp", (x / window.innerWidth).toFixed(2));
-        cardRef.current.style.setProperty("--y", y.toFixed(2));
-        cardRef.current.style.setProperty("--yp", (y / window.innerHeight).toFixed(2));
-      });
+    // Per-card callback — updates only this card's CSS custom properties
+    const cb: PointerCallback = (x, y) => {
+      if (!cardRef.current) return;
+      cardRef.current.style.setProperty("--x", x.toFixed(2));
+      cardRef.current.style.setProperty("--xp", (x / window.innerWidth).toFixed(2));
+      cardRef.current.style.setProperty("--y", y.toFixed(2));
+      cardRef.current.style.setProperty("--yp", (y / window.innerHeight).toFixed(2));
     };
 
-    document.addEventListener("pointermove", syncPointer);
+    // Register shared document listener only when first subscriber mounts
+    if (listeners.size === 0) {
+      document.addEventListener("pointermove", handleSharedPointerMove);
+    }
+    listeners.add(cb);
+
     return () => {
-      document.removeEventListener("pointermove", syncPointer);
-      if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
+      listeners.delete(cb);
+      // Deregister shared listener only when last subscriber unmounts
+      if (listeners.size === 0) {
+        document.removeEventListener("pointermove", handleSharedPointerMove);
+        if (sharedRafId !== null) {
+          cancelAnimationFrame(sharedRafId);
+          sharedRafId = null;
+        }
+      }
     };
   }, []);
 
@@ -175,13 +195,21 @@ const SpotlightCard: React.FC<SpotlightCardProps> = ({
         ref={cardRef}
         data-glow
         style={inlineStyles}
+        // FIX 1: Set/unset will-change via ref on mouseenter/mouseleave — no re-render
+        onMouseEnter={() => {
+          if (glowRef.current) glowRef.current.style.willChange = "transform";
+        }}
+        onMouseLeave={() => {
+          if (glowRef.current) glowRef.current.style.willChange = "";
+        }}
         className={`
           ${!customSize ? sizeMap[size] : ""}
-          rounded-xl relative shadow-2xl p-6 backdrop-blur-md
+          rounded-xl relative shadow-2xl p-6 backdrop-blur-sm
           ${className}
         `}
       >
-        <div data-glow className="absolute inset-0 pointer-events-none rounded-xl" />
+        {/* FIX 1: glowRef attached here — will-change toggled imperatively on hover */}
+        <div ref={glowRef} data-glow className="absolute inset-0 pointer-events-none rounded-xl" />
         <div className="relative z-10 h-full">{children}</div>
       </div>
     </>

@@ -70,15 +70,16 @@ export function NetworkGraph() {
         {EDGES.map(([a, b], i) => {
           const na = NODES[a], nb = NODES[b];
           const active = isEdgeActive(a, b);
+          // FIX 5: stroke and strokeWidth are static — only opacity is animated (compositor-only)
           return (
             <motion.line
               key={i}
               x1={na.x} y1={na.y}
               x2={nb.x} y2={nb.y}
+              stroke={active ? "#F24567" : "rgba(255,255,255,0.08)"}
+              strokeWidth={2}
               animate={{
-                stroke: active ? "#F24567" : "rgba(255,255,255,0.08)",
-                strokeWidth: active ? 3 : 2,
-                opacity: hovered !== null && !active ? 0.12 : 1,
+                opacity: active ? 0.8 : hovered !== null ? 0.3 : 1,
               }}
               transition={{ duration: 0.2 }}
             />
@@ -99,9 +100,11 @@ export function NetworkGraph() {
               onMouseLeave={() => setHovered(null)}
               style={{ cursor: "pointer" }}
             >
+              {/* FIX 7: willChange promotes this SVG group to a compositor layer for scale animation */}
               <motion.g
                 animate={{ scale: active ? 1.12 : 1, opacity: dimmed ? 0.25 : 1 }}
                 transition={{ duration: 0.2 }}
+                style={{ willChange: "transform" }}
               >
                 {/* Hover glow ring */}
                 <motion.circle
@@ -157,19 +160,26 @@ export function NetworkGraph() {
           );
         })}
 
-        {/* Ripple pulse — animates outward from center node, loops */}
+        {/* FIX 6: Ripple pulse — r animation replaced with scale on motion.g (compositor-only) */}
         <g
           transform={`translate(${NODES[0].x}, ${NODES[0].y})`}
           style={{ pointerEvents: "none" }}
         >
-          <motion.circle
-            r={PRIMARY_R + 6}
-            fill="none"
-            stroke="#DD297D"
-            strokeWidth="1"
-            animate={{ r: [PRIMARY_R + 6, PRIMARY_R + 20], opacity: [0.4, 0] }}
+          <motion.g
+            style={{ transformOrigin: "0px 0px" }}
+            animate={{
+              scale: [1, (PRIMARY_R + 20) / (PRIMARY_R + 6)],
+              opacity: [0.4, 0],
+            }}
             transition={{ duration: 2.5, repeat: Infinity, ease: "easeOut" }}
-          />
+          >
+            <circle
+              r={PRIMARY_R + 6}
+              fill="none"
+              stroke="#DD297D"
+              strokeWidth="1"
+            />
+          </motion.g>
         </g>
       </svg>
     </div>
