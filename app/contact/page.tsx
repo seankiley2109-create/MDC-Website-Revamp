@@ -23,6 +23,45 @@ const ENQUIRY_VALUES = [
 
 type EnquiryValue = typeof ENQUIRY_VALUES[number];
 
+interface ServiceDefaults {
+  enquiryType: EnquiryValue;
+  label: string;
+  message: string;
+}
+
+const SERVICE_DEFAULTS: Record<string, ServiceDefaults> = {
+  "ibm-backup": {
+    enquiryType: "enterprise-backup",
+    label: "IBM Enterprise Backup",
+    message:
+      "Hi,\n\nI'd like to request a consultation for IBM Enterprise Backup.\n\nOur environment:\n- Cloud / hybrid / on-premises: \n- Approximate data volume (TB): \n- Current backup solution: \n- Recovery time objective (RTO): \n- Recovery point objective (RPO): \n\nPlease reach out to arrange a discovery call.",
+  },
+  "ransomware": {
+    enquiryType: "enterprise-backup",
+    label: "Ransomware Protection",
+    message:
+      "Hi,\n\nI'm interested in Montana DC's Ransomware Protection solution (immutable storage + AI-driven anomaly detection).\n\nOur environment:\n- Number of servers / endpoints: \n- Current backup solution: \n- Last security audit: \n- Urgency / timeline: \n\nPlease contact me to discuss our options.",
+  },
+  "archive": {
+    enquiryType: "archiving",
+    label: "Archive & Lifecycle",
+    message:
+      "Hi,\n\nI'd like to learn more about Archive & Lifecycle management for our organisation.\n\nOur data profile:\n- Estimated cold data volume (TB): \n- Compliance / legal hold requirements: \n- Current archiving approach: \n- Data types (email, files, database): \n\nPlease get in touch to discuss a solution.",
+  },
+  "guardium": {
+    enquiryType: "guardium",
+    label: "IBM Guardium",
+    message:
+      "Hi,\n\nI'd like to request a consultation for IBM Guardium (data security, monitoring & governance).\n\nOur environment:\n- Database platforms in use: \n- Sensitive data categories (PII, financial, health): \n- Current data security tooling: \n- Compliance frameworks applicable (POPIA, PCI-DSS, ISO 27001): \n\nPlease reach out to arrange a discovery call.",
+  },
+  "quantum": {
+    enquiryType: "quantum",
+    label: "Quantum Security (PQC)",
+    message:
+      "Hi,\n\nI'm interested in Montana DC's Quantum Security (Post-Quantum Cryptography) readiness assessment.\n\nOur context:\n- Industry / sector: \n- Encryption standards currently in use: \n- Known long-lived data assets: \n- Timeline for PQC migration planning: \n\nPlease contact me to discuss next steps.",
+  },
+};
+
 const contactSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
   email: z.string().email("Please enter a valid email address"),
@@ -35,10 +74,15 @@ type ContactFormValues = z.infer<typeof contactSchema>;
 
 function ContactFormInner() {
   const searchParams = useSearchParams();
+
+  // ?service= takes precedence over ?type= for pre-population
+  const serviceKey = searchParams.get("service") ?? "";
+  const serviceDefaults = SERVICE_DEFAULTS[serviceKey] ?? null;
+
   const rawType = searchParams.get("type") ?? "";
-  const defaultType: EnquiryValue = (ENQUIRY_VALUES as readonly string[]).includes(rawType)
-    ? (rawType as EnquiryValue)
-    : "general";
+  const defaultType: EnquiryValue = serviceDefaults?.enquiryType
+    ?? ((ENQUIRY_VALUES as readonly string[]).includes(rawType) ? (rawType as EnquiryValue) : "general");
+
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -50,7 +94,10 @@ function ContactFormInner() {
     formState: { errors },
   } = useForm<ContactFormValues>({
     resolver: zodResolver(contactSchema),
-    defaultValues: { enquiryType: defaultType },
+    defaultValues: {
+      enquiryType: defaultType,
+      message: serviceDefaults?.message ?? "",
+    },
   });
 
   const onSubmit = async (data: ContactFormValues) => {
@@ -244,6 +291,14 @@ function ContactFormInner() {
                     <p className="text-montana-muted text-sm">Complete the form and we&apos;ll be in touch within one business day.</p>
                   </div>
 
+                  {serviceDefaults && (
+                    <div className="flex items-center gap-3 px-4 py-3 border border-montana-pink/20 bg-montana-pink/5 text-xs text-montana-muted">
+                      <span className="h-1.5 w-1.5 rounded-full bg-montana-pink shrink-0" />
+                      Pre-filled for <span className="text-white font-medium ml-1">{serviceDefaults.label}</span>
+                      <span className="ml-auto text-white/30">Edit any field before submitting</span>
+                    </div>
+                  )}
+
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-2">
                       <label htmlFor="name" className="text-xs font-bold uppercase tracking-wider text-white/50">Full Name</label>
@@ -309,9 +364,9 @@ function ContactFormInner() {
                     <textarea
                       {...register("message")}
                       id="message"
-                      rows={5}
-                      className="w-full border border-white/10 bg-montana-surface/50 px-4 py-3 text-sm text-white placeholder-white/20 focus:border-montana-pink focus:outline-none transition-colors resize-none"
-                      placeholder="Tell us about your environment, current challenges, or what you&apos;re looking to achieve..."
+                      rows={serviceDefaults ? 10 : 5}
+                      className="w-full border border-white/10 bg-montana-surface/50 px-4 py-3 text-sm text-white placeholder-white/20 focus:border-montana-pink focus:outline-none transition-colors resize-none font-mono"
+                      placeholder="Tell us about your environment, current challenges, or what you're looking to achieve..."
                     />
                     {errors.message && <p className="text-xs text-red-400">{errors.message.message}</p>}
                   </div>
