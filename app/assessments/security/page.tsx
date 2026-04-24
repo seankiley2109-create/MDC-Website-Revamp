@@ -319,12 +319,8 @@ export default function SecurityAssessment() {
     return () => { cancelled = true; };
   }, []);
 
-  // Can we bypass the lead gate? Only if we have name + company + email on file.
-  const canSkipLeadGate = Boolean(
-    authedProfile?.full_name &&
-    authedProfile?.company_name &&
-    authedProfile?.email,
-  );
+  // Skip the gate for any authenticated user — profile may be partially filled.
+  const canSkipLeadGate = Boolean(authedProfile);
 
   // Silently submit the assessment using profile data and navigate to results.
   const autoSubmitFromProfile = useCallback(async (finalAnswers: Record<number, number>) => {
@@ -336,9 +332,9 @@ export default function SecurityAssessment() {
       return;
     }
     const profileLead = {
-      name: authedProfile.full_name ?? "",
-      company: authedProfile.company_name ?? "",
-      email: authedProfile.email,
+      name:    authedProfile.full_name    ?? "Portal User",
+      company: authedProfile.company_name ?? "N/A",
+      email:   authedProfile.email,
     };
     setLeadForm(profileLead);
     try {
