@@ -856,3 +856,92 @@ export async function sendCheckoutConfirmationEmails(p: CheckoutPayload): Promis
     return { success: false, error: 'Email service unavailable.' };
   }
 }
+
+// ===========================================================================
+// POS — Quote Summary (sent to prospect after CRM lead is created)
+// ===========================================================================
+
+function posQuoteSummaryHtml(p: POSPayload): string {
+  const solutionName =
+    p.resolvedLines.length === 1
+      ? p.resolvedLines[0].serviceName
+      : `${p.resolvedLines[0].serviceName} + ${p.resolvedLines.length - 1} more`;
+
+  const serviceLines = p.resolvedLines
+    .map(
+      l => `<tr>
+      <td style="padding:10px 12px;font-size:14px;color:#18181b;border-bottom:1px solid #e4e4e7;">${l.serviceName}</td>
+      <td style="padding:10px 12px;font-size:14px;color:#3f3f46;border-bottom:1px solid #e4e4e7;">${l.planName}</td>
+      <td style="padding:10px 12px;font-size:14px;font-weight:700;color:#f24567;border-bottom:1px solid #e4e4e7;text-align:right;">${l.price}</td>
+    </tr>`,
+    )
+    .join('');
+
+  const body = `
+    <p style="margin:0 0 20px;font-size:15px;color:#3f3f46;">Hi ${p.contact.name},</p>
+    <p style="margin:0 0 20px;font-size:15px;color:#3f3f46;">Here is a summary of the Montana Data solution you configured. A Montana specialist will review your requirements and contact you within <strong>1 business day</strong>.</p>
+
+    ${sectionHeading(`Solution: ${solutionName}`)}
+    <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f9f9fa;border:1px solid #e4e4e7;border-radius:6px;overflow:hidden;margin:0 0 24px;">
+      <tr style="background:#18181b;">
+        <th style="padding:10px 12px;font-size:12px;font-weight:700;color:#fff;text-align:left;text-transform:uppercase;letter-spacing:1px;">Service</th>
+        <th style="padding:10px 12px;font-size:12px;font-weight:700;color:#fff;text-align:left;text-transform:uppercase;letter-spacing:1px;">Plan</th>
+        <th style="padding:10px 12px;font-size:12px;font-weight:700;color:#fff;text-align:right;text-transform:uppercase;letter-spacing:1px;">Pricing</th>
+      </tr>
+      ${serviceLines}
+    </table>
+
+    ${sectionHeading('Next Steps')}
+    <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 28px;">
+      ${[
+        'A Montana specialist will review your selected solution and prepare a tailored proposal.',
+        'We will contact you within 1 business day to discuss your requirements.',
+        'You will receive a formal quote outlining pricing, timelines, and implementation steps.',
+      ]
+        .map(
+          (step, i) => `<tr>
+          <td style="padding:8px 12px 8px 0;vertical-align:top;width:32px;">
+            <div style="width:28px;height:28px;background:#f24567;border-radius:50%;text-align:center;line-height:28px;font-size:13px;font-weight:700;color:#fff;">${i + 1}</div>
+          </td>
+          <td style="padding:8px 0;font-size:14px;color:#3f3f46;vertical-align:top;line-height:1.6;">${step}</td>
+        </tr>`,
+        )
+        .join('')}
+    </table>
+
+    ${divider()}
+    <p style="margin:0;font-size:14px;color:#71717a;">Questions? Call us on <a href="tel:+27871883843" style="color:#f24567;">+27 (0)87 188 3843</a> or reply to this email.</p>
+  `;
+
+  return shell(`Your Montana Data Solution Summary — ${solutionName}`, body);
+}
+
+export async function sendPOSQuoteSummary(
+  payload: POSPayload,
+  recipientEmail: string,
+): Promise<EmailResult> {
+  const solutionName =
+    payload.resolvedLines.length === 1
+      ? payload.resolvedLines[0].serviceName
+      : `${payload.resolvedLines[0].serviceName} + ${payload.resolvedLines.length - 1} more`;
+
+  try {
+    const result = await resend.emails.send({
+      from: FROM_ADDRESS,
+      to: [recipientEmail],
+      replyTo: SALES_EMAIL,
+      subject: `Your Montana Data solution summary — ${solutionName}`,
+      html: posQuoteSummaryHtml(payload),
+    });
+
+    if (result.error) {
+      console.error('[email] sendPOSQuoteSummary error:', result.error);
+      return { success: false, error: 'Failed to send quote summary email.' };
+    }
+
+    return { success: true };
+  } catch (err) {
+    console.error('[email] sendPOSQuoteSummary error:', err);
+    return { success: false, error: 'Email service unavailable.' };
+  }
+}

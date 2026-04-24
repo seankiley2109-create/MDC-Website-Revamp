@@ -15,7 +15,8 @@
       "Read(//c/Users/seank/AppData/Local/Programs/GitHub CLI/**)",
       "Bash(git checkout *)",
       "Bash(git add *)",
-      "Bash(git commit *)"
+      "Bash(git commit *)",
+      "Bash(npm uninstall *)"
     ]
   }
 }

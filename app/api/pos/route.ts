@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
-import { sendPOSEmails, type POSPayload, type POSServicePlan } from '@/lib/email';
+import { sendPOSEmails, sendPOSQuoteSummary, type POSPayload, type POSServicePlan } from '@/lib/email';
 import { createPOSLead } from '@/lib/monday';
 
 // Mirror the service catalogue so the API can resolve IDs → labels
@@ -167,6 +167,16 @@ export async function POST(request: Request) {
       console.error('[pos] monday.com item creation failed:', mondayResult.value.error);
     } else if (!mondayResult.value.skipped) {
       console.log('[pos] monday.com item created:', mondayResult.value.itemId);
+
+      // Send quote summary to the prospect now that the CRM lead exists
+      try {
+        const quoteResult = await sendPOSQuoteSummary(payload, contact.email);
+        if (!quoteResult.success) {
+          console.error('[pos] Quote summary email failed:', quoteResult.error);
+        }
+      } catch (err) {
+        console.error('[pos] Quote summary email threw:', err);
+      }
     }
 
     return NextResponse.json({ success: true, message: 'Solution request submitted successfully.' });

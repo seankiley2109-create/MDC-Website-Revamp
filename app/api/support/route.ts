@@ -21,6 +21,7 @@ const schema = z.object({
 });
 
 export async function POST(request: NextRequest) {
+  try {
   // ── 1. Auth check ──────────────────────────────────────────────────────────
   const supabase = await createServerClient();
   const { data: { user } } = await supabase.auth.getUser();
@@ -93,4 +94,14 @@ export async function POST(request: NextRequest) {
     success: true,
     message: 'Your support ticket has been submitted. We\'ll be in touch within 1 business day.',
   });
+  } catch (err) {
+    console.error('[support] integration failed:', {
+      error: err instanceof Error ? err.message : String(err),
+      timestamp: new Date().toISOString(),
+    });
+    return NextResponse.json(
+      { success: false, error: 'An unexpected error occurred.' },
+      { status: 500 },
+    );
+  }
 }

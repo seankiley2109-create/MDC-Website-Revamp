@@ -1,3 +1,4 @@
+import '@/lib/env';
 import { createServerClient as createSupabaseServerClient } from '@supabase/ssr';
 import { createClient } from '@supabase/supabase-js';
 import { cookies } from 'next/headers';

@@ -1,6 +1,15 @@
 import type {NextConfig} from 'next';
 
 const nextConfig: NextConfig = {
+  async redirects() {
+    return [
+      {
+        source: '/popia',
+        destination: '/assessments/popia',
+        permanent: true,
+      },
+    ];
+  },
   reactStrictMode: true,
   eslint: {
     ignoreDuringBuilds: true,

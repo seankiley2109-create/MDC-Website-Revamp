@@ -1,6 +1,0 @@
-# Montana Data Company Project Rules
-
-- Ignore all compiled CSS or hidden build files.
-- When searching, prioritize files in the /src directory.
-- Use concise code snippets; do not rewrite entire files unless specifically asked.
-- Focus on Next.js 15 App Router conventions.
