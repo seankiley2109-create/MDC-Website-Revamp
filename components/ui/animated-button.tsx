@@ -4,8 +4,9 @@ import { HTMLMotionProps, motion } from "motion/react";
 import { cn } from "@/lib/utils";
 import React from "react";
 
-interface AnimatedButtonProps extends HTMLMotionProps<"button"> {
+interface AnimatedButtonProps extends Omit<HTMLMotionProps<"button">, "children"> {
   variant?: "primary" | "secondary" | "ghost" | "outline";
+  children?: React.ReactNode;
 }
 
 export const AnimatedButton = React.forwardRef<HTMLButtonElement, AnimatedButtonProps>(
