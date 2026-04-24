@@ -567,10 +567,12 @@ function ConsultingSection({ preselected = [] }: { preselected?: string[] }) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          services: Array.from(selected),
-          plans: {},
-          contact,
-          environment: { type: "popia-consulting" },
+          type: "consulting",
+          name: contact.name,
+          email: contact.email,
+          company: contact.company || "—",
+          serviceType: Array.from(selected).join(", "),
+          requirements: contact.notes || undefined,
         }),
       });
       setSubmitted(true);

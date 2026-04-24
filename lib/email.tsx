@@ -63,6 +63,18 @@ export interface POSPayload {
   resolvedLines: POSServicePlan[];
 }
 
+export interface ConsultingPayload {
+  name: string;
+  email: string;
+  company: string;
+  phone?: string;
+  serviceType: string;
+  engagementModel?: string;
+  teamSize?: string;
+  timeline?: string;
+  requirements?: string;
+}
+
 export interface AssessmentPayload {
   type: AssessmentType;
   lead: { name: string; email: string; company: string };

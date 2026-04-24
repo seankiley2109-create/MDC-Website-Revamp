@@ -74,7 +74,7 @@
  * ─────────────────────────────────────────────────────────────────────────────
  */
 
-import type { ContactPayload, POSPayload, AssessmentPayload } from '@/lib/email';
+import type { ContactPayload, POSPayload, AssessmentPayload, ConsultingPayload } from '@/lib/email';
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -420,6 +420,40 @@ export async function createPOSLead(payload: POSPayload): Promise<MondayResult> 
   return createItem(
     boardId,
     `${payload.contact.company} — Solution Request`,
+    columns,
+  );
+}
+
+/**
+ * Creates a consulting lead on the "Solution Requests" monday.com board.
+ * Adds a "Type: Consulting" note to distinguish from product leads.
+ * Returns { skipped: true } silently when the board ID is not configured.
+ */
+export async function createConsultingLead(payload: ConsultingPayload): Promise<MondayResult> {
+  const boardId = process.env.MONDAY_POS_BOARD_ID;
+  if (!boardId) return { success: true, skipped: true };
+
+  const lines: string[] = [
+    `Type: Consulting`,
+    `Service: ${payload.serviceType}`,
+  ];
+  if (payload.engagementModel) lines.push(`Engagement Model: ${payload.engagementModel}`);
+  if (payload.teamSize)        lines.push(`Team Size: ${payload.teamSize}`);
+  if (payload.timeline)        lines.push(`Timeline: ${payload.timeline}`);
+  if (payload.phone)           lines.push(`Phone: ${payload.phone}`);
+  if (payload.requirements)    lines.push(`\nRequirements:\n${payload.requirements}`);
+
+  const columns: ColumnValueMap = {
+    [POS_COLS.email]:      colEmail(payload.email),
+    [POS_COLS.company]:    payload.company,
+    [POS_COLS.services]:   lines.join('\n'),
+    [POS_COLS.notes]:      payload.requirements || '—',
+    [POS_COLS.leadStatus]: colStatus('New Request'),
+  };
+
+  return createItem(
+    boardId,
+    `${payload.company} — Consulting Lead`,
     columns,
   );
 }

@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
-import { sendPOSEmails, sendPOSQuoteSummary, type POSPayload, type POSServicePlan } from '@/lib/email';
-import { createPOSLead } from '@/lib/monday';
+import { sendPOSEmails, sendPOSQuoteSummary, type POSPayload, type POSServicePlan, type ConsultingPayload } from '@/lib/email';
+import { createPOSLead, createConsultingLead } from '@/lib/monday';
 
 // Mirror the service catalogue so the API can resolve IDs → labels
 const SERVICE_CATALOGUE: Record<
@@ -89,7 +89,8 @@ const envLabelMap: Record<string, string> = {
   popiaEmployees: 'Number of Employees',
 };
 
-const schema = z.object({
+const productSchema = z.object({
+  type:        z.literal('product').optional(),
   services:    z.array(z.string()).min(1),
   plans:       z.record(z.string(), z.string()),
   contact:     z.object({
@@ -101,10 +102,50 @@ const schema = z.object({
   environment: z.record(z.string(), z.string()).optional().default({}),
 });
 
+const consultingSchema = z.object({
+  type:            z.literal('consulting'),
+  name:            z.string().min(1),
+  email:           z.string().email(),
+  company:         z.string().min(1),
+  phone:           z.string().optional(),
+  serviceType:     z.string().min(1),
+  engagementModel: z.string().optional(),
+  teamSize:        z.string().optional(),
+  timeline:        z.string().optional(),
+  requirements:    z.string().optional(),
+});
+
 export async function POST(request: Request) {
   try {
-    const body   = await request.json();
-    const parsed = schema.safeParse(body);
+    const body = await request.json();
+
+    // ── Consulting branch ────────────────────────────────────────────────────
+    if (body?.type === 'consulting') {
+      const parsed = consultingSchema.safeParse(body);
+      if (!parsed.success) {
+        return NextResponse.json(
+          { success: false, error: 'Invalid consulting submission data.', details: parsed.error.flatten() },
+          { status: 400 },
+        );
+      }
+
+      const consultingPayload: ConsultingPayload = parsed.data;
+      const mondayResult = await createConsultingLead(consultingPayload).catch((err: unknown): import('@/lib/monday').MondayResult => {
+        console.error('[pos] consulting monday.com threw:', err);
+        return { success: false, error: String(err) };
+      });
+
+      if (!mondayResult.success) {
+        console.error('[pos] consulting monday.com failed:', mondayResult.error);
+      } else if (!mondayResult.skipped) {
+        console.log('[pos] consulting monday.com item created:', mondayResult.itemId);
+      }
+
+      return NextResponse.json({ success: true, message: 'Consulting enquiry submitted successfully.' });
+    }
+
+    // ── Product branch (existing flow) ───────────────────────────────────────
+    const parsed = productSchema.safeParse(body);
 
     if (!parsed.success) {
       return NextResponse.json(

@@ -7,8 +7,8 @@
  *   1. Greeting header — name, company, plan status, quick actions
  *   2. Stats bar — status, monthly commitment, contract end, product count
  *   3. Active Products + Billing sidebar (2/3 + 1/3 grid)
- *   4. Security Snapshot (POPIA assessment data)
- *   5. Organisation Profile form
+ *   4. Assessments — POPIA + Security panels
+ *   5. Organisation Profile form (merged personal + org + address)
  *   6. Support Ticket form
  */
 
@@ -26,7 +26,6 @@ import { SpotlightCard } from '@/components/ui/spotlight-card';
 import { AnimatedButton }        from '@/components/ui/animated-button';
 import { SupportForm }           from './support-form';
 import { ProfileForm }           from './profile-form';
-import { ContactDetailsForm }    from './contact-details-form';
 import type { Profile, PlanStatus } from '@/lib/supabase/types';
 import type { Metadata }         from 'next';
 import {
@@ -567,73 +566,90 @@ export default async function PortalPage() {
           </SpotlightCard>
         </div>
 
-        {/* ── 4. Security Snapshot ──────────────────────────────────────────── */}
+        {/* ── 4. Assessments ────────────────────────────────────────────────── */}
         <SpotlightCard customSize className="p-6 md:p-8 mb-6">
-          <div className="flex items-center justify-between mb-5 flex-wrap gap-3">
-            <div className="flex items-center gap-2">
-              <BarChart3 className="h-5 w-5 text-montana-pink" />
-              <h2 className="text-base font-semibold text-white">Security Snapshot</h2>
-            </div>
-            <div className="flex items-center gap-4">
-              <Link href="/assessments/popia"     className="text-xs text-montana-pink hover:underline">Run POPIA Assessment →</Link>
-              <span className="text-montana-muted/30">|</span>
-              <Link href="/assessments/security"  className="text-xs text-montana-pink hover:underline">Security Assessment →</Link>
-            </div>
+          <div className="flex items-center gap-2 mb-6">
+            <BarChart3 className="h-5 w-5 text-montana-pink" />
+            <h2 className="text-base font-semibold text-white">Assessments</h2>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div className="border border-white/5 bg-white/[0.02] p-4">
-              <p className="text-xs text-montana-muted uppercase tracking-wider mb-2">Risk Posture</p>
-              {profile.popia_risk_level ? (
-                <div className="flex items-center gap-2">
-                  <div className={`h-2.5 w-2.5 rounded-full ${
-                    profile.popia_risk_level === 'low' ? 'bg-emerald-400' :
-                    profile.popia_risk_level === 'medium' ? 'bg-amber-400' : 'bg-red-400'
-                  }`} />
-                  <span className={`text-sm font-semibold capitalize ${
-                    profile.popia_risk_level === 'low' ? 'text-emerald-400' :
-                    profile.popia_risk_level === 'medium' ? 'text-amber-400' : 'text-red-400'
-                  }`}>{profile.popia_risk_level} Risk</span>
-                </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+            {/* POPIA Compliance */}
+            <div className="border border-white/10 bg-white/[0.02] p-5 flex flex-col gap-4">
+              <div className="flex items-center gap-2">
+                <FileText className="h-4 w-4 text-montana-pink shrink-0" />
+                <p className="text-sm font-semibold text-white">POPIA Compliance</p>
+              </div>
+
+              {profile.last_popia_assessment_at ? (
+                <>
+                  <div className="space-y-3">
+                    <div>
+                      <p className="text-xs text-montana-muted uppercase tracking-wider mb-1">Completed</p>
+                      <p className="text-sm font-semibold text-white">{formatDate(profile.last_popia_assessment_at)}</p>
+                    </div>
+                    {profile.popia_score !== null && profile.popia_score !== undefined && (
+                      <div>
+                        <p className="text-xs text-montana-muted uppercase tracking-wider mb-1.5">Score</p>
+                        <div className="flex items-end gap-1.5 mb-2">
+                          <span className="text-2xl font-bold text-white">{profile.popia_score}</span>
+                          <span className="text-sm text-montana-muted/60 pb-0.5">/ 20</span>
+                        </div>
+                        <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
+                          <div
+                            className={`h-full rounded-full transition-all ${
+                              profile.popia_risk_level === 'low'    ? 'bg-emerald-400' :
+                              profile.popia_risk_level === 'medium' ? 'bg-amber-400'   : 'bg-red-400'
+                            }`}
+                            style={{ width: `${(profile.popia_score / 20) * 100}%` }}
+                          />
+                        </div>
+                      </div>
+                    )}
+                    {profile.popia_risk_level && (
+                      <div className="flex items-center gap-2">
+                        <div className={`h-2.5 w-2.5 rounded-full shrink-0 ${
+                          profile.popia_risk_level === 'low'    ? 'bg-emerald-400' :
+                          profile.popia_risk_level === 'medium' ? 'bg-amber-400'   : 'bg-red-400'
+                        }`} />
+                        <span className={`text-sm font-semibold capitalize ${
+                          profile.popia_risk_level === 'low'    ? 'text-emerald-400' :
+                          profile.popia_risk_level === 'medium' ? 'text-amber-400'   : 'text-red-400'
+                        }`}>{profile.popia_risk_level} Risk</span>
+                      </div>
+                    )}
+                  </div>
+                  <Link href="/assessments/popia" className="text-xs text-montana-pink hover:underline mt-auto">
+                    Retake assessment →
+                  </Link>
+                </>
               ) : (
-                <p className="text-sm text-montana-muted/60 italic">Run an assessment to see your risk level.</p>
+                <>
+                  <p className="text-sm text-montana-muted/70 italic">No POPIA assessment completed yet.</p>
+                  <Link href="/assessments/popia">
+                    <AnimatedButton variant="outline" className="text-xs py-2 px-4 w-full justify-center">
+                      Start POPIA Assessment
+                    </AnimatedButton>
+                  </Link>
+                </>
               )}
             </div>
 
-            <div className="border border-white/5 bg-white/[0.02] p-4">
-              <p className="text-xs text-montana-muted uppercase tracking-wider mb-2">POPIA Score</p>
-              {profile.popia_score !== null && profile.popia_score !== undefined ? (
-                <div>
-                  <div className="flex items-end gap-1.5 mb-2">
-                    <span className="text-2xl font-bold text-white">{profile.popia_score}</span>
-                    <span className="text-sm text-montana-muted/60 pb-0.5">/ 20</span>
-                  </div>
-                  <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
-                    <div
-                      className={`h-full rounded-full transition-all ${
-                        profile.popia_risk_level === 'low' ? 'bg-emerald-400' :
-                        profile.popia_risk_level === 'medium' ? 'bg-amber-400' : 'bg-red-400'
-                      }`}
-                      style={{ width: `${(profile.popia_score / 20) * 100}%` }}
-                    />
-                  </div>
-                </div>
-              ) : (
-                <p className="text-sm text-montana-muted/60 italic">No assessment data yet.</p>
-              )}
+            {/* Security Assessment */}
+            <div className="border border-white/10 bg-white/[0.02] p-5 flex flex-col gap-4">
+              <div className="flex items-center gap-2">
+                <Shield className="h-4 w-4 text-montana-pink shrink-0" />
+                <p className="text-sm font-semibold text-white">Security Assessment</p>
+              </div>
+              <p className="text-sm text-montana-muted/70 italic">No Security assessment completed yet.</p>
+              <Link href="/assessments/security">
+                <AnimatedButton variant="outline" className="text-xs py-2 px-4 w-full justify-center">
+                  Start Security Assessment
+                </AnimatedButton>
+              </Link>
             </div>
 
-            <div className="border border-white/5 bg-white/[0.02] p-4">
-              <p className="text-xs text-montana-muted uppercase tracking-wider mb-2">Last Assessment</p>
-              <p className={`text-sm font-semibold ${profile.last_popia_assessment_at ? 'text-white' : 'text-montana-muted/60 italic'}`}>
-                {profile.last_popia_assessment_at ? formatDate(profile.last_popia_assessment_at) : 'Never'}
-              </p>
-              {!profile.last_popia_assessment_at && (
-                <Link href="/assessments/popia" className="text-xs text-montana-pink hover:underline mt-2 block">
-                  Start assessment →
-                </Link>
-              )}
-            </div>
           </div>
         </SpotlightCard>
 
@@ -646,38 +662,33 @@ export default async function PortalPage() {
           <p className="text-sm text-montana-muted mb-6">
             Keep your details up to date. These appear on invoices and compliance reports.
           </p>
-          <ProfileForm
-            initialData={{
-              fullName:    profile.full_name    ?? '',
-              companyName: profile.company_name ?? '',
-              companySize: profile.company_size ?? '',
-              industry:    profile.industry     ?? '',
-            }}
-          />
+          {(() => {
+            const p = profile as unknown as Record<string, unknown>;
+            return (
+              <ProfileForm
+                userEmail={user.email ?? ''}
+                initialData={{
+                  fullName:         profile.full_name    ?? '',
+                  phone:            (p.phone             as string) ?? '',
+                  avatarUrl:        (p.avatar_url        as string) ?? '',
+                  companyName:      profile.company_name ?? '',
+                  companyRegNumber: (p.company_reg_number as string) ?? '',
+                  vatNumber:        (p.vat_number        as string) ?? '',
+                  industry:         profile.industry     ?? '',
+                  companySize:      profile.company_size ?? '',
+                  addressLine1:     (p.address_line1     as string) ?? '',
+                  addressLine2:     (p.address_line2     as string) ?? '',
+                  city:             (p.city              as string) ?? '',
+                  province:         (p.province          as string) ?? '',
+                  postalCode:       (p.postal_code       as string) ?? '',
+                  country:          (p.country           as string) ?? '',
+                }}
+              />
+            );
+          })()}
         </SpotlightCard>
 
-        {/* ── 6. Contact Details ────────────────────────────────────────────── */}
-        <SpotlightCard customSize className="p-6 md:p-8 mb-6">
-          <div className="flex items-center gap-2 mb-2">
-            <FileCheck className="h-5 w-5 text-montana-pink" />
-            <h2 className="text-base font-semibold text-white">Contact Details</h2>
-          </div>
-          <p className="text-sm text-montana-muted mb-6">
-            Optional — used for invoice delivery, service communications, and on-site support.
-          </p>
-          <ContactDetailsForm
-            initialData={{
-              email:        (profile as unknown as Record<string, unknown>).email as string ?? '',
-              phone:        (profile as unknown as Record<string, unknown>).phone as string ?? '',
-              addressLine1: (profile as unknown as Record<string, unknown>).address_line1 as string ?? '',
-              city:         (profile as unknown as Record<string, unknown>).city as string ?? '',
-              province:     (profile as unknown as Record<string, unknown>).province as string ?? '',
-              postalCode:   (profile as unknown as Record<string, unknown>).postal_code as string ?? '',
-            }}
-          />
-        </SpotlightCard>
-
-        {/* ── 7. Support ────────────────────────────────────────────────────── */}
+        {/* ── 6. Support ────────────────────────────────────────────────────── */}
         <SpotlightCard customSize className="p-6 md:p-8">
           <div className="flex items-center gap-2 mb-6">
             <Shield className="h-5 w-5 text-montana-pink" />
