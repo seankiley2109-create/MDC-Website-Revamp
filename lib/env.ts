@@ -7,7 +7,6 @@ const serverSchema = z.object({
   MONDAY_CONTACT_BOARD_ID:       z.string().min(1),
   MONDAY_POS_BOARD_ID:           z.string().min(1),
   MONDAY_ASSESSMENT_BOARD_ID:    z.string().min(1),
-  MONDAY_SUPPORT_BOARD_ID:       z.string().min(1),
   PAYSTACK_SECRET_KEY:           z.string().min(1),
 });
 
