@@ -62,9 +62,6 @@ export function Services() {
               In today&apos;s landscape, you aren&apos;t just buying backup. You are buying business continuity, regulatory compliance, and peace of mind. We provide the infrastructure and advisory support to ensure your data is always secure, compliant, and instantly recoverable.
             </p>
           </div>
-
-          {/* Service architecture network */}
-          <NetworkGraph />
         </div>
 
         <div className="mb-8 md:mb-12">
