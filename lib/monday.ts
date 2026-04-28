@@ -103,7 +103,7 @@ const POS_COLS = {
 
 /** Column IDs for the subitems board attached to the Solution Requests board. */
 const CONSULTING_SUBITEM_COLS = {
-  productCode: 'text_mm2vbe5n',
+  productCode: 'text_mm2vxwwn',
 } as const;
 
 /** Column IDs for the "Support Tickets" board. */
@@ -167,7 +167,7 @@ const SUBITEM_COLS = {
  * After adding the column in monday.com: Board → Subitems → column header → Settings → copy ID.
  * Leave as '' to silently skip writing emails until the column exists.
  */
-const SUBITEM_USER_EMAILS_COL = '';
+const SUBITEM_USER_EMAILS_COL = 'text_mm2vbe5n';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
