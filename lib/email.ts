@@ -204,6 +204,7 @@ function sectionHeading(text: string): string {
 
 const enquiryLabels: Record<EnquiryType, string> = {
   'enterprise-backup': 'Enterprise Backup',
+  'ransomware':           'Ransomware Protection',
   'archiving':         'Archiving & Lifecycle',
   'quantum':           'Quantum Security (PQC)',
   'guardium':          'IBM Guardium',
