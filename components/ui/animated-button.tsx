@@ -33,7 +33,6 @@ export const AnimatedButton = React.forwardRef<HTMLButtonElement, AnimatedButton
         {...props}
       >
         {children}
-        <span className="btn-arrow">→</span>
       </motion.button>
     );
   }
