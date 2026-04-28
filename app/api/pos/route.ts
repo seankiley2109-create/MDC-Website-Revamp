@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { sendPOSEmails, sendPOSQuoteSummary, type POSPayload, type POSServicePlan, type ConsultingPayload } from '@/lib/email';
 import { createPOSLead, createConsultingLead } from '@/lib/monday';
+import { POPIA_SERVICES } from '@/lib/popia-services';
 
 // Mirror the service catalogue so the API can resolve IDs → labels
 const SERVICE_CATALOGUE: Record<
@@ -129,7 +130,16 @@ export async function POST(request: Request) {
         );
       }
 
-      const consultingPayload: ConsultingPayload = parsed.data;
+      const codes = parsed.data.serviceType.split(',').map(c => c.trim()).filter(Boolean);
+      const resolvedServices = codes
+        .map(code => POPIA_SERVICES.find(s => s.code === code))
+        .filter((s): s is NonNullable<typeof s> => s != null)
+        .map(s => ({ code: s.code, name: s.name, price: s.price, type: s.type }));
+
+      const consultingPayload: ConsultingPayload = {
+        ...parsed.data,
+        resolvedServices: resolvedServices.length > 0 ? resolvedServices : undefined,
+      };
       const mondayResult = await createConsultingLead(consultingPayload).catch((err: unknown): import('@/lib/monday').MondayResult => {
         console.error('[pos] consulting monday.com threw:', err);
         return { success: false, error: String(err) };

@@ -108,17 +108,25 @@ export interface CheckoutPayload {
 // Consulting enquiry types
 // ---------------------------------------------------------------------------
 
+export interface ResolvedConsultingService {
+  code:  string;
+  name:  string;
+  price: number;
+  type:  'once-off' | 'recurring';
+}
+
 export interface ConsultingPayload {
-  type:            'consulting';
-  name:            string;
-  email:           string;
-  company:         string;
-  phone?:          string;
-  serviceType:     string;
-  engagementModel?: string;
-  teamSize?:       string;
-  timeline?:       string;
-  requirements?:   string;
+  type:              'consulting';
+  name:              string;
+  email:             string;
+  company:           string;
+  phone?:            string;
+  serviceType:       string;
+  resolvedServices?: ResolvedConsultingService[];
+  engagementModel?:  string;
+  teamSize?:         string;
+  timeline?:         string;
+  requirements?:     string;
 }
 
 // ---------------------------------------------------------------------------

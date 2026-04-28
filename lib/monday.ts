@@ -87,6 +87,7 @@ const CONTACT_COLS = {
   company:     'text_mm201srx',
   enquiryType: 'color_mm20kdra',
   message:     'text_mm208etp',
+  date:        'date_mm2vhct',
   leadStatus:  'color_mm20shcj',
 } as const;
 
@@ -95,8 +96,14 @@ const POS_COLS = {
   email:      'email_mm20vp3x',
   company:    'text_mm201srx',
   services:   'text_mm208etp',
+  date:       'date_mm2vak9c',
   notes:      'text_mm20785f',
   leadStatus: 'color_mm20shcj',
+} as const;
+
+/** Column IDs for the subitems board attached to the Solution Requests board. */
+const CONSULTING_SUBITEM_COLS = {
+  productCode: 'text_mm2vxwwn',
 } as const;
 
 /** Column IDs for the "Support Tickets" board. */
@@ -116,6 +123,7 @@ const ASSESSMENT_COLS = {
   assessmentType: 'color_mm20shcj', // Fixed: was incorrectly showing "New Request"
   score:          'numeric_mm2036ae',
   riskLevel:      'color_mm202efg',
+  date:           'date_mm2v3z1p',
   leadStatus:     'color_mm20qe7',
 } as const;
 
@@ -380,6 +388,7 @@ export async function createContactLead(
     [CONTACT_COLS.company]:     payload.company,
     [CONTACT_COLS.enquiryType]: colStatus(enquiryStatusLabel[payload.enquiryType] ?? 'General'),
     [CONTACT_COLS.message]:     payload.message,
+    [CONTACT_COLS.date]:        colDate(new Date()),
     [CONTACT_COLS.leadStatus]:  colStatus('New Lead'),
   };
 
@@ -437,29 +446,53 @@ export async function createConsultingLead(payload: ConsultingPayload): Promise<
   const boardId = process.env.MONDAY_POS_BOARD_ID;
   if (!boardId) return { success: true, skipped: true };
 
-  const lines: string[] = [
-    `Type: Consulting`,
-    `Service: ${payload.serviceType}`,
-  ];
-  if (payload.engagementModel) lines.push(`Engagement Model: ${payload.engagementModel}`);
-  if (payload.teamSize)        lines.push(`Team Size: ${payload.teamSize}`);
-  if (payload.timeline)        lines.push(`Timeline: ${payload.timeline}`);
-  if (payload.phone)           lines.push(`Phone: ${payload.phone}`);
-  if (payload.requirements)    lines.push(`\nRequirements:\n${payload.requirements}`);
+  const serviceCount = payload.resolvedServices?.length ?? 0;
+  const servicesSummary = serviceCount > 0
+    ? `${serviceCount} consulting service${serviceCount !== 1 ? 's' : ''} — see subitems`
+    : payload.serviceType;
+
+  const detailLines: string[] = [];
+  if (payload.engagementModel) detailLines.push(`Engagement Model: ${payload.engagementModel}`);
+  if (payload.teamSize)        detailLines.push(`Team Size: ${payload.teamSize}`);
+  if (payload.timeline)        detailLines.push(`Timeline: ${payload.timeline}`);
+  if (payload.phone)           detailLines.push(`Phone: ${payload.phone}`);
 
   const columns: ColumnValueMap = {
     [POS_COLS.email]:      colEmail(payload.email),
     [POS_COLS.company]:    payload.company,
-    [POS_COLS.services]:   lines.join('\n'),
+    [POS_COLS.services]:   detailLines.length ? detailLines.join('\n') : servicesSummary,
+    [POS_COLS.date]:       colDate(new Date()),
     [POS_COLS.notes]:      payload.requirements || '—',
     [POS_COLS.leadStatus]: colStatus('New Request'),
   };
 
-  return createItem(
+  const parentResult = await createItem(
     boardId,
     `${payload.company} — Consulting Lead`,
     columns,
   );
+
+  if (!parentResult.success || !parentResult.itemId) return parentResult;
+
+  // Create one subitem per selected consulting service
+  if (payload.resolvedServices && payload.resolvedServices.length > 0) {
+    for (const service of payload.resolvedServices) {
+      await mondayGraphQL<{ create_subitem: { id: string } }>(
+        CREATE_SUBITEM_MUTATION,
+        {
+          parentItemId: parentResult.itemId,
+          itemName:     service.name,
+          columnValues: JSON.stringify({
+            [CONSULTING_SUBITEM_COLS.productCode]: service.code,
+          }),
+        },
+      ).catch((err: unknown) => {
+        console.error('[monday] consulting subitem creation failed:', err);
+      });
+    }
+  }
+
+  return parentResult;
 }
 
 // ─── Support ticket types ─────────────────────────────────────────────────────
@@ -535,6 +568,7 @@ export async function createAssessmentLead(
     [ASSESSMENT_COLS.assessmentType]: colStatus(typeLabel),
     [ASSESSMENT_COLS.score]:          String(payload.score),  // Numbers col requires string
     [ASSESSMENT_COLS.riskLevel]:      colStatus(boardRiskLabel),
+    [ASSESSMENT_COLS.date]:           colDate(new Date()),
     [ASSESSMENT_COLS.leadStatus]:     colStatus('New Lead'),
   };
 
