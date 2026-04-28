@@ -352,11 +352,15 @@ async function createItem(
 // ─── Enquiry type label map ───────────────────────────────────────────────────
 
 const enquiryStatusLabel: Record<string, string> = {
-  'new-solution':    'New Solution',
-  'existing-client': 'Existing Client',
-  'partnership':     'Partnership',
-  'compliance':      'POPIA Consulting',
-  'general':         'General',
+  'enterprise-backup': 'Enterprise Backup',
+  'ransomware':        'Ransomware Protection',
+  'archiving':         'Archiving & Lifecycle',
+  'quantum':           'Quantum Security (PQC)',
+  'guardium':          'IBM Guardium',
+  'existing-client':   'Existing Client',
+  'partnership':       'Partnership',
+  'compliance':        'POPIA Consulting',
+  'general':           'General',
 };
 
 // ─── Public API ───────────────────────────────────────────────────────────────

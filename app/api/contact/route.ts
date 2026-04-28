@@ -7,7 +7,7 @@ const schema = z.object({
   name:        z.string().min(2),
   email:       z.string().email(),
   company:     z.string().min(1),
-  enquiryType: z.enum(['enterprise-backup', 'archiving', 'quantum', 'guardium', 'existing-client', 'partnership', 'compliance', 'general']),
+  enquiryType: z.enum(['enterprise-backup', 'ransomware', 'archiving', 'quantum', 'guardium', 'existing-client', 'partnership', 'compliance', 'general']),
   message:     z.string().min(10),
 });
 
