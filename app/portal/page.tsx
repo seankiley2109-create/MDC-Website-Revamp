@@ -337,7 +337,7 @@ export default async function PortalPage() {
         {/* ── 2. Stats bar ──────────────────────────────────────────────────── */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 py-6 mb-2">
           <SpotlightCard customSize className="p-4">
-            <p className="text-xs text-montana-muted uppercase tracking-wider mb-1.5">Profile Status</p>
+            <p className="text-xs text-montana-muted uppercase tracking-wider mb-1.5">Customer Status</p>
             <div className="flex items-center gap-2">
               {statusCfg.icon}
               <span className={`text-base font-bold ${statusCfg.color}`}>{statusCfg.label}</span>
@@ -345,7 +345,7 @@ export default async function PortalPage() {
           </SpotlightCard>
 
           <SpotlightCard customSize className="p-4">
-            <p className="text-xs text-montana-muted uppercase tracking-wider mb-1.5">Active Since</p>
+            <p className="text-xs text-montana-muted uppercase tracking-wider mb-1.5">Profile Created</p>
             <div className="flex items-center gap-2">
               <Clock className="h-4 w-4 text-montana-pink shrink-0" />
               <span className="text-base font-bold text-white">
