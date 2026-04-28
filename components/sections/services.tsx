@@ -1,6 +1,5 @@
 import { SpotlightCard } from "@/components/ui/spotlight-card";
 import { AnimatedButton } from "@/components/ui/animated-button";
-import { NetworkGraph } from "@/components/ui/network-graph";
 import { Database, ShieldCheck, FileText, Server, ShieldAlert, Archive, Activity, Lock } from "lucide-react";
 import Link from "next/link";
 
