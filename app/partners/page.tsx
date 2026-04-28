@@ -54,7 +54,7 @@ const benefits = [
   },
 ];
 
-const products = [
+const resellerProducts = [
   {
     icon:  Server,
     title: 'Enterprise Backup',
@@ -76,6 +76,9 @@ const products = [
     accent: 'text-montana-orange',
     border: 'border-montana-orange/20',
   },
+];
+
+const referralProducts = [
   {
     icon:  Activity,
     title: 'IBM Guardium',
@@ -197,16 +200,41 @@ export default function PartnersPage() {
           </div>
         </div>
 
-        {/* Products to Resell */}
+        {/* Reseller Products */}
         <div className="mb-16 md:mb-24">
           <div className="mb-10">
             <h2 className="font-display text-3xl md:text-4xl font-bold text-white mb-4">Products you can resell</h2>
             <p className="text-montana-muted max-w-2xl">
-              Our full portfolio is available to reseller partners — from self-serve SaaS products to consultative enterprise engagements.
+              Reseller partners can actively sell and manage these solutions for their clients, earning recurring margins on every subscription.
             </p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {products.map((p) => {
+            {resellerProducts.map((p) => {
+              const Icon = p.icon;
+              return (
+                <SpotlightCard customSize key={p.title} className={`p-6 flex flex-col gap-3 border ${p.border} hover:border-opacity-60 transition-colors`}>
+                  <Icon className={`h-7 w-7 ${p.accent}`} />
+                  <h3 className="font-bold text-white">{p.title}</h3>
+                  <p className="text-sm text-montana-muted leading-relaxed">{p.body}</p>
+                </SpotlightCard>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Referral-Only Products */}
+        <div className="mb-16 md:mb-24">
+          <div className="mb-10">
+            <div className="inline-flex items-center border border-white/10 bg-montana-surface/80 backdrop-blur-sm px-3 py-1 text-xs font-bold tracking-widest text-montana-muted uppercase mb-4">
+              Referral Only
+            </div>
+            <h2 className="font-display text-3xl md:text-4xl font-bold text-white mb-4">Products you can refer</h2>
+            <p className="text-montana-muted max-w-2xl">
+              These specialist solutions are delivered directly by Montana — refer a qualified lead and earn a one-time referral fee. No technical knowledge required.
+            </p>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {referralProducts.map((p) => {
               const Icon = p.icon;
               return (
                 <SpotlightCard customSize key={p.title} className={`p-6 flex flex-col gap-3 border ${p.border} hover:border-opacity-60 transition-colors`}>
@@ -234,11 +262,6 @@ export default function PartnersPage() {
                 key={tier.name}
                 className={`p-8 flex flex-col h-full relative ${tier.featured ? 'border-montana-pink/50 md:-translate-y-4' : ''}`}
               >
-                {tier.featured && (
-                  <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-montana-pink text-white text-xs font-bold px-4 py-1.5 tracking-wider">
-                    MOST POPULAR
-                  </div>
-                )}
                 <h3 className="font-display text-xl font-bold text-white mb-3">{tier.name}</h3>
                 <p className="text-montana-muted text-sm mb-6">{tier.description}</p>
                 <ul className="space-y-2 mb-8 flex-1">

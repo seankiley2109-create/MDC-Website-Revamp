@@ -50,10 +50,10 @@ interface CartItem {
 // ─── Default configs per service ─────────────────────────────────────────────
 
 const DEFAULT_CONFIGS: Record<SelfServeServiceId, ServiceConfig> = {
-  "druva-m365":      { storageTier: "50GB",  protectionLevel: "standard", billingPeriod: "monthly", quantity: 10 },
-  "druva-endpoint":  { storageTier: "50GB",  protectionLevel: "standard", billingPeriod: "monthly", quantity: 10 },
+  "druva-m365":      { storageTier: "50GB",  protectionLevel: "standard", billingPeriod: "monthly", quantity: 1 },
+  "druva-endpoint":  { storageTier: "50GB",  protectionLevel: "standard", billingPeriod: "monthly", quantity: 1 },
   "druva-server":    { storageTier: "1TB",   protectionLevel: "standard", billingPeriod: "monthly", quantity: 1  },
-  "maas360":         { storageTier: "",      protectionLevel: "standard", billingPeriod: "monthly", quantity: 10 },
+  "maas360":         { storageTier: "",      protectionLevel: "standard", billingPeriod: "monthly", quantity: 1 },
 };
 
 // ─── Cloud service metadata ───────────────────────────────────────────────────
