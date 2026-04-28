@@ -19,6 +19,7 @@ const ENQUIRY_VALUES = [
   "partnership",
   "compliance",
   "general",
+  "ransomware",
 ] as const;
 
 type EnquiryValue = typeof ENQUIRY_VALUES[number];
@@ -34,13 +35,13 @@ const SERVICE_DEFAULTS: Record<string, ServiceDefaults> = {
     enquiryType: "enterprise-backup",
     label: "IBM Enterprise Backup",
     message:
-      "Hi,\n\nI'd like to request a consultation for IBM Enterprise Backup.\n\nOur environment:\n- Cloud / hybrid / on-premises: \n- Approximate data volume (TB): \n- Current backup solution: \n- Recovery time objective (RTO): \n- Recovery point objective (RPO): \n\nPlease reach out to arrange a discovery call.",
+      "Hi,\n\nI'd like to request a consultation for IBM Enterprise Backup.\n\nOur environment:\n- Cloud / hybrid / on-premises: \n- Approximate data volume (TB): \n- Current backup solution: \n- Data types (email, files, database): \n\nPlease reach out to arrange a discovery call.",
   },
   "ransomware": {
-    enquiryType: "enterprise-backup",
+    enquiryType: "ransomware",
     label: "Ransomware Protection",
     message:
-      "Hi,\n\nI'm interested in Montana DC's Ransomware Protection solution (immutable storage + AI-driven anomaly detection).\n\nOur environment:\n- Number of servers / endpoints: \n- Current backup solution: \n- Last security audit: \n- Urgency / timeline: \n\nPlease contact me to discuss our options.",
+      "Hi,\n\nI'm interested in Montana's Ransomware Protection solution (immutable storage + AI-driven anomaly detection).\n\nOur environment:\n- Number of servers / endpoints: \n- Current backup solution: \n- Last security audit: \n- Urgency / timeline: \n\nPlease contact me to discuss our options.",
   },
   "archive": {
     enquiryType: "archiving",
@@ -58,7 +59,7 @@ const SERVICE_DEFAULTS: Record<string, ServiceDefaults> = {
     enquiryType: "quantum",
     label: "Quantum Security (PQC)",
     message:
-      "Hi,\n\nI'm interested in Montana DC's Quantum Security (Post-Quantum Cryptography) readiness assessment.\n\nOur context:\n- Industry / sector: \n- Encryption standards currently in use: \n- Known long-lived data assets: \n- Timeline for PQC migration planning: \n\nPlease contact me to discuss next steps.",
+      "Hi,\n\nI'm interested in Montana's Quantum Security (Post-Quantum Cryptography) readiness assessment.\n\nOur context:\n- Industry / sector: \n- Encryption standards currently in use: \n- Known long-lived data assets: \n- Timeline for PQC migration planning: \n\nPlease contact me to discuss next steps.",
   },
 };
 
@@ -344,6 +345,7 @@ function ContactFormInner() {
                         <option value="" disabled>Select a category</option>
                         <optgroup label="Product Enquiries">
                           <option value="enterprise-backup">Enterprise Backup</option>
+                          <option value="ransomware">Ransomware Protection</option>
                           <option value="archiving">Archiving &amp; Lifecycle</option>
                           <option value="quantum">Quantum Security (PQC)</option>
                           <option value="guardium">IBM Guardium</option>
