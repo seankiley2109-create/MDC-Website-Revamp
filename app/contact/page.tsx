@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, Suspense } from "react";
+import { useState, useEffect, useRef, Suspense } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useSearchParams } from "next/navigation";
@@ -63,6 +63,14 @@ const SERVICE_DEFAULTS: Record<string, ServiceDefaults> = {
   },
 };
 
+const ENQUIRY_TYPE_DEFAULTS: Partial<Record<EnquiryValue, { label: string; message: string }>> = {
+  "enterprise-backup": { label: "Enterprise Backup", message: SERVICE_DEFAULTS["ibm-backup"].message },
+  "ransomware":        { label: "Ransomware Protection", message: SERVICE_DEFAULTS["ransomware"].message },
+  "archiving":         { label: "Archive & Lifecycle", message: SERVICE_DEFAULTS["archive"].message },
+  "guardium":          { label: "IBM Guardium", message: SERVICE_DEFAULTS["guardium"].message },
+  "quantum":           { label: "Quantum Security (PQC)", message: SERVICE_DEFAULTS["quantum"].message },
+};
+
 const contactSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
   email: z.string().email("Please enter a valid email address"),
@@ -92,6 +100,8 @@ function ContactFormInner() {
     register,
     handleSubmit,
     reset,
+    watch,
+    setValue,
     formState: { errors },
   } = useForm<ContactFormValues>({
     resolver: zodResolver(contactSchema),
@@ -100,6 +110,20 @@ function ContactFormInner() {
       message: serviceDefaults?.message ?? "",
     },
   });
+
+  const watchedEnquiryType = watch("enquiryType");
+  const isFirstRender = useRef(true);
+
+  useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+    const defaults = ENQUIRY_TYPE_DEFAULTS[watchedEnquiryType];
+    setValue("message", defaults?.message ?? "");
+  }, [watchedEnquiryType, setValue]);
+
+  const activeDefaults = ENQUIRY_TYPE_DEFAULTS[watchedEnquiryType] ?? null;
 
   const onSubmit = async (data: ContactFormValues) => {
     setIsSubmitting(true);
@@ -292,10 +316,10 @@ function ContactFormInner() {
                     <p className="text-montana-muted text-sm">Complete the form and we&apos;ll be in touch within one business day.</p>
                   </div>
 
-                  {serviceDefaults && (
+                  {activeDefaults && (
                     <div className="flex items-center gap-3 px-4 py-3 border border-montana-pink/20 bg-montana-pink/5 text-xs text-montana-muted">
                       <span className="h-1.5 w-1.5 rounded-full bg-montana-pink shrink-0" />
-                      Pre-filled for <span className="text-white font-medium ml-1">{serviceDefaults.label}</span>
+                      Pre-filled for <span className="text-white font-medium ml-1">{activeDefaults.label}</span>
                       <span className="ml-auto text-white/30">Edit any field before submitting</span>
                     </div>
                   )}
@@ -366,7 +390,7 @@ function ContactFormInner() {
                     <textarea
                       {...register("message")}
                       id="message"
-                      rows={serviceDefaults ? 10 : 5}
+                      rows={activeDefaults ? 10 : 5}
                       className="w-full border border-white/10 bg-montana-surface/50 px-4 py-3 text-sm text-white placeholder-white/20 focus:border-montana-pink focus:outline-none transition-colors resize-none font-mono"
                       placeholder="Tell us about your environment, current challenges, or what you're looking to achieve..."
                     />
