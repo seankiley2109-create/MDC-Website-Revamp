@@ -105,6 +105,23 @@ export interface CheckoutPayload {
 }
 
 // ---------------------------------------------------------------------------
+// Consulting enquiry types
+// ---------------------------------------------------------------------------
+
+export interface ConsultingPayload {
+  type:            'consulting';
+  name:            string;
+  email:           string;
+  company:         string;
+  phone?:          string;
+  serviceType:     string;
+  engagementModel?: string;
+  teamSize?:       string;
+  timeline?:       string;
+  requirements?:   string;
+}
+
+// ---------------------------------------------------------------------------
 // Shared HTML shell
 // ---------------------------------------------------------------------------
 
