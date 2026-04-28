@@ -22,6 +22,7 @@ export type EnquiryType =
   | 'existing-client'
   | 'partnership'
   | 'compliance'
+  | 'ransomware'
   | 'general';
 
 export type AssessmentType = 'security' | 'popia';
