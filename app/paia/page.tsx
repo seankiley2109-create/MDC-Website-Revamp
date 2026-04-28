@@ -120,7 +120,7 @@ export default function PAIAPage() {
             <div className="space-y-1">
               <p className="text-white/40 text-xs uppercase tracking-wider mb-3">Postal Address</p>
               <address className="not-italic leading-relaxed">
-                Suite 158, First Floor<br />
+                Suite 126, First Floor<br />
                 Willowbridge Centre<br />
                 Carl Cronje Drive<br />
                 Tyger Valley, 7530

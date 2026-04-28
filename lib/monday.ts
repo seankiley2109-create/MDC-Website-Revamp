@@ -103,7 +103,7 @@ const POS_COLS = {
 
 /** Column IDs for the subitems board attached to the Solution Requests board. */
 const CONSULTING_SUBITEM_COLS = {
-  productCode: 'text_mm2vxwwn',
+  productCode: 'text_mm2vbe5n',
 } as const;
 
 /** Column IDs for the "Support Tickets" board. */
@@ -161,6 +161,13 @@ const SUBITEM_COLS = {
   lineTotal:   'numeric_mkqfjn0d',
   orderId:     'text_mm00beth',
 } as const;
+
+/**
+ * Column ID for the Long Text "Provisioning Emails" column on the subitems board.
+ * After adding the column in monday.com: Board → Subitems → column header → Settings → copy ID.
+ * Leave as '' to silently skip writing emails until the column exists.
+ */
+const SUBITEM_USER_EMAILS_COL = '';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -667,6 +674,7 @@ export async function createOrderSubitem(
     quantity:     number;
     line_total:   number;
   },
+  userEmails?: string[],
 ): Promise<MondayResult> {
   const columns: ColumnValueMap = {
     [SUBITEM_COLS.productCode]: line.product_code,
@@ -674,6 +682,10 @@ export async function createOrderSubitem(
     [SUBITEM_COLS.quantity]:    String(line.quantity),
     [SUBITEM_COLS.lineTotal]:   String(line.line_total.toFixed(2)),
     [SUBITEM_COLS.orderId]:     orderId,
+    ...(SUBITEM_USER_EMAILS_COL && userEmails?.length
+      ? { [SUBITEM_USER_EMAILS_COL]: colLongText(userEmails.join('\n')) }
+      : {}
+    ),
   };
 
   const result = await mondayGraphQL<{ create_subitem: { id: string; name: string } }>(

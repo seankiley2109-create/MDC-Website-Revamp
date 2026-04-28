@@ -57,13 +57,16 @@ const inputClass =
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
+type UserEmailContextEntry = { serviceId: string; emails: string[] };
+
 export default function CheckoutPage() {
-  const router                = useRouter();
-  const [cart, setCart]       = useState<CartLineItem[]>([]);
-  const [userEmail, setEmail] = useState<string>('');
-  const [cartReady, setReady] = useState(false);
-  const [submitting, setSub]  = useState(false);
-  const [serverError, setErr] = useState<string | null>(null);
+  const router                              = useRouter();
+  const [cart, setCart]                     = useState<CartLineItem[]>([]);
+  const [userEmail, setEmail]               = useState<string>('');
+  const [userEmailContext, setEmailContext] = useState<UserEmailContextEntry[]>([]);
+  const [cartReady, setReady]               = useState(false);
+  const [submitting, setSub]                = useState(false);
+  const [serverError, setErr]               = useState<string | null>(null);
 
   const {
     register,
@@ -72,7 +75,7 @@ export default function CheckoutPage() {
     formState: { errors },
   } = useForm<OrderFormData>({ defaultValues: { country: 'ZA' } });
 
-  // Load cart from sessionStorage
+  // Load cart and user email context from sessionStorage
   useEffect(() => {
     const raw = sessionStorage.getItem('mdc_cart');
     if (!raw) {
@@ -86,6 +89,17 @@ export default function CheckoutPage() {
         return;
       }
       setCart(parsed);
+
+      const rawEmails = sessionStorage.getItem('mdc_user_emails');
+      if (rawEmails) {
+        try {
+          const parsedEmails = JSON.parse(rawEmails) as UserEmailContextEntry[];
+          if (Array.isArray(parsedEmails)) setEmailContext(parsedEmails);
+        } catch {
+          // Malformed — ignore
+        }
+      }
+
       setReady(true);
     } catch {
       router.replace('/pos?error=empty_cart');
@@ -112,7 +126,7 @@ export default function CheckoutPage() {
     setSub(true);
     setErr(null);
 
-    const result = await processOrder(data, cart);
+    const result = await processOrder(data, cart, userEmailContext.length > 0 ? userEmailContext : undefined);
 
     if (!result.success || !result.authorization_url) {
       setErr(result.error ?? 'Something went wrong. Please try again.');
@@ -121,6 +135,7 @@ export default function CheckoutPage() {
     }
 
     sessionStorage.removeItem('mdc_cart');
+    sessionStorage.removeItem('mdc_user_emails');
     window.location.href = result.authorization_url;
   }, [cart]);
 

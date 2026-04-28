@@ -90,8 +90,9 @@ function lookupDiscount(code: string | undefined): number {
 // ─── Server Action ────────────────────────────────────────────────────────────
 
 export async function processOrder(
-  formData: OrderFormData,
-  rawCart:  unknown[],
+  formData:          OrderFormData,
+  rawCart:           unknown[],
+  userEmailContext?: { serviceId: string; emails: string[] }[],
 ): Promise<OrderResult> {
 
   // 1. Validate form data
@@ -210,7 +211,8 @@ export async function processOrder(
       // 9. Monday.com subitems — non-critical, one per line
       for (const line of cart) {
         try {
-          await createOrderSubitem(mondayResult.itemId, orderId, line);
+          const emailsForLine = userEmailContext?.find(ctx => ctx.serviceId === line.service_id)?.emails;
+          await createOrderSubitem(mondayResult.itemId, orderId, line, emailsForLine);
         } catch (err) {
           console.error('[order] Subitem failed for', line.name, ':', err);
         }
@@ -276,6 +278,7 @@ export async function processOrder(
           services: cart.map(({ service_id, plan_id, quantity }) => ({
             service_id, plan_id, quantity,
           })),
+          ...(userEmailContext?.length && { user_email_context: userEmailContext }),
         },
       }),
     });

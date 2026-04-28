@@ -186,6 +186,8 @@ function ServiceConfigCard({
   onUserEmailsChange:  (serviceId: SelfServeServiceId, emails: string) => void;
 }) {
   const cardRef = useRef<HTMLDivElement>(null);
+  const [emailError, setEmailError] = useState<string | null>(null);
+
   useEffect(() => {
     if (isFocused && cardRef.current) {
       cardRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
@@ -197,6 +199,21 @@ function ServiceConfigCard({
   const dims = SERVICE_DIMENSIONS[service.id];
   const { unitPrice, lineTotal, planId, valid } = getCartItemPrice(service.id, config);
   const isServer = service.id === "druva-server";
+  const needsEmails = service.id === "druva-m365" || service.id === "druva-endpoint";
+  const parsedEmails = needsEmails
+    ? userEmails.split(/[\n,]+/).map(e => e.trim()).filter(Boolean)
+    : [];
+  const countMismatch = parsedEmails.length > 0 && parsedEmails.length !== config.quantity;
+  const countMatch    = parsedEmails.length > 0 && parsedEmails.length === config.quantity;
+
+  const handleAddToCart = () => {
+    if (needsEmails && !userEmails.trim()) {
+      setEmailError("Email addresses are required to provision this service.");
+      return;
+    }
+    setEmailError(null);
+    onAddToCart(service.id);
+  };
 
   // Annual saving vs paying monthly × 12
   const monthlyPlanId = planId.replace("-annual", "-monthly");
@@ -362,22 +379,43 @@ function ServiceConfigCard({
       )}
 
       {/* User Email Capture — M365 / endpoint only */}
-      {(service.id === "druva-m365" || service.id === "druva-endpoint") && (
+      {needsEmails && (
         <div className="mb-5">
-          <div className="text-xs font-bold tracking-wider text-white/50 uppercase mb-1">
+          <div className="text-xs font-bold tracking-wider text-white/50 uppercase mb-1 flex items-center gap-1.5">
             {service.id === "druva-m365" ? "M365 / Google Workspace User Emails" : "Endpoint User Emails"}
-            <span className="ml-2 font-normal normal-case text-white/30">(optional — assists onboarding)</span>
+            <span className="text-red-400">*</span>
           </div>
           <p className="text-xs text-montana-muted mb-2">
-            Paste the email addresses of the users to be protected, one per line or comma-separated. We&apos;ll use these during account provisioning.
+            Paste the email addresses of the users to be protected, one per line or comma-separated. Required for provisioning.
           </p>
           <textarea
             rows={4}
             value={userEmails}
-            onChange={e => onUserEmailsChange(service.id, e.target.value)}
+            onChange={e => {
+              onUserEmailsChange(service.id, e.target.value);
+              if (emailError) setEmailError(null);
+            }}
             placeholder={"user@company.com\nuser2@company.com"}
-            className="w-full border border-white/10 bg-montana-surface/50 px-3 py-2 text-xs text-white placeholder:text-white/20 focus:border-montana-pink focus:outline-none resize-none font-mono"
+            className={`w-full border bg-montana-surface/50 px-3 py-2 text-xs text-white placeholder:text-white/20 focus:outline-none resize-none font-mono ${
+              emailError ? "border-red-400/60 focus:border-red-400" : "border-white/10 focus:border-montana-pink"
+            }`}
           />
+          {emailError && (
+            <p className="text-xs text-red-400 mt-1.5 flex items-center gap-1">
+              <AlertCircle className="h-3 w-3 shrink-0" />
+              {emailError}
+            </p>
+          )}
+          {countMismatch && !emailError && (
+            <p className="text-xs text-montana-orange mt-1.5">
+              {parsedEmails.length} email{parsedEmails.length !== 1 ? "s" : ""} entered — you configured {config.quantity} {service.unitLabel}. Adjust the quantity or add the remaining emails.
+            </p>
+          )}
+          {countMatch && (
+            <p className="text-xs text-emerald-400 mt-1.5">
+              ✓ {parsedEmails.length} email{parsedEmails.length !== 1 ? "s" : ""} match the configured quantity.
+            </p>
+          )}
         </div>
       )}
 
@@ -407,7 +445,7 @@ function ServiceConfigCard({
             </div>
           ) : (
             <AnimatedButton
-              onClick={() => onAddToCart(service.id)}
+              onClick={handleAddToCart}
               className="shrink-0 text-sm py-2 px-4"
             >
               Add to Cart
@@ -877,6 +915,15 @@ function POSForm() {
   const handleCheckout = () => {
     if (cartItems.length === 0) return;
 
+    // Build parsed email context from raw textarea values
+    const emailContext = (Object.entries(userEmails) as [SelfServeServiceId, string][])
+      .filter(([, raw]) => raw?.trim())
+      .map(([serviceId, raw]) => ({
+        serviceId,
+        emails: raw.split(/[\n,]+/).map(e => e.trim()).filter(Boolean),
+      }))
+      .filter(ctx => ctx.emails.length > 0);
+
     // If not logged in: save cart state and redirect to sign-in → /checkout
     if (!user) {
       sessionStorage.setItem('pos_cart_state', JSON.stringify({
@@ -905,6 +952,11 @@ function POSForm() {
     });
 
     sessionStorage.setItem('mdc_cart', JSON.stringify(lineItems));
+    if (emailContext.length > 0) {
+      sessionStorage.setItem('mdc_user_emails', JSON.stringify(emailContext));
+    } else {
+      sessionStorage.removeItem('mdc_user_emails');
+    }
     router.push('/checkout');
   };
 
