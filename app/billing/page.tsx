@@ -14,7 +14,8 @@ import { redirect }                 from 'next/navigation';
 import Link                         from 'next/link';
 import { createServerClient }       from '@/lib/supabase/server';
 import type { Profile }             from '@/lib/supabase/types';
-import { SpotlightCard } from '@/components/ui/spotlight-card';
+import { SpotlightCard }    from '@/components/ui/spotlight-card';
+import { AnimatedButton }   from '@/components/ui/animated-button';
 import {
   CreditCard, AlertCircle, CheckCircle, Clock, XCircle,
   Package, Plus, Receipt, ArrowRight, Calendar, Tag,
@@ -422,126 +423,122 @@ export default async function BillingPage({
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
           {/* ── Main: purchase history ──────────────────────────────────── */}
-          <div className="lg:col-span-2 space-y-4">
+          <SpotlightCard customSize className="lg:col-span-2 p-6 md:p-8">
 
-            <div className="flex items-center justify-between mb-2">
-              <h2 className="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
-                <Receipt className="h-4 w-4 text-montana-pink" />
-                Purchase History
-              </h2>
-              <Link
-                href="/pos"
-                className="inline-flex items-center gap-1.5 text-xs font-bold text-montana-pink hover:text-montana-pink/80 transition-colors"
-              >
-                <Plus className="h-3.5 w-3.5" />
-                Add Products
-              </Link>
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-2">
+                <Receipt className="h-5 w-5 text-montana-pink" />
+                <h2 className="text-base font-semibold text-white">Purchase History</h2>
+              </div>
+              {purchaseGroups.length > 0 && (
+                <Link href="/pos">
+                  <AnimatedButton variant="outline" className="text-xs py-1.5 px-3 gap-1.5">
+                    <Plus className="h-3 w-3" />
+                    Add More
+                  </AnimatedButton>
+                </Link>
+              )}
             </div>
 
             {purchaseGroups.length === 0 ? (
-              /* Empty state */
-              <SpotlightCard customSize className="p-10 flex flex-col items-center text-center gap-4">
-                <div className="flex h-14 w-14 items-center justify-center bg-montana-surface border border-white/10">
-                  <ShoppingBag className="h-6 w-6 text-montana-muted/40" />
+              <div className="flex flex-col items-center justify-center py-12 text-center">
+                <div className="flex h-14 w-14 items-center justify-center bg-white/5 border border-white/10 mb-4">
+                  <ShoppingBag className="h-6 w-6 text-montana-muted" />
                 </div>
-                <div>
-                  <p className="text-sm font-semibold text-white mb-1">No purchases yet</p>
-                  <p className="text-xs text-montana-muted/60 max-w-xs">
-                    Head to the product configurator to build your solution and complete your first purchase.
-                  </p>
-                </div>
-                <Link
-                  href="/pos"
-                  className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-bold bg-montana-pink text-white hover:bg-montana-pink/90 transition-colors"
-                >
-                  Build Your Solution
-                  <ArrowRight className="h-4 w-4" />
+                <p className="text-sm text-montana-muted mb-1">No purchases yet</p>
+                <p className="text-xs text-montana-muted/60 max-w-xs mb-4">
+                  Head to the product configurator to build your solution and complete your first purchase.
+                </p>
+                <Link href="/pos">
+                  <AnimatedButton variant="primary" className="text-sm py-2 px-5">
+                    Build Your Solution
+                    <ArrowRight className="h-4 w-4 ml-1" />
+                  </AnimatedButton>
                 </Link>
-              </SpotlightCard>
+              </div>
             ) : (
-              purchaseGroups.map((group, gi) => (
-                <SpotlightCard customSize key={group.reference ?? group.orderId ?? `legacy-${gi}`} className="overflow-hidden">
-                  {/* Group header */}
-                  <div className="flex items-center justify-between px-5 py-3 border-b border-white/5 bg-white/[0.02]">
-                    <div className="flex items-center gap-3">
-                      <Tag className="h-3.5 w-3.5 text-montana-muted/50 shrink-0" />
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <p className="text-[11px] text-montana-muted/60 uppercase tracking-wider">
-                            {group.reference ? 'Transaction' : group.orderId ? 'Order' : 'Legacy purchases'}
-                          </p>
-                          {group.orderId && group.isPaid === false && (
-                            <span className="inline-flex items-center text-[9px] font-bold px-1.5 py-0.5 border border-amber-400/30 bg-amber-400/10 text-amber-400 uppercase tracking-wider">
-                              Awaiting payment
-                            </span>
-                          )}
-                        </div>
-                        {group.reference && (
-                          <p className="text-xs font-mono text-white/60">{group.reference}</p>
+              <div className="space-y-6">
+                {purchaseGroups.map((group, gi) => (
+                  <div key={group.reference ?? group.orderId ?? `legacy-${gi}`}>
+                    {/* Group label */}
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        <Tag className="h-3 w-3 text-montana-muted/50" />
+                        <span className="text-[10px] text-montana-muted/60 uppercase tracking-wider">
+                          {group.reference ? 'Transaction' : group.orderId ? 'Order' : 'Legacy purchases'}
+                        </span>
+                        {(group.reference || group.orderId) && (
+                          <span className="text-[10px] font-mono text-white/40">
+                            {group.reference ?? group.orderId}
+                          </span>
                         )}
-                        {!group.reference && group.orderId && (
-                          <p className="text-xs font-mono text-white/60">{group.orderId}</p>
+                        {group.orderId && group.isPaid === false && (
+                          <span className="inline-flex items-center text-[9px] font-bold px-1.5 py-0.5 border border-amber-400/30 bg-amber-400/10 text-amber-400 uppercase tracking-wider">
+                            Awaiting payment
+                          </span>
                         )}
                       </div>
+                      <span className="text-[10px] text-montana-muted/50">{formatDate(group.purchasedAt)}</span>
                     </div>
-                    <div className="text-right">
-                      <p className="text-[11px] text-montana-muted/60 uppercase tracking-wider">Date</p>
-                      <p className="text-xs text-white/60">{formatDate(group.purchasedAt)}</p>
-                    </div>
-                  </div>
 
-                  {/* Line items */}
-                  <div className="divide-y divide-white/5">
-                    {group.lines.map((line, li) => (
-                      <div key={li} className="px-5 py-4 flex items-start gap-4">
-                        <div className="flex h-8 w-8 shrink-0 items-center justify-center bg-montana-pink/10 border border-montana-pink/20 mt-0.5">
-                          <Package className="h-3.5 w-3.5 text-montana-pink" />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex flex-wrap items-center gap-2 mb-1">
-                            <p className="text-sm font-semibold text-white truncate">{line.displayName}</p>
-                            <BillingPeriodBadge period={line.billingPeriod} />
+                    {/* Line items */}
+                    <div className="space-y-2">
+                      {group.lines.map((line, li) => (
+                        <div key={li} className="flex items-start gap-4 p-4 border border-white/5 bg-white/[0.015] hover:bg-white/[0.03] transition-colors">
+                          <div className="flex h-9 w-9 shrink-0 items-center justify-center bg-montana-pink/10 border border-montana-pink/20 text-montana-pink mt-0.5">
+                            <Package className="h-3.5 w-3.5" />
                           </div>
-                          <div className="flex flex-wrap gap-x-4 gap-y-0.5 text-xs text-montana-muted/60">
-                            <span>Sage: <span className="font-mono text-montana-muted/80">{line.sageCode}</span></span>
-                            <span>
-                              {line.quantity} {line.unit}{line.quantity !== 1 ? 's' : ''}
-                              {' @ '}{formatZAR(line.unitPrice)}/{line.billingPeriod === 'once-off' ? 'once' : line.unit}
-                            </span>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-start justify-between gap-2 flex-wrap">
+                              <div>
+                                <p className="text-sm font-semibold text-white leading-tight">{line.displayName}</p>
+                                <div className="flex items-center gap-2 mt-1 flex-wrap">
+                                  {line.sageCode && (
+                                    <span className="text-[10px] font-mono text-montana-muted/60 bg-white/5 px-1.5 py-0.5 border border-white/5">
+                                      {line.sageCode}
+                                    </span>
+                                  )}
+                                  <BillingPeriodBadge period={line.billingPeriod} />
+                                  <span className="text-xs text-montana-muted/60">
+                                    {line.quantity} {line.unit}{line.quantity !== 1 ? 's' : ''}
+                                  </span>
+                                </div>
+                              </div>
+                              <div className="text-right shrink-0">
+                                <p className="text-sm font-bold text-white font-mono">{formatZAR(line.lineTotal)}</p>
+                                <p className="text-[10px] text-montana-muted/50">
+                                  {line.billingPeriod === 'annual' ? 'per year' : line.billingPeriod === 'once-off' ? 'once-off' : 'per month'}
+                                </p>
+                              </div>
+                            </div>
                           </div>
                         </div>
-                        <div className="text-right shrink-0">
-                          <p className="text-sm font-bold text-white">{formatZAR(line.lineTotal)}</p>
-                          <p className="text-[10px] text-montana-muted/50">
-                            {line.billingPeriod === 'annual' ? 'per year' : line.billingPeriod === 'once-off' ? 'once-off' : 'per month'}
-                          </p>
-                        </div>
+                      ))}
+                    </div>
+
+                    {/* Group total */}
+                    {group.lines.length > 1 && (
+                      <div className="flex justify-between items-center pt-2 mt-1 border-t border-white/5">
+                        <span className="text-xs text-montana-muted/60">Transaction Total</span>
+                        <span className="text-sm font-bold text-white">{formatZAR(group.groupTotal)}</span>
                       </div>
-                    ))}
+                    )}
                   </div>
-
-                  {/* Group total */}
-                  {group.lines.length > 1 && (
-                    <div className="flex justify-between items-center px-5 py-3 border-t border-white/5 bg-white/[0.02]">
-                      <span className="text-xs text-montana-muted/60 uppercase tracking-wider">Transaction Total</span>
-                      <span className="text-sm font-bold text-white">{formatZAR(group.groupTotal)}</span>
-                    </div>
-                  )}
-                </SpotlightCard>
-              ))
+                ))}
+              </div>
             )}
 
-            {/* Add more products CTA */}
-            {purchaseGroups.length > 0 && (
-              <Link
-                href="/pos"
-                className="flex items-center justify-center gap-2 w-full py-3 border border-dashed border-white/10 text-sm text-montana-muted/60 hover:text-white hover:border-white/20 transition-colors"
-              >
-                <Plus className="h-4 w-4" />
-                Add more products
-              </Link>
+            {/* Monthly total footer */}
+            {purchaseGroups.length > 0 && monthlyCommitment > 0 && (
+              <div className="flex items-center justify-between border-t border-white/5 pt-4 mt-6">
+                <span className="text-xs text-montana-muted">Monthly equivalent (ex VAT)</span>
+                <span className="text-sm font-bold text-montana-pink font-mono">
+                  {formatZAR(monthlyCommitment)}/mo
+                </span>
+              </div>
             )}
-          </div>
+
+          </SpotlightCard>
 
           {/* ── Sidebar ────────────────────────────────────────────────────── */}
           <div className="space-y-4">
