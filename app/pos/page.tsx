@@ -192,6 +192,14 @@ function ServiceConfigCard({
 }) {
   const cardRef = useRef<HTMLDivElement>(null);
   const [emailError, setEmailError] = useState<string | null>(null);
+  const [toastMsg, setToastMsg] = useState<string | null>(null);
+  const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const showToast = (msg: string) => {
+    if (toastTimer.current) clearTimeout(toastTimer.current);
+    setToastMsg(msg);
+    toastTimer.current = setTimeout(() => setToastMsg(null), 2500);
+  };
 
   useEffect(() => {
     if (isFocused && cardRef.current) {
@@ -229,7 +237,12 @@ function ServiceConfigCard({
   const entry = valid ? getProductEntry(service.id, planId) : null;
 
   return (
-    <div ref={cardRef}>
+    <div ref={cardRef} className="relative">
+      {toastMsg && (
+        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-50 px-4 py-2 text-xs font-bold text-white bg-montana-surface border border-white/20 shadow-lg pointer-events-none whitespace-nowrap">
+          {toastMsg}
+        </div>
+      )}
     <SpotlightCard customSize className={`transition-all ${inCart ? "border-montana-pink/40 bg-montana-magenta/5" : ""} ${isFocused && !inCart ? "border-white/40 ring-1 ring-white/20" : ""}`}>
       {/* Header */}
       <div className="flex items-start justify-between gap-4 mb-5">
@@ -426,6 +439,13 @@ function ServiceConfigCard({
               onUserEmailsChange(service.id, e.target.value);
               if (emailError) setEmailError(null);
             }}
+            onBlur={e => {
+              const emails = e.target.value.split(/[\n,]+/).map(s => s.trim()).filter(Boolean);
+              if (emails.length > 0 && emails.length !== config.quantity) {
+                onConfigChange(service.id, { quantity: emails.length });
+                showToast(`Quantity updated to ${emails.length}`);
+              }
+            }}
             placeholder={"user@company.com\nuser2@company.com"}
             className={`w-full border bg-montana-surface/50 px-3 py-2 text-xs text-white placeholder:text-white/20 focus:outline-none resize-none font-mono ${
               emailError ? "border-red-400/60 focus:border-red-400" : "border-white/10 focus:border-montana-pink"
@@ -438,9 +458,21 @@ function ServiceConfigCard({
             </p>
           )}
           {countMismatch && !emailError && (
-            <p className="text-xs text-montana-orange mt-1.5">
-              {parsedEmails.length} email{parsedEmails.length !== 1 ? "s" : ""} entered — you configured {config.quantity} {service.unitLabel}. Adjust the quantity or add the remaining emails.
-            </p>
+            <div className="mt-1.5 flex flex-wrap items-start gap-2">
+              <p className="text-xs text-montana-orange flex-1 min-w-0">
+                {parsedEmails.length} email{parsedEmails.length !== 1 ? "s" : ""} entered — you configured {config.quantity} {service.unitLabel}. Adjust the quantity or add the remaining emails.
+              </p>
+              <button
+                type="button"
+                onClick={() => {
+                  onConfigChange(service.id, { quantity: parsedEmails.length });
+                  showToast(`Quantity updated to ${parsedEmails.length}`);
+                }}
+                className="shrink-0 text-[10px] font-bold border border-montana-orange/40 text-montana-orange hover:bg-montana-orange/10 px-2 py-1 transition-colors whitespace-nowrap"
+              >
+                Match quantity to email count ({parsedEmails.length})
+              </button>
+            </div>
           )}
           {countMatch && (
             <p className="text-xs text-emerald-400 mt-1.5">
