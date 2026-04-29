@@ -20,6 +20,7 @@ const ENQUIRY_VALUES = [
   "compliance",
   "general",
   "ransomware",
+  "m365-licensing",
 ] as const;
 
 type EnquiryValue = typeof ENQUIRY_VALUES[number];
@@ -61,6 +62,12 @@ const SERVICE_DEFAULTS: Record<string, ServiceDefaults> = {
     message:
       "Hi,\n\nI'm interested in Montana's Quantum Security (Post-Quantum Cryptography) readiness assessment.\n\nOur context:\n- Industry / sector: \n- Encryption standards currently in use: \n- Known long-lived data assets: \n- Timeline for PQC migration planning: \n\nPlease contact me to discuss next steps.",
   },
+  "m365-licensing": {
+    enquiryType: "m365-licensing",
+    label: "M365 / Google Workspace Licensing",
+    message:
+      "Hi,\n\nI'm interested in procuring a Microsoft 365 Business or Google Workspace Business licence through Montana Data Company, as a prerequisite for the SaaS Backup service.\n\nOur requirements:\n- Preferred platform (M365 / Google Workspace / unsure): \n- Number of users to license: \n- Current licensing situation (none / personal / expired): \n- Timeline: \n\nPlease reach out to help us get set up.",
+  },
 };
 
 const ENQUIRY_TYPE_DEFAULTS: Partial<Record<EnquiryValue, { label: string; message: string }>> = {
@@ -69,6 +76,7 @@ const ENQUIRY_TYPE_DEFAULTS: Partial<Record<EnquiryValue, { label: string; messa
   "archiving":         { label: "Archive & Lifecycle", message: SERVICE_DEFAULTS["archive"].message },
   "guardium":          { label: "IBM Guardium", message: SERVICE_DEFAULTS["guardium"].message },
   "quantum":           { label: "Quantum Security (PQC)", message: SERVICE_DEFAULTS["quantum"].message },
+  "m365-licensing":    { label: "M365 / Google Workspace Licensing", message: SERVICE_DEFAULTS["m365-licensing"].message },
 };
 
 const contactSchema = z.object({
@@ -373,6 +381,7 @@ function ContactFormInner() {
                           <option value="archiving">Archiving &amp; Lifecycle</option>
                           <option value="quantum">Quantum Security (PQC)</option>
                           <option value="guardium">IBM Guardium</option>
+                          <option value="m365-licensing">M365 / Google Workspace Licensing</option>
                         </optgroup>
                         <optgroup label="Other">
                           <option value="existing-client">Existing Client Support</option>

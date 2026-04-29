@@ -10,7 +10,7 @@ import {
   Cloud, Monitor, HardDrive, Smartphone,
   FileText, Server, ShieldAlert, Archive, Activity, Lock,
   CheckCircle2, AlertCircle, ShoppingCart, ChevronDown, ChevronUp,
-  ArrowRight, Minus, Plus, X,
+  ArrowRight, Minus, Plus, X, Info,
 } from "lucide-react";
 import { createBrowserClient } from "@/lib/supabase/browser";
 import type { User } from "@supabase/supabase-js";
@@ -250,6 +250,32 @@ function ServiceConfigCard({
       </div>
 
       <p className="text-sm text-montana-muted mb-5 leading-relaxed">{service.description}</p>
+
+      {/* M365 / Google Workspace licence prerequisite notice */}
+      {service.id === "druva-m365" && (
+        <div className="mb-5 border border-blue-400/20 bg-blue-400/5 rounded-sm p-4 space-y-3">
+          <div className="flex items-start gap-2.5">
+            <Info className="h-4 w-4 text-blue-400 mt-0.5 shrink-0" />
+            <div>
+              <p className="text-xs font-bold text-blue-300 mb-1 uppercase tracking-wider">Licence Prerequisite</p>
+              <p className="text-xs text-blue-200/70 leading-relaxed">
+                This service requires an active <span className="text-white font-semibold">Microsoft 365 Business</span> or <span className="text-white font-semibold">Google Workspace Business</span> licence for each user being backed up. Your existing licences are used — no additional Microsoft or Google subscription is included.
+              </p>
+            </div>
+          </div>
+          <div className="ml-6.5 border-t border-blue-400/10 pt-3 flex items-center justify-between gap-3 flex-wrap">
+            <p className="text-xs text-blue-200/60">
+              Don&apos;t have a business licence yet? We can procure and set one up for you.
+            </p>
+            <Link
+              href="/contact?service=m365-licensing&ref=pos"
+              className="shrink-0 inline-flex items-center gap-1.5 text-xs font-bold text-blue-300 hover:text-white transition-colors"
+            >
+              Get help with licensing <ArrowRight className="h-3 w-3" />
+            </Link>
+          </div>
+        </div>
+      )}
 
       {/* Storage Tier */}
       {dims.storageTiers && (
