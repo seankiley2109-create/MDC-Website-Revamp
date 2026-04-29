@@ -145,9 +145,9 @@ function ContactFormInner() {
       }
       const { data: profile } = await supabase
         .from("profiles")
-        .select("*")
+        .select("full_name, company_name")
         .eq("id", session.user.id)
-        .single();
+        .single<{ full_name: string | null; company_name: string | null }>();
       if (profile?.full_name) {
         setValue("name", profile.full_name);
         filled.add("name");
