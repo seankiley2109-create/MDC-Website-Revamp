@@ -97,6 +97,20 @@ export interface Download {
   created_at: string;
 }
 
+export interface AssessmentSession {
+  id:         string;
+  type:       'popia' | 'security';
+  score:      number;
+  risk_level: string;
+  answers:    Record<string, number>;
+  compliant:  number;
+  partial:    number;
+  critical:   number;
+  gaps:       string[];
+  created_at: string;
+  updated_at: string;
+}
+
 export interface Purchase {
   id:                 string;
   user_id:            string | null;
@@ -149,6 +163,12 @@ export type Database = {
         Row:    Purchase;
         Insert: Omit<Purchase, 'id' | 'created_at' | 'discount_amount'> & { id?: string; created_at?: string; discount_amount?: number };
         Update: Partial<Purchase>;
+        Relationships: [];
+      };
+      assessment_sessions: {
+        Row:    AssessmentSession;
+        Insert: Omit<AssessmentSession, 'created_at' | 'updated_at'> & { created_at?: string; updated_at?: string };
+        Update: Partial<AssessmentSession>;
         Relationships: [];
       };
     };

@@ -11,6 +11,7 @@ import {
   Shield, Eye, FileText, Lock,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
+import { createServerClient } from "@/lib/supabase/server";
 
 export const metadata: Metadata = {
   title: "POPIA Assessment Results | Montana Data Company",
@@ -66,6 +67,10 @@ export default async function PopiaResultsPage({
     redirect("/assessments/popia");
   }
 
+  const supabase = await createServerClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  const isAuthenticated = Boolean(user);
+
   const risk = String(params.risk ?? "Low Risk");
   const compliant = Number(params.compliant ?? 0);
   const partial = Number(params.partial ?? 0);
@@ -106,6 +111,20 @@ export default async function PopiaResultsPage({
             Based on your 10-question snapshot. A full 88-control assessment provides a definitive compliance picture.
           </p>
         </div>
+
+        {/* Save results banner — shown only to unauthenticated users */}
+        {!isAuthenticated && (
+          <div className="mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border border-montana-pink/20 bg-montana-pink/5 backdrop-blur-sm rounded-lg px-5 py-4">
+            <p className="text-sm text-montana-muted leading-relaxed">
+              <span className="text-white font-semibold">Save your results permanently</span> — create a free account to track your compliance progress and access your report any time.
+            </p>
+            <Link href="/sign-up" className="shrink-0">
+              <AnimatedButton variant="outline" className="text-xs px-5 py-2 whitespace-nowrap">
+                Create free account →
+              </AnimatedButton>
+            </Link>
+          </div>
+        )}
 
         {/* Hero score card */}
         <SpotlightCard customSize className={`p-8 md:p-12 mb-12 border-t-4 ${borderClass}`}>

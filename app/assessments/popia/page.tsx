@@ -1,15 +1,13 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { SpotlightCard } from "@/components/ui/spotlight-card";
-import { AnimatedButton } from "@/components/ui/animated-button";
 import { AwarenessCards, type AwarenessFact } from "@/components/assessments/awareness-cards";
 import {
   Shield, FileText, UserCheck, AlertTriangle,
   Lock, Scale, Eye, Users, Clock, DollarSign,
 } from "lucide-react";
-import Link from "next/link";
 import { createBrowserClient } from "@/lib/supabase/browser";
 
 const questions = [
@@ -222,7 +220,7 @@ const questions = [
   },
 ];
 
-function buildResultsUrl(finalAnswers: Record<number, number>, score: number): string {
+function buildResultsUrl(finalAnswers: Record<number, number>, score: number, sessionId?: string): string {
   const risk = score <= 8 ? "High Risk" : score <= 14 ? "Medium Risk" : "Low Risk";
   const compliant = Object.values(finalAnswers).filter((v) => v === 2).length;
   const partial = Object.values(finalAnswers).filter((v) => v === 1).length;
@@ -249,6 +247,7 @@ function buildResultsUrl(finalAnswers: Record<number, number>, score: number): s
     partial: String(partial),
     critical: String(critical),
     ...(gaps ? { gaps } : {}),
+    ...(sessionId ? { sid: sessionId } : {}),
   });
   return `/assessments/popia/results?${params.toString()}`;
 }
@@ -264,13 +263,14 @@ export default function PopiaAssessment() {
   const router = useRouter();
   const [currentStep, setCurrentStep] = useState(0);
   const [answers, setAnswers] = useState<Record<number, number>>({});
-  const [leadForm, setLeadForm] = useState({ name: "", company: "", email: "" });
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [authedProfile, setAuthedProfile] = useState<AuthedProfile | null>(null);
   const [isAuthChecking, setIsAuthChecking] = useState(true);
   const [pendingFinalAnswers, setPendingFinalAnswers] = useState<Record<number, number> | null>(null);
+  // Stable session ID for anonymous result persistence (generated once on mount).
+  const sessionIdRef = useRef<string>('');
+  useEffect(() => { sessionIdRef.current = crypto.randomUUID(); }, []);
 
-  // On mount: check auth and pre-load profile data to decide whether we can skip the lead gate.
+  // On mount: check auth and pre-load profile data.
   useEffect(() => {
     let cancelled = false;
     (async () => {
@@ -298,52 +298,57 @@ export default function PopiaAssessment() {
     return () => { cancelled = true; };
   }, []);
 
-  // Skip the gate for any authenticated user — profile may be partially filled.
-  const canSkipLeadGate = Boolean(authedProfile);
-
-  // Silently submit the assessment using profile data and navigate to results.
-  const autoSubmitFromProfile = useCallback(async (finalAnswers: Record<number, number>) => {
+  // Auto-save results and navigate to the results page. Works for both auth and anon users.
+  const saveAndNavigate = useCallback(async (finalAnswers: Record<number, number>) => {
     const finalScore = Object.values(finalAnswers).reduce((a, b) => a + b, 0);
-    const url = buildResultsUrl(finalAnswers, finalScore);
-    if (!authedProfile) {
-      console.error("[popia] autoSubmitFromProfile called with no authedProfile — skipping");
+
+    if (authedProfile) {
+      const url = buildResultsUrl(finalAnswers, finalScore);
+      const profileLead = {
+        name:    authedProfile.full_name    ?? "Portal User",
+        company: authedProfile.company_name ?? "N/A",
+        email:   authedProfile.email,
+      };
+      try {
+        await fetch("/api/assessment", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            type: "popia",
+            lead: profileLead,
+            answers: finalAnswers,
+            score: finalScore,
+            user_id: authedProfile.id,
+          }),
+        });
+      } catch (err) {
+        console.error("[popia] profile save failed:", err);
+      }
       router.push(url);
-      return;
-    }
-    const profileLead = {
-      name:    authedProfile.full_name    ?? "Portal User",
-      company: authedProfile.company_name ?? "N/A",
-      email:   authedProfile.email,
-    };
-    setLeadForm(profileLead);
-    try {
-      await fetch("/api/assessment", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          type: "popia",
-          lead: profileLead,
-          answers: finalAnswers,
-          score: finalScore,
-          user_id: authedProfile.id,
-        }),
-      });
-    } catch (err) {
-      console.error("[popia] auto-submit failed:", err);
-    } finally {
+    } else {
+      const sid = sessionIdRef.current;
+      const url = buildResultsUrl(finalAnswers, finalScore, sid || undefined);
+      if (sid) {
+        try {
+          await fetch("/api/assessment-session", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ session_id: sid, type: "popia", score: finalScore, answers: finalAnswers }),
+          });
+        } catch (err) {
+          console.error("[popia] session save failed:", err);
+        }
+      }
       router.push(url);
     }
   }, [authedProfile, router]);
 
+  // Resolve pending answers once the auth check completes.
   useEffect(() => {
     if (isAuthChecking || !pendingFinalAnswers) return;
-    if (canSkipLeadGate) {
-      void autoSubmitFromProfile(pendingFinalAnswers);
-    } else {
-      setCurrentStep(10);
-    }
+    void saveAndNavigate(pendingFinalAnswers);
     setPendingFinalAnswers(null);
-  }, [isAuthChecking, pendingFinalAnswers, canSkipLeadGate, autoSubmitFromProfile]);
+  }, [isAuthChecking, pendingFinalAnswers, saveAndNavigate]);
 
   const handleAnswer = (value: number) => {
     const nextAnswers = { ...answers, [currentStep]: value };
@@ -352,13 +357,12 @@ export default function PopiaAssessment() {
       if (currentStep < 9) {
         setCurrentStep((prev) => prev + 1);
       } else if (isAuthChecking) {
-        // Auth check still in flight — park the answers; the useEffect above will resolve it.
-        setPendingFinalAnswers(nextAnswers);
+        // Auth check still in flight — park the answers and show spinner.
         setCurrentStep(10);
-      } else if (canSkipLeadGate) {
-        void autoSubmitFromProfile(nextAnswers);
+        setPendingFinalAnswers(nextAnswers);
       } else {
         setCurrentStep(10);
+        void saveAndNavigate(nextAnswers);
       }
     }, 300);
   };
@@ -366,30 +370,6 @@ export default function PopiaAssessment() {
   const handleBack = () => {
     if (currentStep > 0 && currentStep < 10) {
       setCurrentStep((prev) => prev - 1);
-    }
-  };
-
-  const totalScore = Object.values(answers).reduce((a, b) => a + b, 0);
-
-  const submitLead = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-    try {
-      await fetch("/api/assessment", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          type: "popia",
-          lead: leadForm,
-          answers,
-          score: totalScore,
-        }),
-      });
-      router.push(buildResultsUrl(answers, totalScore));
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setIsSubmitting(false);
     }
   };
 
@@ -424,15 +404,6 @@ export default function PopiaAssessment() {
             {/* Questions — left 3 columns */}
             <div className="lg:col-span-3">
               <SpotlightCard customSize className="p-8 md:p-10">
-                {/* Sign-up storage note — shown only to unauthenticated users */}
-                {!isAuthChecking && !authedProfile && (
-                  <div className="mb-6 flex items-start gap-3 border border-amber-500/20 bg-amber-500/5 p-3 rounded">
-                    <span className="text-amber-400 text-sm shrink-0 mt-0.5">💡</span>
-                    <p className="text-xs text-montana-muted leading-relaxed">
-                      <Link href="/sign-up" className="text-amber-400 font-semibold hover:underline">Create a free account</Link> — your assessment results will be saved to your profile for future reference.
-                    </p>
-                  </div>
-                )}
                 {/* Progress */}
                 <div className="mb-8">
                   <div className="flex justify-between items-end mb-2">
@@ -516,79 +487,14 @@ export default function PopiaAssessment() {
           </div>
         )}
 
-        {/* Phase 2a: Auth-loading spinner (shown while auth check is still resolving) */}
-        {currentStep === 10 && pendingFinalAnswers !== null && (
+        {/* Phase 2: Saving spinner — shown while persisting results before navigation */}
+        {currentStep === 10 && (
           <div className="flex items-center justify-center py-32">
             <div className="text-center">
               <div className="h-10 w-10 border-2 border-montana-pink border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-              <p className="text-montana-muted text-sm">Checking your account…</p>
-            </div>
-          </div>
-        )}
-
-        {/* Phase 2b: Lead Gate form (shown only once auth has resolved and gate is needed) */}
-        {currentStep === 10 && pendingFinalAnswers === null && (
-          <div className="relative overflow-hidden rounded-2xl animate-in fade-in zoom-in duration-500">
-            <div className="filter blur-xl opacity-30 pointer-events-none select-none">
-              <SpotlightCard customSize className="p-12">
-                <div className="flex justify-center mb-8">
-                  <div className="h-32 w-32 rounded-full bg-montana-pink" />
-                </div>
-                <div className="h-12 bg-white/20 rounded w-1/2 mx-auto mb-4" />
-                <div className="h-6 bg-white/10 rounded w-3/4 mx-auto mb-12" />
-                <div className="grid grid-cols-3 gap-6">
-                  <div className="h-48 bg-white/10 rounded" />
-                  <div className="h-48 bg-white/10 rounded" />
-                  <div className="h-48 bg-white/10 rounded" />
-                </div>
-              </SpotlightCard>
-            </div>
-
-            <div className="absolute inset-0 flex items-center justify-center p-6 bg-montana-bg/40 backdrop-blur-md">
-              <SpotlightCard customSize className="w-full max-w-md p-8 border-montana-pink/30 shadow-2xl shadow-montana-pink/10">
-                <div className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-montana-magenta/20 border border-montana-pink/30 mb-6 mx-auto flex">
-                  <Lock className="h-8 w-8 text-montana-pink" />
-                </div>
-                <h3 className="text-2xl font-bold text-white text-center mb-2">Unlock Your POPIA Report</h3>
-                <p className="text-montana-muted text-center text-sm mb-8">
-                  Enter your details to reveal your POPIA maturity score and receive your 1-page PDF snapshot via email.
-                </p>
-
-                <form onSubmit={submitLead} className="space-y-4">
-                  <input
-                    required
-                    type="text"
-                    placeholder="Full Name"
-                    value={leadForm.name}
-                    onChange={(e) => setLeadForm({ ...leadForm, name: e.target.value })}
-                    className="w-full rounded-sm border border-white/10 bg-montana-surface/80 px-4 py-3 text-white focus:border-montana-pink focus:outline-none"
-                  />
-                  <input
-                    required
-                    type="text"
-                    placeholder="Company Name"
-                    value={leadForm.company}
-                    onChange={(e) => setLeadForm({ ...leadForm, company: e.target.value })}
-                    className="w-full rounded-sm border border-white/10 bg-montana-surface/80 px-4 py-3 text-white focus:border-montana-pink focus:outline-none"
-                  />
-                  <input
-                    required
-                    type="email"
-                    placeholder="Work Email"
-                    value={leadForm.email}
-                    onChange={(e) => setLeadForm({ ...leadForm, email: e.target.value })}
-                    className="w-full rounded-sm border border-white/10 bg-montana-surface/80 px-4 py-3 text-white focus:border-montana-pink focus:outline-none"
-                  />
-                  <div className="pt-2">
-                    <AnimatedButton variant="primary" className="w-full" disabled={isSubmitting}>
-                      {isSubmitting ? "Generating Report..." : "Reveal My Score"}
-                    </AnimatedButton>
-                  </div>
-                  <p className="text-xs text-center text-white/40 mt-4">
-                    By submitting, you agree to our privacy policy. We will send your results to the email provided.
-                  </p>
-                </form>
-              </SpotlightCard>
+              <p className="text-montana-muted text-sm">
+                {pendingFinalAnswers !== null ? "Checking your account…" : "Saving your results…"}
+              </p>
             </div>
           </div>
         )}
