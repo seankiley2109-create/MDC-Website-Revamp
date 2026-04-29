@@ -47,6 +47,11 @@ interface CartItem {
   label:     string;
 }
 
+// ─── localStorage persistence keys ───────────────────────────────────────────
+
+const LS_CART_KEY  = 'mdc_cart_ls';
+const LS_GUEST_KEY = 'mdc_guest_id';
+
 // ─── Default configs per service ─────────────────────────────────────────────
 
 const DEFAULT_CONFIGS: Record<SelfServeServiceId, ServiceConfig> = {
@@ -839,6 +844,8 @@ function POSForm() {
   const [isSubmitting, setSubmit]   = useState(false);
   const [submitError, setError]     = useState<string | null>(null);
   const [cartOpen, setCartOpen]     = useState(false);
+  const [cartToast, setCartToast]   = useState(false);
+  const isFirstSyncRef              = useRef(true);
 
   // Auth
   useEffect(() => {
@@ -850,6 +857,72 @@ function POSForm() {
     });
     return () => subscription.unsubscribe();
   }, []);
+
+  // Restore cart from localStorage on mount (persistent across sessions)
+  useEffect(() => {
+    // When returning from sign-in, sessionStorage handles the restore — skip LS restore.
+    if (searchParams.get("checkout") === "1") return;
+
+    try {
+      let guestId = localStorage.getItem(LS_GUEST_KEY);
+      if (!guestId) {
+        guestId = crypto.randomUUID();
+        localStorage.setItem(LS_GUEST_KEY, guestId);
+      }
+
+      const raw = localStorage.getItem(LS_CART_KEY);
+      if (!raw) return;
+      const saved = JSON.parse(raw) as {
+        guestId:      string;
+        configs:      Record<SelfServeServiceId, ServiceConfig>;
+        cartIds:      SelfServeServiceId[];
+        discountCode: string;
+        userEmails?:  Partial<Record<SelfServeServiceId, string>>;
+      };
+
+      if (!saved.cartIds?.length || saved.guestId !== guestId) return;
+
+      setConfigs(saved.configs ?? DEFAULT_CONFIGS);
+      setCartIds(new Set(saved.cartIds));
+      setDiscount(saved.discountCode ?? "");
+      if (saved.userEmails && typeof saved.userEmails === "object") {
+        const safeEmails: Partial<Record<SelfServeServiceId, string>> = {};
+        for (const [k, v] of Object.entries(saved.userEmails)) {
+          if (typeof v === "string") safeEmails[k as SelfServeServiceId] = v;
+        }
+        setUserEmails(safeEmails);
+      }
+      setCartToast(true);
+    } catch {
+      localStorage.removeItem(LS_CART_KEY);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Sync cart to localStorage on every change (skip initial render so defaults never clobber a saved cart)
+  useEffect(() => {
+    if (isFirstSyncRef.current) {
+      isFirstSyncRef.current = false;
+      return;
+    }
+    try {
+      let guestId = localStorage.getItem(LS_GUEST_KEY);
+      if (!guestId) {
+        guestId = crypto.randomUUID();
+        localStorage.setItem(LS_GUEST_KEY, guestId);
+      }
+      localStorage.setItem(LS_CART_KEY, JSON.stringify({
+        guestId,
+        userId:       user?.id ?? null,
+        configs,
+        cartIds:      Array.from(cartIds),
+        discountCode,
+        userEmails,
+      }));
+    } catch {
+      // localStorage may be unavailable (private browsing, storage quota)
+    }
+  }, [configs, cartIds, discountCode, userEmails, user]);
 
   // Restore cart after sign-in redirect
   useEffect(() => {
@@ -964,6 +1037,7 @@ function POSForm() {
     } else {
       sessionStorage.removeItem('mdc_user_emails');
     }
+    localStorage.removeItem(LS_CART_KEY);
     router.push('/checkout');
   };
 
@@ -981,6 +1055,23 @@ function POSForm() {
           <p className="text-sm text-red-300">
             Your payment was not completed. Please review your cart and try again, or contact us if the issue persists.
           </p>
+        </div>
+      )}
+
+      {cartToast && (
+        <div className="flex items-center justify-between gap-3 p-4 border border-blue-400/20 bg-blue-400/5 mb-8">
+          <div className="flex items-center gap-3">
+            <CheckCircle2 className="h-4 w-4 text-blue-400 shrink-0" />
+            <p className="text-sm text-blue-300">Cart restored from your last session.</p>
+          </div>
+          <button
+            type="button"
+            onClick={() => setCartToast(false)}
+            className="text-blue-400/60 hover:text-blue-300 transition-colors shrink-0"
+            aria-label="Dismiss"
+          >
+            <X className="h-4 w-4" />
+          </button>
         </div>
       )}
 
