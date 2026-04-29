@@ -25,7 +25,7 @@ export const AnimatedButton = React.forwardRef<HTMLButtonElement, AnimatedButton
         className={cn(
           "animated-btn",
           "inline-flex items-center justify-center gap-1.5",
-          "focus:outline-none focus:ring-2 focus:ring-montana-pink/40",
+          "button-focus",
           "disabled:opacity-50 disabled:pointer-events-none",
           variantClass[variant],
           className

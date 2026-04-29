@@ -80,7 +80,7 @@ export default function SignUpForm({ redirectTo, signInHref = '/sign-in' }: Prop
             required
             value={fullName}
             onChange={(e) => setFullName(e.target.value)}
-            className="w-full bg-white/5 border border-white/10 text-white placeholder:text-montana-muted/40 pl-10 pr-4 py-3 text-sm focus:outline-none focus:border-montana-pink/50 transition-colors"
+            className="w-full bg-white/5 border border-white/10 text-white placeholder:text-montana-muted/40 pl-10 pr-4 py-3 text-sm input-focus"
             placeholder="Jane Smith"
             autoComplete="name"
           />
@@ -98,7 +98,7 @@ export default function SignUpForm({ redirectTo, signInHref = '/sign-in' }: Prop
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full bg-white/5 border border-white/10 text-white placeholder:text-montana-muted/40 pl-10 pr-4 py-3 text-sm focus:outline-none focus:border-montana-pink/50 transition-colors"
+            className="w-full bg-white/5 border border-white/10 text-white placeholder:text-montana-muted/40 pl-10 pr-4 py-3 text-sm input-focus"
             placeholder="you@company.com"
             autoComplete="email"
           />
@@ -117,7 +117,7 @@ export default function SignUpForm({ redirectTo, signInHref = '/sign-in' }: Prop
             minLength={8}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full bg-white/5 border border-white/10 text-white placeholder:text-montana-muted/40 pl-10 pr-4 py-3 text-sm focus:outline-none focus:border-montana-pink/50 transition-colors"
+            className="w-full bg-white/5 border border-white/10 text-white placeholder:text-montana-muted/40 pl-10 pr-4 py-3 text-sm input-focus"
             placeholder="Min 8 characters"
             autoComplete="new-password"
           />

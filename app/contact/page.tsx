@@ -381,7 +381,7 @@ function ContactFormInner() {
                         <input
                           {...register("name")}
                           id="name"
-                          className="w-full border border-white/10 bg-montana-surface/50 px-4 py-3 pr-10 text-sm text-white placeholder-white/20 focus:border-montana-pink focus:outline-none transition-colors"
+                          className="w-full border border-white/10 bg-montana-surface/50 px-4 py-3 pr-10 text-sm text-white placeholder-white/20 input-focus"
                           placeholder="Jane Dlamini"
                         />
                         {fieldState("name") === true && <Check className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-green-400 pointer-events-none" />}
@@ -399,7 +399,7 @@ function ContactFormInner() {
                           {...register("email")}
                           id="email"
                           type="email"
-                          className="w-full border border-white/10 bg-montana-surface/50 px-4 py-3 pr-10 text-sm text-white placeholder-white/20 focus:border-montana-pink focus:outline-none transition-colors"
+                          className="w-full border border-white/10 bg-montana-surface/50 px-4 py-3 pr-10 text-sm text-white placeholder-white/20 input-focus"
                           placeholder="jane@company.co.za"
                         />
                         {fieldState("email") === true && <Check className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-green-400 pointer-events-none" />}
@@ -419,7 +419,7 @@ function ContactFormInner() {
                         <input
                           {...register("company")}
                           id="company"
-                          className="w-full border border-white/10 bg-montana-surface/50 px-4 py-3 pr-10 text-sm text-white placeholder-white/20 focus:border-montana-pink focus:outline-none transition-colors"
+                          className="w-full border border-white/10 bg-montana-surface/50 px-4 py-3 pr-10 text-sm text-white placeholder-white/20 input-focus"
                           placeholder="Acme (Pty) Ltd"
                         />
                         {fieldState("company") === true && <Check className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-green-400 pointer-events-none" />}
@@ -436,7 +436,7 @@ function ContactFormInner() {
                         <select
                           {...register("enquiryType")}
                           id="enquiryType"
-                          className="w-full border border-white/10 bg-montana-surface/80 px-4 py-3 pr-10 text-sm text-white focus:border-montana-pink focus:outline-none transition-colors appearance-none"
+                          className="w-full border border-white/10 bg-montana-surface/80 px-4 py-3 pr-10 text-sm text-white input-focus appearance-none"
                         >
                           <option value="" disabled>Select a category</option>
                           <optgroup label="Product Enquiries">
@@ -468,7 +468,7 @@ function ContactFormInner() {
                         {...register("message")}
                         id="message"
                         rows={activeDefaults ? 10 : 5}
-                        className="w-full border border-white/10 bg-montana-surface/50 px-4 py-3 pr-10 text-sm text-white placeholder-white/20 focus:border-montana-pink focus:outline-none transition-colors resize-none font-mono"
+                        className="w-full border border-white/10 bg-montana-surface/50 px-4 py-3 pr-10 text-sm text-white placeholder-white/20 input-focus resize-none font-mono"
                         placeholder="Tell us about your environment, current challenges, or what you're looking to achieve..."
                       />
                       {fieldState("message") === true && <Check className="absolute right-3 top-3.5 h-4 w-4 text-green-400 pointer-events-none" />}

@@ -113,10 +113,17 @@
 
 /* ─────────────────────────────────────────────────────────────────────────── */
 
-/* Add to the bottom of globals.css */
 @utility bg-grid-pattern {
-  background-image: 
+  background-image:
     linear-gradient(to right, var(--color-montana-surface) 1px, transparent 1px),
     linear-gradient(to bottom, var(--color-montana-surface) 1px, transparent 1px);
   background-size: 40px 40px;
+}
+
+@utility input-focus {
+  @apply focus:border-montana-pink focus:ring-2 focus:ring-montana-pink/30 focus:outline-none transition-colors duration-150;
+}
+
+@utility button-focus {
+  @apply focus-visible:ring-2 focus-visible:ring-montana-pink focus-visible:ring-offset-2 focus-visible:ring-offset-black;
 }

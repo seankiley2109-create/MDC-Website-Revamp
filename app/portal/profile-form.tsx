@@ -67,10 +67,10 @@ const SA_PROVINCES = [
 // ─── Styles ───────────────────────────────────────────────────────────────────
 
 const fieldClass =
-  "w-full bg-white/5 border border-white/10 text-white text-sm px-4 py-3 placeholder:text-montana-muted/50 focus:outline-none focus:border-montana-pink/50 focus:bg-montana-pink/5 transition-all";
+  "w-full bg-white/5 border border-white/10 text-white text-sm px-4 py-3 placeholder:text-montana-muted/50 input-focus";
 
 const fieldErrorClass =
-  "w-full bg-white/5 border border-red-400/40 text-white text-sm px-4 py-3 placeholder:text-montana-muted/50 focus:outline-none focus:border-red-400/60 transition-all";
+  "w-full bg-white/5 border border-red-400/40 text-white text-sm px-4 py-3 placeholder:text-montana-muted/50 input-focus";
 
 const labelClass =
   "block text-xs font-medium text-montana-muted uppercase tracking-wider mb-1.5";
