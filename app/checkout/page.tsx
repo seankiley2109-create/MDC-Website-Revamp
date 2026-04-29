@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { useRouter }                        from 'next/navigation';
+import Link                                 from 'next/link';
 import { useForm }                          from 'react-hook-form';
 import { SpotlightCard } from '@/components/ui/spotlight-card';
 import { AnimatedButton }                   from '@/components/ui/animated-button';
@@ -181,9 +182,16 @@ export default function CheckoutPage() {
               type="hidden"
               {...register('email', { required: 'Email address is required' })}
             />
-            <div className={`${inputClass} opacity-60 cursor-not-allowed`}>
-              {userEmail || 'Loading\u2026'}
-            </div>
+            <p className="text-sm text-white/60">
+              Invoice will be sent to:{' '}
+              <span className="text-white/80">{userEmail || 'Loading\u2026'}</span>
+            </p>
+            <p className="text-xs text-white/40 mt-1">
+              Wrong email?{' '}
+              <Link href="/portal" className="text-blue-400/70 hover:text-blue-400 underline transition-colors">
+                Update in account settings
+              </Link>
+            </p>
           </Field>
           <Field label="Phone Number" required error={errors.phone?.message}>
             <input
