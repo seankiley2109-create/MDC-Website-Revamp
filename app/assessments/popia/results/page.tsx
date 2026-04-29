@@ -20,6 +20,17 @@ export const metadata: Metadata = {
 
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;
 
+const GAP_CTA: Record<string, { label: string; href: string }> = {
+  "Governance":           { label: "IO Registration & Training",    href: "/pos?tab=consulting&services=SE-PE001,SE-PT001-5" },
+  "Lawful Processing":    { label: "Remedial Consulting",           href: "/pos?tab=consulting&services=SE-PR002" },
+  "Consent":              { label: "Remedial Consulting",           href: "/pos?tab=consulting&services=SE-PR002" },
+  "Processing Integrity": { label: "Compliance Assessment",         href: "/pos?tab=consulting&services=SE-PA002" },
+  "Data Quality":         { label: "Remedial Consulting",           href: "/pos?tab=consulting&services=SE-PR002" },
+  "Transparency":         { label: "Remedial Consulting",           href: "/pos?tab=consulting&services=SE-PR002" },
+  "Security":             { label: "Ransomware & Data Protection",  href: "/pos?tab=enterprise" },
+  "Data Subject Rights":  { label: "Remedial Consulting",           href: "/pos?tab=consulting&services=SE-PR002" },
+};
+
 const GAP_META: Record<string, { Icon: LucideIcon; description: string }> = {
   "Governance": {
     Icon: Users,
@@ -187,6 +198,7 @@ export default async function PopiaResultsPage({
                 const meta = GAP_META[cat];
                 if (!meta) return null;
                 const { Icon } = meta;
+                const cta = GAP_CTA[cat];
                 return (
                   <GlassCard key={cat} className="flex flex-col gap-4">
                     <div className="flex items-center gap-3">
@@ -196,6 +208,15 @@ export default async function PopiaResultsPage({
                       <h3 className="font-bold text-white">{cat}</h3>
                     </div>
                     <p className="text-sm text-montana-muted leading-relaxed">{meta.description}</p>
+                    {cta && (
+                      <Link
+                        href={cta.href}
+                        className="mt-auto flex items-center gap-2 border-t border-white/10 pt-4 text-xs font-medium text-montana-muted hover:text-white transition-colors group"
+                      >
+                        <span>Address this gap → View {cta.label}</span>
+                        <ArrowRight className="h-3 w-3 shrink-0 group-hover:translate-x-0.5 transition-transform" />
+                      </Link>
+                    )}
                   </GlassCard>
                 );
               })}
