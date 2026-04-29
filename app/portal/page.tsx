@@ -709,30 +709,25 @@ export default async function PortalPage() {
           <p className="text-sm text-montana-muted mb-6">
             Keep your details up to date. These appear on invoices and compliance reports.
           </p>
-          {(() => {
-            const p = profile as unknown as Record<string, unknown>;
-            return (
-              <ProfileForm
-                userEmail={user.email ?? ''}
-                initialData={{
-                  fullName:         profile.full_name    ?? '',
-                  phone:            (p.phone             as string) ?? '',
-                  avatarUrl:        (p.avatar_url        as string) ?? '',
-                  companyName:      profile.company_name ?? '',
-                  companyRegNumber: (p.company_reg_number as string) ?? '',
-                  vatNumber:        (p.vat_number        as string) ?? '',
-                  industry:         profile.industry     ?? '',
-                  companySize:      profile.company_size ?? '',
-                  addressLine1:     (p.address_line1     as string) ?? '',
-                  addressLine2:     (p.address_line2     as string) ?? '',
-                  city:             (p.city              as string) ?? '',
-                  province:         (p.province          as string) ?? '',
-                  postalCode:       (p.postal_code       as string) ?? '',
-                  country:          (p.country           as string) ?? '',
-                }}
-              />
-            );
-          })()}
+          <ProfileForm
+            userEmail={user.email ?? ''}
+            initialData={{
+              fullName:         profile.full_name         ?? '',
+              phone:            profile.phone             ?? '',
+              avatarUrl:        profile.avatar_url        ?? '',
+              companyName:      profile.company_name      ?? '',
+              companyRegNumber: profile.company_reg_number ?? '',
+              vatNumber:        profile.vat_number        ?? '',
+              industry:         profile.industry          ?? '',
+              companySize:      profile.company_size      ?? '',
+              addressLine1:     profile.address_line1     ?? '',
+              addressLine2:     profile.address_line2     ?? '',
+              city:             profile.city              ?? '',
+              province:         profile.province          ?? '',
+              postalCode:       profile.postal_code       ?? '',
+              country:          profile.country           ?? '',
+            }}
+          />
         </SpotlightCard>
 
         {/* ── 6. Support ────────────────────────────────────────────────────── */}

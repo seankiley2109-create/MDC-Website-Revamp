@@ -27,9 +27,19 @@ export interface Profile {
   paystack_customer_code: string | null;
   paystack_subscription_code: string | null;
   current_period_end: string | null;
+  phone: string | null;
+  avatar_url: string | null;
   company_name: string | null;
+  company_reg_number: string | null;
+  vat_number: string | null;
   company_size: CompanySize | null;
   industry: string | null;
+  address_line1: string | null;
+  address_line2: string | null;
+  city: string | null;
+  province: string | null;
+  postal_code: string | null;
+  country: string | null;
   /**
    * JSONB column — append-only purchase log.  Each Paystack transaction adds
    * one or more entries; they are never merged or overwritten.
