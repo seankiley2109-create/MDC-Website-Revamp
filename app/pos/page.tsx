@@ -193,7 +193,9 @@ function ServiceConfigCard({
   const cardRef = useRef<HTMLDivElement>(null);
   const [emailError, setEmailError] = useState<string | null>(null);
   const [toastMsg, setToastMsg] = useState<string | null>(null);
+  const [pendingSync, setPendingSync] = useState<{ emailCount: number; currentQty: number } | null>(null);
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const quantityTouched = useRef(false);
 
   const showToast = (msg: string) => {
     if (toastTimer.current) clearTimeout(toastTimer.current);
@@ -214,7 +216,7 @@ function ServiceConfigCard({
   const isServer = service.id === "druva-server";
   const needsEmails = service.id === "druva-m365" || service.id === "druva-endpoint";
   const parsedEmails = needsEmails
-    ? userEmails.split(/[\n,]+/).map(e => e.trim()).filter(Boolean)
+    ? userEmails.split(/[\n,;]+/).map(e => e.trim()).filter(e => e.includes('@'))
     : [];
   const countMismatch = parsedEmails.length > 0 && parsedEmails.length !== config.quantity;
   const countMatch    = parsedEmails.length > 0 && parsedEmails.length === config.quantity;
@@ -398,7 +400,7 @@ function ServiceConfigCard({
           <div className="flex items-center gap-3">
             <button
               type="button"
-              onClick={() => onConfigChange(service.id, { quantity: Math.max(1, config.quantity - 1) })}
+              onClick={() => { quantityTouched.current = true; setPendingSync(null); onConfigChange(service.id, { quantity: Math.max(1, config.quantity - 1) }); }}
               className="h-8 w-8 flex items-center justify-center border border-white/10 text-white/70 hover:border-white/30 hover:text-white transition-colors"
             >
               <Minus className="h-3 w-3" />
@@ -407,12 +409,12 @@ function ServiceConfigCard({
               type="number"
               min="1"
               value={config.quantity}
-              onChange={e => onConfigChange(service.id, { quantity: Math.max(1, parseInt(e.target.value) || 1) })}
+              onChange={e => { quantityTouched.current = true; setPendingSync(null); onConfigChange(service.id, { quantity: Math.max(1, parseInt(e.target.value) || 1) }); }}
               className="w-20 text-center border border-white/10 bg-montana-surface/50 py-1.5 text-white text-sm focus:border-montana-pink focus:outline-none"
             />
             <button
               type="button"
-              onClick={() => onConfigChange(service.id, { quantity: config.quantity + 1 })}
+              onClick={() => { quantityTouched.current = true; setPendingSync(null); onConfigChange(service.id, { quantity: config.quantity + 1 }); }}
               className="h-8 w-8 flex items-center justify-center border border-white/10 text-white/70 hover:border-white/30 hover:text-white transition-colors"
             >
               <Plus className="h-3 w-3" />
@@ -438,12 +440,18 @@ function ServiceConfigCard({
             onChange={e => {
               onUserEmailsChange(service.id, e.target.value);
               if (emailError) setEmailError(null);
+              if (pendingSync) setPendingSync(null);
             }}
             onBlur={e => {
-              const emails = e.target.value.split(/[\n,]+/).map(s => s.trim()).filter(Boolean);
+              const emails = e.target.value.split(/[\n,;]+/).map(s => s.trim()).filter(s => s.includes('@'));
               if (emails.length > 0 && emails.length !== config.quantity) {
-                onConfigChange(service.id, { quantity: emails.length });
-                showToast(`Quantity updated to ${emails.length}`);
+                if (quantityTouched.current && config.quantity > 1) {
+                  setPendingSync({ emailCount: emails.length, currentQty: config.quantity });
+                } else {
+                  onConfigChange(service.id, { quantity: emails.length });
+                  quantityTouched.current = false;
+                  showToast(`Quantity updated to match ${emails.length} email address${emails.length !== 1 ? 'es' : ''}`);
+                }
               }
             }}
             placeholder={"user@company.com\nuser2@company.com"}
@@ -457,7 +465,35 @@ function ServiceConfigCard({
               {emailError}
             </p>
           )}
-          {countMismatch && !emailError && (
+          {pendingSync && (
+            <div className="mt-1.5 border border-montana-orange/40 bg-montana-orange/5 px-3 py-2 flex items-center gap-2 flex-wrap">
+              <p className="text-xs text-montana-orange flex-1 min-w-0">
+                You entered {pendingSync.emailCount} email{pendingSync.emailCount !== 1 ? 's' : ''} but quantity is {pendingSync.currentQty}. Update to {pendingSync.emailCount}?
+              </p>
+              <div className="flex gap-2 shrink-0">
+                <button
+                  type="button"
+                  onClick={() => {
+                    onConfigChange(service.id, { quantity: pendingSync.emailCount });
+                    quantityTouched.current = false;
+                    showToast(`Quantity updated to match ${pendingSync.emailCount} email address${pendingSync.emailCount !== 1 ? 'es' : ''}`);
+                    setPendingSync(null);
+                  }}
+                  className="text-[10px] font-bold border border-montana-orange/40 text-montana-orange hover:bg-montana-orange/10 px-2 py-1 transition-colors whitespace-nowrap"
+                >
+                  Update to {pendingSync.emailCount}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPendingSync(null)}
+                  className="text-[10px] font-bold border border-white/20 text-white/50 hover:text-white px-2 py-1 transition-colors"
+                >
+                  Keep {pendingSync.currentQty}
+                </button>
+              </div>
+            </div>
+          )}
+          {countMismatch && !emailError && !pendingSync && (
             <div className="mt-1.5 flex flex-wrap items-start gap-2">
               <p className="text-xs text-montana-orange flex-1 min-w-0">
                 {parsedEmails.length} email{parsedEmails.length !== 1 ? "s" : ""} entered — you configured {config.quantity} {service.unitLabel}. Adjust the quantity or add the remaining emails.
@@ -466,7 +502,7 @@ function ServiceConfigCard({
                 type="button"
                 onClick={() => {
                   onConfigChange(service.id, { quantity: parsedEmails.length });
-                  showToast(`Quantity updated to ${parsedEmails.length}`);
+                  showToast(`Quantity updated to match ${parsedEmails.length} email address${parsedEmails.length !== 1 ? 'es' : ''}`);
                 }}
                 className="shrink-0 text-[10px] font-bold border border-montana-orange/40 text-montana-orange hover:bg-montana-orange/10 px-2 py-1 transition-colors whitespace-nowrap"
               >
