@@ -10,7 +10,7 @@ import { createBrowserClient }              from '@/lib/supabase/browser';
 import { processOrder }                     from '@/app/actions/order';
 import type { OrderFormData }               from '@/app/actions/order';
 import type { CartLineItem }               from '@/app/api/subscribe/route';
-import { AlertCircle, ShoppingCart, CheckCircle2, ArrowRight } from 'lucide-react';
+import { AlertCircle, ShoppingCart, CheckCircle2, ArrowRight, Check, X } from 'lucide-react';
 
 // ─── Cart helpers ─────────────────────────────────────────────────────────────
 
@@ -28,11 +28,13 @@ function Field({
   label,
   error,
   required,
+  valid,
   children,
 }: {
   label:     string;
   error?:    string;
   required?: boolean;
+  valid?:    boolean;
   children:  React.ReactNode;
 }) {
   return (
@@ -40,7 +42,11 @@ function Field({
       <label className="text-sm font-medium text-white/70">
         {label}{required && <span className="text-red-400 ml-0.5">*</span>}
       </label>
-      {children}
+      <div className="relative">
+        {children}
+        {valid === true && <Check className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-green-400 pointer-events-none" />}
+        {valid === false && <X className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-red-400 pointer-events-none" />}
+      </div>
       {error && (
         <p className="text-xs text-red-400 flex items-center gap-1">
           <AlertCircle className="h-3 w-3 shrink-0" />
@@ -53,7 +59,7 @@ function Field({
 
 const inputClass =
   'w-full bg-white/5 border border-white/10 text-white placeholder-white/30 ' +
-  'px-3 py-2.5 text-sm rounded focus:outline-none focus:border-blue-400/60 ' +
+  'px-3 py-2.5 pr-9 text-sm rounded focus:outline-none focus:border-blue-400/60 ' +
   'focus:bg-white/8 transition-colors disabled:opacity-50';
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
@@ -73,8 +79,19 @@ export default function CheckoutPage() {
     register,
     handleSubmit,
     setValue,
-    formState: { errors },
-  } = useForm<OrderFormData>({ defaultValues: { country: 'ZA' } });
+    formState: { errors, touchedFields, isSubmitted },
+  } = useForm<OrderFormData>({ defaultValues: { country: 'ZA' }, mode: 'onBlur' });
+
+  const fieldValid = (name: keyof OrderFormData): boolean | undefined => {
+    if (!isSubmitted && !touchedFields[name]) return undefined;
+    return !errors[name];
+  };
+
+  const onError = () => {
+    const firstKey = Object.keys(errors)[0];
+    const el = document.querySelector(`[name="${firstKey}"]`) as HTMLElement | null;
+    el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  };
 
   // Load cart and user email context from sessionStorage
   useEffect(() => {
@@ -153,7 +170,7 @@ export default function CheckoutPage() {
 
       {/* ── Left: Form ──────────────────────────────────────────────────────── */}
       <form
-        onSubmit={handleSubmit(onSubmit)}
+        onSubmit={handleSubmit(onSubmit, onError)}
         className="lg:col-span-2 flex flex-col gap-6"
       >
         <h1 className="text-2xl font-semibold text-white">Complete your order</h1>
@@ -162,14 +179,14 @@ export default function CheckoutPage() {
         <SpotlightCard customSize className="p-6 flex flex-col gap-5">
           <h2 className="text-sm font-semibold text-white/50 uppercase tracking-wider">Contact Details</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <Field label="First Name" required error={errors.firstName?.message}>
+            <Field label="First Name" required error={errors.firstName?.message} valid={fieldValid('firstName')}>
               <input
                 {...register('firstName', { required: 'First name is required' })}
                 className={inputClass}
                 placeholder="Sean"
               />
             </Field>
-            <Field label="Last Name" required error={errors.lastName?.message}>
+            <Field label="Last Name" required error={errors.lastName?.message} valid={fieldValid('lastName')}>
               <input
                 {...register('lastName', { required: 'Last name is required' })}
                 className={inputClass}
@@ -193,7 +210,7 @@ export default function CheckoutPage() {
               </Link>
             </p>
           </Field>
-          <Field label="Phone Number" required error={errors.phone?.message}>
+          <Field label="Phone Number" required error={errors.phone?.message} valid={fieldValid('phone')}>
             <input
               {...register('phone', { required: 'Phone number is required', minLength: { value: 7, message: 'Enter a valid phone number' } })}
               className={inputClass}
@@ -206,7 +223,7 @@ export default function CheckoutPage() {
         {/* Company & Tax */}
         <SpotlightCard customSize className="p-6 flex flex-col gap-5">
           <h2 className="text-sm font-semibold text-white/50 uppercase tracking-wider">Company & Tax</h2>
-          <Field label="Company Name" required error={errors.company?.message}>
+          <Field label="Company Name" required error={errors.company?.message} valid={fieldValid('company')}>
             <input
               {...register('company', { required: 'Company name is required' })}
               className={inputClass}
@@ -225,7 +242,7 @@ export default function CheckoutPage() {
         {/* Billing Address */}
         <SpotlightCard customSize className="p-6 flex flex-col gap-5">
           <h2 className="text-sm font-semibold text-white/50 uppercase tracking-wider">Billing Address</h2>
-          <Field label="Street Address" required error={errors.address1?.message}>
+          <Field label="Street Address" required error={errors.address1?.message} valid={fieldValid('address1')}>
             <input
               {...register('address1', { required: 'Street address is required' })}
               className={inputClass}
@@ -240,14 +257,14 @@ export default function CheckoutPage() {
             />
           </Field>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <Field label="City / Town" required error={errors.city?.message}>
+            <Field label="City / Town" required error={errors.city?.message} valid={fieldValid('city')}>
               <input
                 {...register('city', { required: 'City is required' })}
                 className={inputClass}
                 placeholder="Johannesburg"
               />
             </Field>
-            <Field label="Province" required error={errors.province?.message}>
+            <Field label="Province" required error={errors.province?.message} valid={fieldValid('province')}>
               <select
                 {...register('province', { required: 'Province is required' })}
                 className={inputClass}
@@ -261,7 +278,7 @@ export default function CheckoutPage() {
             </Field>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <Field label="Postal Code" required error={errors.postalCode?.message}>
+            <Field label="Postal Code" required error={errors.postalCode?.message} valid={fieldValid('postalCode')}>
               <input
                 {...register('postalCode', { required: 'Postal code is required', minLength: { value: 4, message: 'Enter a valid postal code' } })}
                 className={inputClass}

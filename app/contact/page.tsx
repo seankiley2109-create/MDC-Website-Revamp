@@ -7,7 +7,7 @@ import { useSearchParams } from "next/navigation";
 import * as z from "zod";
 import { SpotlightCard } from "@/components/ui/spotlight-card";
 import { AnimatedButton } from "@/components/ui/animated-button";
-import { Phone, Mail, Facebook, Linkedin, Clock, Shield, MessageSquare, Building2 } from "lucide-react";
+import { Phone, Mail, Facebook, Linkedin, Clock, Shield, MessageSquare, Building2, Check, X } from "lucide-react";
 import Link from "next/link";
 import { createBrowserClient } from "@/lib/supabase/browser";
 
@@ -112,9 +112,10 @@ function ContactFormInner() {
     reset,
     watch,
     setValue,
-    formState: { errors },
+    formState: { errors, touchedFields, isSubmitted },
   } = useForm<ContactFormValues>({
     resolver: zodResolver(contactSchema),
+    mode: 'onBlur',
     defaultValues: {
       enquiryType: defaultType,
       message: serviceDefaults?.message ?? "",
@@ -162,6 +163,17 @@ function ContactFormInner() {
   }, []);
 
   const activeDefaults = ENQUIRY_TYPE_DEFAULTS[watchedEnquiryType] ?? null;
+
+  const fieldState = (name: keyof ContactFormValues): boolean | undefined => {
+    if (!isSubmitted && !touchedFields[name]) return undefined;
+    return !errors[name];
+  };
+
+  const onError = () => {
+    const firstKey = Object.keys(errors)[0];
+    const el = document.getElementById(firstKey) ?? (document.querySelector(`[name="${firstKey}"]`) as HTMLElement | null);
+    el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  };
 
   const onSubmit = async (data: ContactFormValues) => {
     setIsSubmitting(true);
@@ -348,7 +360,7 @@ function ContactFormInner() {
                   </div>
                 </div>
               ) : (
-                <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+                <form onSubmit={handleSubmit(onSubmit, onError)} className="space-y-6">
                   <div>
                     <h2 className="font-display text-2xl font-bold text-white mb-1">Send an Enquiry</h2>
                     <p className="text-montana-muted text-sm">Complete the form and we&apos;ll be in touch within one business day.</p>
@@ -365,27 +377,35 @@ function ContactFormInner() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-2">
                       <label htmlFor="name" className="text-xs font-bold uppercase tracking-wider text-white/50">Full Name</label>
-                      <input
-                        {...register("name")}
-                        id="name"
-                        className="w-full border border-white/10 bg-montana-surface/50 px-4 py-3 text-sm text-white placeholder-white/20 focus:border-montana-pink focus:outline-none transition-colors"
-                        placeholder="Jane Dlamini"
-                      />
-                      {profilePrefilled.has("name") && !errors.name && (
+                      <div className="relative">
+                        <input
+                          {...register("name")}
+                          id="name"
+                          className="w-full border border-white/10 bg-montana-surface/50 px-4 py-3 pr-10 text-sm text-white placeholder-white/20 focus:border-montana-pink focus:outline-none transition-colors"
+                          placeholder="Jane Dlamini"
+                        />
+                        {fieldState("name") === true && <Check className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-green-400 pointer-events-none" />}
+                        {fieldState("name") === false && <X className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-red-400 pointer-events-none" />}
+                      </div>
+                      {profilePrefilled.has("name") && !errors.name && fieldState("name") !== false && (
                         <p className="text-xs text-montana-muted/60">From your profile</p>
                       )}
                       {errors.name && <p className="text-xs text-red-400">{errors.name.message}</p>}
                     </div>
                     <div className="space-y-2">
                       <label htmlFor="email" className="text-xs font-bold uppercase tracking-wider text-white/50">Corporate Email</label>
-                      <input
-                        {...register("email")}
-                        id="email"
-                        type="email"
-                        className="w-full border border-white/10 bg-montana-surface/50 px-4 py-3 text-sm text-white placeholder-white/20 focus:border-montana-pink focus:outline-none transition-colors"
-                        placeholder="jane@company.co.za"
-                      />
-                      {profilePrefilled.has("email") && !errors.email && (
+                      <div className="relative">
+                        <input
+                          {...register("email")}
+                          id="email"
+                          type="email"
+                          className="w-full border border-white/10 bg-montana-surface/50 px-4 py-3 pr-10 text-sm text-white placeholder-white/20 focus:border-montana-pink focus:outline-none transition-colors"
+                          placeholder="jane@company.co.za"
+                        />
+                        {fieldState("email") === true && <Check className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-green-400 pointer-events-none" />}
+                        {fieldState("email") === false && <X className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-red-400 pointer-events-none" />}
+                      </div>
+                      {profilePrefilled.has("email") && !errors.email && fieldState("email") !== false && (
                         <p className="text-xs text-montana-muted/60">From your profile</p>
                       )}
                       {errors.email && <p className="text-xs text-red-400">{errors.email.message}</p>}
@@ -395,53 +415,65 @@ function ContactFormInner() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-2">
                       <label htmlFor="company" className="text-xs font-bold uppercase tracking-wider text-white/50">Organisation</label>
-                      <input
-                        {...register("company")}
-                        id="company"
-                        className="w-full border border-white/10 bg-montana-surface/50 px-4 py-3 text-sm text-white placeholder-white/20 focus:border-montana-pink focus:outline-none transition-colors"
-                        placeholder="Acme (Pty) Ltd"
-                      />
-                      {profilePrefilled.has("company") && !errors.company && (
+                      <div className="relative">
+                        <input
+                          {...register("company")}
+                          id="company"
+                          className="w-full border border-white/10 bg-montana-surface/50 px-4 py-3 pr-10 text-sm text-white placeholder-white/20 focus:border-montana-pink focus:outline-none transition-colors"
+                          placeholder="Acme (Pty) Ltd"
+                        />
+                        {fieldState("company") === true && <Check className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-green-400 pointer-events-none" />}
+                        {fieldState("company") === false && <X className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-red-400 pointer-events-none" />}
+                      </div>
+                      {profilePrefilled.has("company") && !errors.company && fieldState("company") !== false && (
                         <p className="text-xs text-montana-muted/60">From your profile</p>
                       )}
                       {errors.company && <p className="text-xs text-red-400">{errors.company.message}</p>}
                     </div>
                     <div className="space-y-2">
                       <label htmlFor="enquiryType" className="text-xs font-bold uppercase tracking-wider text-white/50">Enquiry Type</label>
-                      <select
-                        {...register("enquiryType")}
-                        id="enquiryType"
-                        className="w-full border border-white/10 bg-montana-surface/80 px-4 py-3 text-sm text-white focus:border-montana-pink focus:outline-none transition-colors appearance-none"
-                      >
-                        <option value="" disabled>Select a category</option>
-                        <optgroup label="Product Enquiries">
-                          <option value="enterprise-backup">Enterprise Backup</option>
-                          <option value="ransomware">Ransomware Protection</option>
-                          <option value="archiving">Archiving &amp; Lifecycle</option>
-                          <option value="quantum">Quantum Security (PQC)</option>
-                          <option value="guardium">IBM Guardium</option>
-                          <option value="m365-licensing">M365 / Google Workspace Licensing</option>
-                        </optgroup>
-                        <optgroup label="Other">
-                          <option value="existing-client">Existing Client Support</option>
-                          <option value="partnership">Channel Partnership</option>
-                          <option value="compliance">POPIA / Compliance Consulting</option>
-                          <option value="general">General Enquiry</option>
-                        </optgroup>
-                      </select>
+                      <div className="relative">
+                        <select
+                          {...register("enquiryType")}
+                          id="enquiryType"
+                          className="w-full border border-white/10 bg-montana-surface/80 px-4 py-3 pr-10 text-sm text-white focus:border-montana-pink focus:outline-none transition-colors appearance-none"
+                        >
+                          <option value="" disabled>Select a category</option>
+                          <optgroup label="Product Enquiries">
+                            <option value="enterprise-backup">Enterprise Backup</option>
+                            <option value="ransomware">Ransomware Protection</option>
+                            <option value="archiving">Archiving &amp; Lifecycle</option>
+                            <option value="quantum">Quantum Security (PQC)</option>
+                            <option value="guardium">IBM Guardium</option>
+                            <option value="m365-licensing">M365 / Google Workspace Licensing</option>
+                          </optgroup>
+                          <optgroup label="Other">
+                            <option value="existing-client">Existing Client Support</option>
+                            <option value="partnership">Channel Partnership</option>
+                            <option value="compliance">POPIA / Compliance Consulting</option>
+                            <option value="general">General Enquiry</option>
+                          </optgroup>
+                        </select>
+                        {fieldState("enquiryType") === true && <Check className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-green-400 pointer-events-none" />}
+                        {fieldState("enquiryType") === false && <X className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-red-400 pointer-events-none" />}
+                      </div>
                       {errors.enquiryType && <p className="text-xs text-red-400">Please select an enquiry type</p>}
                     </div>
                   </div>
 
                   <div className="space-y-2">
                     <label htmlFor="message" className="text-xs font-bold uppercase tracking-wider text-white/50">Message</label>
-                    <textarea
-                      {...register("message")}
-                      id="message"
-                      rows={activeDefaults ? 10 : 5}
-                      className="w-full border border-white/10 bg-montana-surface/50 px-4 py-3 text-sm text-white placeholder-white/20 focus:border-montana-pink focus:outline-none transition-colors resize-none font-mono"
-                      placeholder="Tell us about your environment, current challenges, or what you're looking to achieve..."
-                    />
+                    <div className="relative">
+                      <textarea
+                        {...register("message")}
+                        id="message"
+                        rows={activeDefaults ? 10 : 5}
+                        className="w-full border border-white/10 bg-montana-surface/50 px-4 py-3 pr-10 text-sm text-white placeholder-white/20 focus:border-montana-pink focus:outline-none transition-colors resize-none font-mono"
+                        placeholder="Tell us about your environment, current challenges, or what you're looking to achieve..."
+                      />
+                      {fieldState("message") === true && <Check className="absolute right-3 top-3.5 h-4 w-4 text-green-400 pointer-events-none" />}
+                      {fieldState("message") === false && <X className="absolute right-3 top-3.5 h-4 w-4 text-red-400 pointer-events-none" />}
+                    </div>
                     {errors.message && <p className="text-xs text-red-400">{errors.message.message}</p>}
                   </div>
 
