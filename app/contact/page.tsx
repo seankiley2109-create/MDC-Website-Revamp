@@ -9,6 +9,7 @@ import { SpotlightCard } from "@/components/ui/spotlight-card";
 import { AnimatedButton } from "@/components/ui/animated-button";
 import { Phone, Mail, Facebook, Linkedin, Clock, Shield, MessageSquare, Building2 } from "lucide-react";
 import Link from "next/link";
+import { createBrowserClient } from "@/lib/supabase/browser";
 
 const ENQUIRY_VALUES = [
   "enterprise-backup",
@@ -103,6 +104,7 @@ function ContactFormInner() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [profilePrefilled, setProfilePrefilled] = useState<Set<keyof ContactFormValues>>(new Set());
 
   const {
     register,
@@ -130,6 +132,34 @@ function ContactFormInner() {
     const defaults = ENQUIRY_TYPE_DEFAULTS[watchedEnquiryType];
     setValue("message", defaults?.message ?? "");
   }, [watchedEnquiryType, setValue]);
+
+  useEffect(() => {
+    const supabase = createBrowserClient();
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
+      if (!session) return;
+      const filled = new Set<keyof ContactFormValues>();
+      // email comes from the auth session directly
+      if (session.user.email) {
+        setValue("email", session.user.email);
+        filled.add("email");
+      }
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("full_name, company_name")
+        .eq("id", session.user.id)
+        .single();
+      if (profile?.full_name) {
+        setValue("name", profile.full_name);
+        filled.add("name");
+      }
+      if (profile?.company_name) {
+        setValue("company", profile.company_name);
+        filled.add("company");
+      }
+      if (filled.size > 0) setProfilePrefilled(filled);
+    });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const activeDefaults = ENQUIRY_TYPE_DEFAULTS[watchedEnquiryType] ?? null;
 
@@ -341,6 +371,9 @@ function ContactFormInner() {
                         className="w-full border border-white/10 bg-montana-surface/50 px-4 py-3 text-sm text-white placeholder-white/20 focus:border-montana-pink focus:outline-none transition-colors"
                         placeholder="Jane Dlamini"
                       />
+                      {profilePrefilled.has("name") && !errors.name && (
+                        <p className="text-xs text-montana-muted/60">From your profile</p>
+                      )}
                       {errors.name && <p className="text-xs text-red-400">{errors.name.message}</p>}
                     </div>
                     <div className="space-y-2">
@@ -352,6 +385,9 @@ function ContactFormInner() {
                         className="w-full border border-white/10 bg-montana-surface/50 px-4 py-3 text-sm text-white placeholder-white/20 focus:border-montana-pink focus:outline-none transition-colors"
                         placeholder="jane@company.co.za"
                       />
+                      {profilePrefilled.has("email") && !errors.email && (
+                        <p className="text-xs text-montana-muted/60">From your profile</p>
+                      )}
                       {errors.email && <p className="text-xs text-red-400">{errors.email.message}</p>}
                     </div>
                   </div>
@@ -365,6 +401,9 @@ function ContactFormInner() {
                         className="w-full border border-white/10 bg-montana-surface/50 px-4 py-3 text-sm text-white placeholder-white/20 focus:border-montana-pink focus:outline-none transition-colors"
                         placeholder="Acme (Pty) Ltd"
                       />
+                      {profilePrefilled.has("company") && !errors.company && (
+                        <p className="text-xs text-montana-muted/60">From your profile</p>
+                      )}
                       {errors.company && <p className="text-xs text-red-400">{errors.company.message}</p>}
                     </div>
                     <div className="space-y-2">
