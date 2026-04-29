@@ -299,10 +299,10 @@ export default function PartnersPage() {
             </Link>
           </div>
           <div className="flex flex-col sm:flex-row gap-6 justify-center text-sm text-montana-muted">
-            <a href="tel:+27871883843" className="flex items-center gap-2 hover:text-white transition-colors">
+            <a href="tel:+27871883843" className="flex items-center gap-2 hover:text-white hover-interactive">
               <Phone className="h-4 w-4 text-montana-pink" /> +27 (0)87 188 3843
             </a>
-            <a href="mailto:support@montanadc.com" className="flex items-center gap-2 hover:text-white transition-colors">
+            <a href="mailto:support@montanadc.com" className="flex items-center gap-2 hover:text-white hover-interactive">
               <Mail className="h-4 w-4 text-montana-pink" /> support@montanadc.com
             </a>
           </div>

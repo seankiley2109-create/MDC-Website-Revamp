@@ -289,7 +289,7 @@ function ServiceConfigCard({
             </p>
             <Link
               href="/contact?service=m365-licensing&ref=pos"
-              className="shrink-0 inline-flex items-center gap-1.5 text-xs font-bold text-blue-300 hover:text-white transition-colors"
+              className="shrink-0 inline-flex items-center gap-1.5 text-xs font-bold text-blue-300 hover:text-white hover-interactive"
             >
               Get help with licensing <ArrowRight className="h-3 w-3" />
             </Link>

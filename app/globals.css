@@ -17,6 +17,10 @@
   --font-display: var(--font-space-grotesk), ui-sans-serif, system-ui, sans-serif;
 }
 
+.hover-interactive {
+  @apply hover:bg-white/5 transition-all duration-200;
+}
+
 /* Custom scrollbar for a polished look */
 ::-webkit-scrollbar {
   width: 8px;

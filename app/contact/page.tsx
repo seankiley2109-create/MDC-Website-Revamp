@@ -224,7 +224,7 @@ function ContactFormInner() {
               <div className="space-y-4">
                 <a
                   href="tel:+27871883843"
-                  className="flex items-center gap-4 text-montana-muted hover:text-white transition-colors group"
+                  className="flex items-center gap-4 text-montana-muted hover:text-white hover-interactive group"
                 >
                   <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-sm bg-white/5 border border-white/10 group-hover:border-montana-pink/50 transition-colors">
                     <Phone className="h-4 w-4 text-montana-pink" />
@@ -236,7 +236,7 @@ function ContactFormInner() {
                 </a>
                 <a
                   href="mailto:support@montanadc.com"
-                  className="flex items-center gap-4 text-montana-muted hover:text-white transition-colors group"
+                  className="flex items-center gap-4 text-montana-muted hover:text-white hover-interactive group"
                 >
                   <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-sm bg-white/5 border border-white/10 group-hover:border-montana-pink/50 transition-colors">
                     <Mail className="h-4 w-4 text-montana-pink" />

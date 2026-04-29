@@ -550,15 +550,15 @@ export default async function PortalPage() {
                   </AnimatedButton>
                 </Link>
               )}
-              <Link href="/billing" className="flex items-center justify-between text-sm text-montana-muted hover:text-white transition-colors py-1.5">
+              <Link href="/billing" className="flex items-center justify-between text-sm text-montana-muted hover:text-white hover-interactive py-1.5">
                 <span>View Billing Details</span>
                 <ChevronRight className="h-4 w-4" />
               </Link>
-              <Link href="/pos" className="flex items-center justify-between text-sm text-montana-muted hover:text-white transition-colors py-1.5">
+              <Link href="/pos" className="flex items-center justify-between text-sm text-montana-muted hover:text-white hover-interactive py-1.5">
                 <span>Add More Products</span>
                 <ChevronRight className="h-4 w-4" />
               </Link>
-              <Link href="/pos?tab=consulting" className="flex items-center justify-between text-sm text-montana-muted hover:text-white transition-colors py-1.5">
+              <Link href="/pos?tab=consulting" className="flex items-center justify-between text-sm text-montana-muted hover:text-white hover-interactive py-1.5">
                 <span>Book Consulting</span>
                 <ChevronRight className="h-4 w-4" />
               </Link>

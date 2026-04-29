@@ -211,7 +211,7 @@ export default async function PopiaResultsPage({
                     {cta && (
                       <Link
                         href={cta.href}
-                        className="mt-auto flex items-center gap-2 border-t border-white/10 pt-4 text-xs font-medium text-montana-muted hover:text-white transition-colors group"
+                        className="mt-auto flex items-center gap-2 border-t border-white/10 pt-4 text-xs font-medium text-montana-muted hover:text-white hover-interactive group"
                       >
                         <span>Address this gap → View {cta.label}</span>
                         <ArrowRight className="h-3 w-3 shrink-0 group-hover:translate-x-0.5 transition-transform" />
@@ -296,7 +296,7 @@ export default async function PopiaResultsPage({
           </Link>
           <Link
             href="/assessments/popia"
-            className="px-8 py-4 text-sm font-medium text-montana-muted border border-white/10 hover:border-white/30 hover:text-white transition-colors flex items-center justify-center"
+            className="px-8 py-4 text-sm font-medium text-montana-muted border border-white/10 hover:border-white/30 hover:text-white hover-interactive flex items-center justify-center"
           >
             Retake Assessment
           </Link>

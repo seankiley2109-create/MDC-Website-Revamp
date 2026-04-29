@@ -103,7 +103,7 @@ export function Navbar() {
             <Link
               key={link.href}
               href={link.href}
-              className="hover:text-montana-pink transition-colors"
+              className="hover:text-montana-pink hover-interactive"
             >
               {link.label}
             </Link>
@@ -144,7 +144,7 @@ export function Navbar() {
                       <Link
                         href="/portal"
                         onClick={() => setProfileOpen(false)}
-                        className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-montana-muted hover:text-white hover:bg-white/5 transition-colors"
+                        className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-montana-muted hover:text-white hover-interactive"
                       >
                         <LayoutDashboard className="h-4 w-4 shrink-0" />
                         Client Portal
@@ -152,7 +152,7 @@ export function Navbar() {
                       <Link
                         href="/billing"
                         onClick={() => setProfileOpen(false)}
-                        className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-montana-muted hover:text-white hover:bg-white/5 transition-colors"
+                        className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-montana-muted hover:text-white hover-interactive"
                       >
                         <CreditCard className="h-4 w-4 shrink-0" />
                         Billing & Subscription
@@ -176,7 +176,7 @@ export function Navbar() {
               /* ── Logged out: Sign In link ── */
               <Link
                 href="/sign-in"
-                className="text-sm font-medium text-montana-muted hover:text-white transition-colors px-2 py-1"
+                className="text-sm font-medium text-montana-muted hover:text-white hover-interactive px-2 py-1"
               >
                 Sign In
               </Link>
@@ -229,7 +229,7 @@ export function Navbar() {
               key={link.href}
               href={link.href}
               onClick={() => setIsOpen(false)}
-              className="block py-3 text-lg font-medium text-white hover:text-montana-pink transition-colors border-b border-white/5"
+              className="block py-3 text-lg font-medium text-white hover:text-montana-pink hover-interactive border-b border-white/5"
             >
               {link.label}
             </Link>
@@ -253,14 +253,14 @@ export function Navbar() {
                 <Link
                   href="/portal"
                   onClick={() => setIsOpen(false)}
-                  className="flex items-center gap-2 py-3 text-sm text-montana-muted hover:text-white transition-colors"
+                  className="flex items-center gap-2 py-3 text-sm text-montana-muted hover:text-white hover-interactive"
                 >
                   <LayoutDashboard className="h-4 w-4" /> Client Portal
                 </Link>
                 <Link
                   href="/billing"
                   onClick={() => setIsOpen(false)}
-                  className="flex items-center gap-2 py-3 text-sm text-montana-muted hover:text-white transition-colors"
+                  className="flex items-center gap-2 py-3 text-sm text-montana-muted hover:text-white hover-interactive"
                 >
                   <CreditCard className="h-4 w-4" /> Billing &amp; Subscription
                 </Link>
@@ -276,14 +276,14 @@ export function Navbar() {
                 <Link
                   href="/sign-in"
                   onClick={() => setIsOpen(false)}
-                  className="block py-3 text-center text-sm font-medium text-montana-muted border border-white/10 hover:border-white/30 hover:text-white transition-colors"
+                  className="block py-3 text-center text-sm font-medium text-montana-muted border border-white/10 hover:border-white/30 hover:text-white hover-interactive"
                 >
                   Sign In
                 </Link>
                 <Link
                   href="/sign-up"
                   onClick={() => setIsOpen(false)}
-                  className="block py-3 text-center text-sm font-medium text-white/70 hover:text-white transition-colors"
+                  className="block py-3 text-center text-sm font-medium text-white/70 hover:text-white hover-interactive"
                 >
                   Create Account
                 </Link>

@@ -314,7 +314,7 @@ export default function PrivacyPage() {
                 <h3 className="font-display font-bold text-white text-sm">Privacy Enquiries</h3>
               </div>
               <div className="space-y-2 text-sm text-montana-muted">
-                <a href="mailto:info@montanadc.com" className="flex items-center gap-2 hover:text-montana-pink transition-colors">
+                <a href="mailto:info@montanadc.com" className="flex items-center gap-2 hover:text-montana-pink hover-interactive">
                   <Mail className="h-3.5 w-3.5" /> info@montanadc.com
                 </a>
                 <div className="flex items-start gap-2 mt-3">
@@ -338,8 +338,8 @@ export default function PrivacyPage() {
               <div className="space-y-2 text-sm text-montana-muted leading-relaxed">
                 <p>You have the right to lodge a complaint with the Information Regulator.</p>
                 <div className="space-y-1 mt-2">
-                  <p><span className="text-white/40">Complaints:</span> <a href="mailto:complaints.IR@justice.gov.za" className="hover:text-montana-pink transition-colors">complaints.IR@justice.gov.za</a></p>
-                  <p><span className="text-white/40">Enquiries:</span> <a href="mailto:inforeg@justice.gov.za" className="hover:text-montana-pink transition-colors">inforeg@justice.gov.za</a></p>
+                  <p><span className="text-white/40">Complaints:</span> <a href="mailto:complaints.IR@justice.gov.za" className="hover:text-montana-pink hover-interactive">complaints.IR@justice.gov.za</a></p>
+                  <p><span className="text-white/40">Enquiries:</span> <a href="mailto:inforeg@justice.gov.za" className="hover:text-montana-pink hover-interactive">inforeg@justice.gov.za</a></p>
                   <p><span className="text-white/40">Address:</span> 27 Stiemens Street, Braamfontein, Johannesburg, 2001</p>
                 </div>
               </div>
@@ -350,7 +350,7 @@ export default function PrivacyPage() {
             <Link href="/paia" className="text-sm text-montana-pink hover:underline flex items-center gap-1">
               View PAIA Manual & Forms <ExternalLink className="h-3.5 w-3.5" />
             </Link>
-            <Link href="/contact" className="text-sm text-montana-muted hover:text-white transition-colors">
+            <Link href="/contact" className="text-sm text-montana-muted hover:text-white hover-interactive">
               Contact Us
             </Link>
           </div>
