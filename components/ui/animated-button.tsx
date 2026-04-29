@@ -15,7 +15,7 @@ export const AnimatedButton = React.forwardRef<HTMLButtonElement, AnimatedButton
       primary:   "animated-btn-primary",
       secondary: "animated-btn-secondary",
       ghost:     "animated-btn-ghost",
-      outline:   "animated-btn-secondary",
+      outline:   "animated-btn-outline",
     };
 
     return (

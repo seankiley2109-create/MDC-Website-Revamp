@@ -111,6 +111,20 @@
   border-color: rgba(221, 41, 125, 0.30);
 }
 
+/* OUTLINE — pink border + pink text at rest, brightens on hover */
+.animated-btn-outline {
+  color: var(--color-montana-pink);
+  border-color: var(--color-montana-pink);
+  background: transparent;
+}
+.animated-btn-outline:not(:disabled):hover {
+  color: #ffffff;
+  background:
+    linear-gradient(var(--color-montana-bg), var(--color-montana-bg)) padding-box,
+    linear-gradient(135deg, var(--color-montana-magenta), var(--color-montana-pink)) border-box;
+  box-shadow: 0 0 12px rgba(242, 69, 103, 0.35);
+}
+
 /* ─────────────────────────────────────────────────────────────────────────── */
 
 @utility bg-grid-pattern {

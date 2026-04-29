@@ -544,6 +544,7 @@ function ServiceConfigCard({
             </div>
           ) : (
             <AnimatedButton
+              variant="outline"
               onClick={handleAddToCart}
               className="shrink-0 text-sm py-2 px-4"
             >
