@@ -321,7 +321,7 @@ export default function PrivacyPage() {
                   <MapPin className="h-3.5 w-3.5 mt-0.5 shrink-0" />
                   <address className="not-italic leading-relaxed">
                     The Information Officer<br />
-                    Suite 158, First Floor<br />
+                    Suite 126, First Floor<br />
                     Willowbridge Centre<br />
                     Carl Cronje Drive, Tyger Valley<br />
                     7530
