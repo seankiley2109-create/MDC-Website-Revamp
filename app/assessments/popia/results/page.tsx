@@ -8,7 +8,7 @@ import { POPIA_SERVICES } from "@/lib/popia-services";
 import {
   XCircle, AlertTriangle, CheckCircle, Award,
   Activity, ArrowRight, Users, Scale, UserCheck,
-  Shield, Eye, FileText, Lock,
+  Shield, Eye, FileText, Lock, ShieldAlert,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { createServerClient } from "@/lib/supabase/server";
@@ -66,6 +66,45 @@ const GAP_META: Record<string, { Icon: LucideIcon; description: string }> = {
   },
 };
 
+/** Map gap categories to the most relevant POPIA service codes, in priority order. */
+function selectPOPIAServices(gaps: string[]): typeof POPIA_SERVICES {
+  const gapSet = new Set(gaps);
+  const hasGovernanceGap = gapSet.has("Governance");
+  const hasSecurityGap = gapSet.has("Security");
+  const hasOtherGaps = [...gapSet].some(g => g !== "Governance" && g !== "Security");
+
+  const selected: string[] = [];
+
+  // Comprehensive assessment is always the primary entry point
+  selected.push("SE-PA002");
+
+  // Governance gaps → IO Registration + Training are highest-leverage
+  if (hasGovernanceGap) {
+    selected.push("SE-PE001");
+    if (selected.length < 3) selected.push("SE-PT001-5");
+  }
+
+  // Non-governance, non-security gaps → Remedial Consulting
+  if (hasOtherGaps && !selected.includes("SE-PR002")) {
+    selected.push("SE-PR002");
+  }
+
+  // Fill remaining slot with Training if not yet included
+  if (selected.length < 3 && !selected.includes("SE-PT001-5")) {
+    selected.push("SE-PT001-5");
+  }
+
+  // If low risk with few gaps, add the retainer as ongoing support
+  if (selected.length < 3 && !hasSecurityGap) {
+    selected.push("SE-PZ001");
+  }
+
+  return selected
+    .slice(0, 3)
+    .map(code => POPIA_SERVICES.find(s => s.code === code))
+    .filter(Boolean) as typeof POPIA_SERVICES;
+}
+
 export default async function PopiaResultsPage({
   searchParams,
 }: {
@@ -86,24 +125,29 @@ export default async function PopiaResultsPage({
   const compliant = Number(params.compliant ?? 0);
   const partial = Number(params.partial ?? 0);
   const critical = Number(params.critical ?? 0);
-  const gaps = String(params.gaps ?? "")
+
+  const allGaps = String(params.gaps ?? "")
     .split(",")
     .map((s) => s.trim())
-    .filter(Boolean)
-    .slice(0, 3);
+    .filter(Boolean);
+
+  const displayedGaps = allGaps.slice(0, 3);
+  const hiddenGapCount = allGaps.length - displayedGaps.length;
 
   const isHigh = risk === "High Risk";
-  const isMedium = risk === "Medium Risk";
-  const isLow = !isHigh && !isMedium;
+  const isModerate = risk === "Moderate Risk";
+  const isLow = !isHigh && !isModerate;
 
-  const colorClass = isHigh ? "text-red-500" : isMedium ? "text-amber-500" : "text-green-500";
-  const bgClass = isHigh ? "bg-red-500" : isMedium ? "bg-amber-500" : "bg-green-500";
-  const borderClass = isHigh ? "border-red-500" : isMedium ? "border-amber-500" : "border-green-500";
+  const colorClass = isHigh ? "text-red-500" : isModerate ? "text-amber-500" : "text-green-500";
+  const bgClass = isHigh ? "bg-red-500" : isModerate ? "bg-amber-500" : "bg-green-500";
+  const borderClass = isHigh ? "border-red-500" : isModerate ? "border-amber-500" : "border-green-500";
   const message = isHigh
     ? "Immediate intervention advised — critical POPIA compliance gaps detected."
-    : isMedium
+    : isModerate
     ? "Remediation required — several compliance gaps need attention."
     : "Well-positioned. An optimisation audit is recommended to maintain compliance.";
+
+  const recommendedServices = selectPOPIAServices(allGaps);
 
   return (
     <div className="pt-24 pb-24 bg-montana-bg min-h-screen">
@@ -125,7 +169,7 @@ export default async function PopiaResultsPage({
 
         {/* Save results banner — shown only to unauthenticated users */}
         {!isAuthenticated && (
-          <div className="mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border border-montana-pink/20 bg-montana-pink/5 backdrop-blur-sm rounded-lg px-5 py-4">
+          <div className="mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border border-montana-pink/20 bg-montana-pink/5 backdrop-blur-sm px-5 py-4">
             <p className="text-sm text-montana-muted leading-relaxed">
               <span className="text-white font-semibold">Save your results permanently</span> — create a free account to track your compliance progress and access your report any time.
             </p>
@@ -145,7 +189,7 @@ export default async function PopiaResultsPage({
                 className={`inline-flex h-40 w-40 items-center justify-center rounded-full bg-montana-surface border-4 ${borderClass} shadow-[0_0_40px_rgba(0,0,0,0.4)]`}
               >
                 {isHigh && <XCircle className={`h-20 w-20 ${colorClass}`} />}
-                {isMedium && <AlertTriangle className={`h-20 w-20 ${colorClass}`} />}
+                {isModerate && <AlertTriangle className={`h-20 w-20 ${colorClass}`} />}
                 {isLow && <CheckCircle className={`h-20 w-20 ${colorClass}`} />}
               </div>
               {isLow && (
@@ -185,7 +229,7 @@ export default async function PopiaResultsPage({
         </SpotlightCard>
 
         {/* Key gap areas */}
-        {gaps.length > 0 && (
+        {displayedGaps.length > 0 && (
           <div className="mb-16">
             <div className="text-center mb-8">
               <h2 className="font-display text-2xl md:text-3xl font-bold text-white mb-3">Key Gap Areas</h2>
@@ -194,7 +238,7 @@ export default async function PopiaResultsPage({
               </p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {gaps.map((cat) => {
+              {displayedGaps.map((cat) => {
                 const meta = GAP_META[cat];
                 if (!meta) return null;
                 const { Icon } = meta;
@@ -221,23 +265,28 @@ export default async function PopiaResultsPage({
                 );
               })}
             </div>
+            {hiddenGapCount > 0 && (
+              <p className="text-center text-sm text-montana-muted mt-6">
+                +{hiddenGapCount} additional gap area{hiddenGapCount > 1 ? "s" : ""} identified — a full consultation will cover all findings.
+              </p>
+            )}
           </div>
         )}
 
-        {/* What Montana recommends */}
+        {/* What Montana recommends — dynamically selected by gap categories */}
         <div className="mb-16">
           <div className="text-center mb-10">
             <h2 className="font-display text-2xl md:text-3xl font-bold text-white mb-3">
               What Montana Recommends
             </h2>
             <p className="text-montana-muted max-w-2xl mx-auto">
-              These engagements will have the most impact on your compliance posture.
+              Engagements selected based on the compliance gaps identified in your assessment.
             </p>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {POPIA_SERVICES.slice(0, 3).map((svc) => {
-              const isRecommended = svc.code === "SE-PA002";
+            {recommendedServices.map((svc, idx) => {
+              const isRecommended = idx === 0;
               const posUrl = `/pos?tab=consulting&services=${svc.code}`;
               return (
                 <SpotlightCard
@@ -282,9 +331,29 @@ export default async function PopiaResultsPage({
           </div>
         </div>
 
+        {/* Cross-assessment prompt */}
+        <div className="mb-12 border border-red-500/20 bg-red-500/5 p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="flex items-start gap-4">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-red-500/10 border border-red-500/20 shrink-0 mt-0.5">
+              <ShieldAlert className="h-5 w-5 text-red-400" />
+            </div>
+            <div>
+              <p className="font-semibold text-white text-sm mb-1">Have you assessed your Backup &amp; Security posture?</p>
+              <p className="text-xs text-montana-muted leading-relaxed">
+                POPIA requires appropriate technical safeguards — your Security Assessment will reveal gaps in your data protection architecture.
+              </p>
+            </div>
+          </div>
+          <Link href="/assessments/security" className="shrink-0">
+            <AnimatedButton variant="outline" className="text-xs px-5 py-2 whitespace-nowrap gap-2">
+              Take Security Assessment <ArrowRight className="h-3.5 w-3.5" />
+            </AnimatedButton>
+          </Link>
+        </div>
+
         {/* CTAs */}
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <Link href="/contact">
+          <Link href="/contact?service=popia&ref=popia-results">
             <AnimatedButton variant="primary" className="gap-2 px-8 py-4">
               Book a Compliance Consultation <ArrowRight className="h-5 w-5" />
             </AnimatedButton>

@@ -29,7 +29,7 @@ function resolveRiskLevel(type: AssessmentType, score: number): RiskLevel {
     return 'Low Risk';
   }
   if (score <= 8)  return 'High Risk';
-  if (score <= 14) return 'Medium Risk';
+  if (score <= 14) return 'Moderate Risk';
   return 'Low Risk';
 }
 
@@ -74,8 +74,8 @@ export async function POST(request: Request) {
 
       if (type === 'popia') {
         const dbRiskLevel: PopiaRiskLevel =
-          riskLevel === 'High Risk'   ? 'high'   :
-          riskLevel === 'Medium Risk' ? 'medium' : 'low';
+          riskLevel === 'High Risk'     ? 'high'   :
+          riskLevel === 'Moderate Risk' ? 'medium' : 'low';
 
         const assessmentUpdate = {
           popia_score:              score,

@@ -259,7 +259,6 @@ function buildResultsUrl(finalAnswers: Record<number, number>, score: number): s
   const gaps = Object.entries(catScores)
     .filter(([, v]) => v.total / v.count < 2)
     .sort(([, a], [, b]) => a.total / a.count - b.total / b.count)
-    .slice(0, 3)
     .map(([cat]) => cat)
     .join(",");
 
@@ -548,69 +547,123 @@ export default function SecurityAssessment() {
           </div>
         )}
 
-        {/* Phase 2b: Lead Gate form (shown only once auth has resolved and gate is needed) */}
+        {/* Phase 2b: Value-before-gate — show score immediately, gate the full report */}
         {currentStep === 10 && pendingFinalAnswers === null && (
-          <div className="relative overflow-hidden rounded-2xl animate-in fade-in zoom-in duration-500">
-            <div className="filter blur-xl opacity-30 pointer-events-none select-none">
-              <SpotlightCard customSize className="p-12">
-                <div className="flex justify-center mb-8">
-                  <div className="h-32 w-32 rounded-full bg-red-500" />
-                </div>
-                <div className="h-12 bg-white/20 rounded w-1/2 mx-auto mb-4" />
-                <div className="h-6 bg-white/10 rounded w-3/4 mx-auto mb-12" />
-                <div className="grid grid-cols-3 gap-6">
-                  <div className="h-48 bg-white/10 rounded" />
-                  <div className="h-48 bg-white/10 rounded" />
-                  <div className="h-48 bg-white/10 rounded" />
-                </div>
-              </SpotlightCard>
-            </div>
-
-            <div className="absolute inset-0 flex items-center justify-center p-6 bg-montana-bg/40 backdrop-blur-md">
-              <SpotlightCard customSize className="w-full max-w-md p-8 border-red-500/30 shadow-2xl shadow-red-500/10">
-                <div className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-red-500/20 border border-red-500/30 mb-6 mx-auto flex">
-                  <Lock className="h-8 w-8 text-red-400" />
-                </div>
-                <h3 className="text-2xl font-bold text-white text-center mb-2">Unlock Your Security Report</h3>
-                <p className="text-montana-muted text-center text-sm mb-8">
-                  Enter your details to reveal your security & resilience score and receive your report via email.
-                </p>
-
-                <form onSubmit={submitLead} className="space-y-4">
-                  <input
-                    required
-                    type="text"
-                    placeholder="Full Name"
-                    value={leadForm.name}
-                    onChange={(e) => setLeadForm({ ...leadForm, name: e.target.value })}
-                    className="w-full rounded-sm border border-white/10 bg-montana-surface/80 px-4 py-3 text-white focus:border-red-500 focus:outline-none"
-                  />
-                  <input
-                    required
-                    type="text"
-                    placeholder="Company Name"
-                    value={leadForm.company}
-                    onChange={(e) => setLeadForm({ ...leadForm, company: e.target.value })}
-                    className="w-full rounded-sm border border-white/10 bg-montana-surface/80 px-4 py-3 text-white focus:border-red-500 focus:outline-none"
-                  />
-                  <input
-                    required
-                    type="email"
-                    placeholder="Work Email"
-                    value={leadForm.email}
-                    onChange={(e) => setLeadForm({ ...leadForm, email: e.target.value })}
-                    className="w-full rounded-sm border border-white/10 bg-montana-surface/80 px-4 py-3 text-white focus:border-red-500 focus:outline-none"
-                  />
-                  <div className="pt-2">
-                    <AnimatedButton variant="primary" className="w-full" disabled={isSubmitting}>
-                      {isSubmitting ? "Generating Report..." : "Reveal My Score"}
-                    </AnimatedButton>
+          <div className="animate-in fade-in duration-500 space-y-8">
+            {/* Score preview — visible immediately, no gate */}
+            {(() => {
+              const gateScore = Object.values(answers).reduce((a, b) => a + b, 0);
+              const gateRisk = gateScore <= 7 ? "High Risk" : gateScore <= 14 ? "Moderate Risk" : "Low Risk";
+              const gateCompliant = Object.values(answers).filter(v => v === 2).length;
+              const gatePartial = Object.values(answers).filter(v => v === 1).length;
+              const gateCritical = Object.values(answers).filter(v => v === 0).length;
+              const isGateHigh = gateRisk === "High Risk";
+              const isGateModerate = gateRisk === "Moderate Risk";
+              const gateColorClass = isGateHigh ? "text-red-500" : isGateModerate ? "text-amber-500" : "text-green-500";
+              const gateBgClass = isGateHigh ? "bg-red-500" : isGateModerate ? "bg-amber-500" : "bg-green-500";
+              const gateBorderClass = isGateHigh ? "border-red-500" : isGateModerate ? "border-amber-500" : "border-green-500";
+              const gateMessage = isGateHigh
+                ? "Immediate attention required — critical gaps in your security and backup posture."
+                : isGateModerate
+                ? "Gaps in your resilience architecture. Remediation recommended."
+                : "Well-positioned. Optimisation opportunities exist to strengthen your resilience further.";
+              return (
+                <SpotlightCard customSize className={`p-8 md:p-12 border-t-4 ${gateBorderClass}`}>
+                  <div className="text-center mb-10">
+                    <div className="relative inline-block mb-6">
+                      <div className={`inline-flex h-36 w-36 items-center justify-center rounded-full bg-montana-surface border-4 ${gateBorderClass} shadow-[0_0_40px_rgba(0,0,0,0.4)]`}>
+                        {isGateHigh && <TrendingDown className={`h-18 w-18 ${gateColorClass}`} style={{ height: "4.5rem", width: "4.5rem" }} />}
+                        {isGateModerate && <AlertTriangle className={`h-18 w-18 ${gateColorClass}`} style={{ height: "4.5rem", width: "4.5rem" }} />}
+                        {!isGateHigh && !isGateModerate && <Activity className={`h-18 w-18 ${gateColorClass}`} style={{ height: "4.5rem", width: "4.5rem" }} />}
+                      </div>
+                    </div>
+                    <h2 className="font-display text-7xl md:text-8xl font-bold text-white mb-2">{gateScore}</h2>
+                    <p className="text-xl text-white/40 mb-4">out of 20</p>
+                    <div className={`inline-flex items-center px-6 py-2 rounded-full ${gateBgClass} bg-opacity-10 border ${gateBorderClass} mb-6`}>
+                      <Activity className={`h-4 w-4 mr-2 ${gateColorClass}`} />
+                      <span className={`font-bold uppercase tracking-widest text-sm ${gateColorClass}`}>{gateRisk}</span>
+                    </div>
+                    <p className="text-lg text-montana-muted max-w-2xl mx-auto leading-relaxed">{gateMessage}</p>
                   </div>
-                  <p className="text-xs text-center text-white/40 mt-4">
-                    By submitting, you agree to our privacy policy. Your results are confidential.
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 border-t border-white/10 pt-8">
+                    <div className="text-center p-4 sm:border-r border-white/10">
+                      <div className="text-4xl font-bold text-white mb-1">{gateCompliant}</div>
+                      <div className="text-xs text-montana-muted uppercase tracking-wider">Fully Implemented</div>
+                    </div>
+                    <div className="text-center p-4 sm:border-r border-white/10">
+                      <div className="text-4xl font-bold text-white mb-1">{gatePartial}</div>
+                      <div className="text-xs text-montana-muted uppercase tracking-wider">Partial / Gaps</div>
+                    </div>
+                    <div className="text-center p-4">
+                      <div className="text-4xl font-bold text-red-400 mb-1">{gateCritical}</div>
+                      <div className="text-xs text-montana-muted uppercase tracking-wider">Critical Gaps</div>
+                    </div>
+                  </div>
+                </SpotlightCard>
+              );
+            })()}
+
+            {/* Lead gate — unlock full report */}
+            <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 items-start">
+              {/* Blurred gap preview */}
+              <div className="lg:col-span-3 filter blur-sm opacity-40 pointer-events-none select-none">
+                <div className="grid grid-cols-3 gap-4">
+                  {[1, 2, 3].map((i) => (
+                    <div key={i} className="h-40 bg-white/5 border border-white/10 rounded-xl" />
+                  ))}
+                </div>
+                <div className="mt-4 grid grid-cols-2 gap-4">
+                  <div className="h-48 bg-white/5 border border-white/10 rounded-xl" />
+                  <div className="h-48 bg-white/5 border border-white/10 rounded-xl" />
+                </div>
+              </div>
+
+              {/* Gate form */}
+              <div className="lg:col-span-2 lg:sticky lg:top-32">
+                <SpotlightCard customSize className="p-8 border-red-500/30 shadow-2xl shadow-red-500/10">
+                  <div className="inline-flex h-14 w-14 items-center justify-center rounded-full bg-red-500/20 border border-red-500/30 mb-5">
+                    <Lock className="h-7 w-7 text-red-400" />
+                  </div>
+                  <h3 className="text-xl font-bold text-white mb-2">Unlock Your Full Report</h3>
+                  <p className="text-montana-muted text-sm mb-6 leading-relaxed">
+                    Enter your details to reveal your key gap areas, personalised recommendations, and receive your report by email.
                   </p>
-                </form>
-              </SpotlightCard>
+                  <form onSubmit={submitLead} className="space-y-3">
+                    <input
+                      required
+                      type="text"
+                      placeholder="Full Name"
+                      value={leadForm.name}
+                      onChange={(e) => setLeadForm({ ...leadForm, name: e.target.value })}
+                      className="w-full rounded-sm border border-white/10 bg-montana-surface/80 px-4 py-3 text-white text-sm focus:border-red-500 focus:outline-none"
+                    />
+                    <input
+                      required
+                      type="text"
+                      placeholder="Company Name"
+                      value={leadForm.company}
+                      onChange={(e) => setLeadForm({ ...leadForm, company: e.target.value })}
+                      className="w-full rounded-sm border border-white/10 bg-montana-surface/80 px-4 py-3 text-white text-sm focus:border-red-500 focus:outline-none"
+                    />
+                    <input
+                      required
+                      type="email"
+                      placeholder="Work Email"
+                      value={leadForm.email}
+                      onChange={(e) => setLeadForm({ ...leadForm, email: e.target.value })}
+                      className="w-full rounded-sm border border-white/10 bg-montana-surface/80 px-4 py-3 text-white text-sm focus:border-red-500 focus:outline-none"
+                    />
+                    <div className="pt-1">
+                      <AnimatedButton variant="primary" className="w-full" disabled={isSubmitting}>
+                        {isSubmitting ? "Generating Report..." : "Reveal Full Report"}
+                      </AnimatedButton>
+                    </div>
+                    <p className="text-xs text-center text-white/40">
+                      Your results are confidential. We will never share your information.
+                    </p>
+                  </form>
+                </SpotlightCard>
+              </div>
             </div>
           </div>
         )}

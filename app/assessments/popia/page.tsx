@@ -221,7 +221,7 @@ const questions = [
 ];
 
 function buildResultsUrl(finalAnswers: Record<number, number>, score: number, sessionId?: string): string {
-  const risk = score <= 8 ? "High Risk" : score <= 14 ? "Medium Risk" : "Low Risk";
+  const risk = score <= 8 ? "High Risk" : score <= 14 ? "Moderate Risk" : "Low Risk";
   const compliant = Object.values(finalAnswers).filter((v) => v === 2).length;
   const partial = Object.values(finalAnswers).filter((v) => v === 1).length;
   const critical = Object.values(finalAnswers).filter((v) => v === 0).length;
@@ -236,7 +236,6 @@ function buildResultsUrl(finalAnswers: Record<number, number>, score: number, se
   const gaps = Object.entries(catScores)
     .filter(([, v]) => v.total / v.count < 2)
     .sort(([, a], [, b]) => a.total / a.count - b.total / b.count)
-    .slice(0, 3)
     .map(([cat]) => cat)
     .join(",");
 

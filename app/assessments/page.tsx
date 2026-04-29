@@ -1,9 +1,49 @@
 import { SpotlightCard } from "@/components/ui/spotlight-card";
 import { AnimatedButton } from "@/components/ui/animated-button";
-import { Shield, ShieldAlert, FileText, Lock, ArrowRight, AlertTriangle, Info } from "lucide-react";
+import { createServerClient } from "@/lib/supabase/server";
+import { Shield, ShieldAlert, FileText, Lock, ArrowRight, AlertTriangle, Info, CheckCircle, RotateCcw } from "lucide-react";
 import Link from "next/link";
 
-export default function AssessmentsPage() {
+export default async function AssessmentsPage() {
+  const supabase = await createServerClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  let securityScore: number | null = null;
+  let securityRisk: string | null = null;
+  let lastSecurityAt: string | null = null;
+  let popiaScore: number | null = null;
+  let popiaRisk: string | null = null;
+  let lastPopiaAt: string | null = null;
+
+  if (user) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data } = await (supabase.from("profiles") as any)
+      .select("security_score, security_risk_level, last_security_assessment_at, popia_score, popia_risk_level, last_popia_assessment_at")
+      .eq("id", user.id)
+      .single();
+    if (data) {
+      securityScore = data.security_score ?? null;
+      securityRisk = data.security_risk_level ?? null;
+      lastSecurityAt = data.last_security_assessment_at ?? null;
+      popiaScore = data.popia_score ?? null;
+      popiaRisk = data.popia_risk_level ?? null;
+      lastPopiaAt = data.last_popia_assessment_at ?? null;
+    }
+  }
+
+  const formatDate = (iso: string) =>
+    new Date(iso).toLocaleDateString("en-ZA", { day: "numeric", month: "short", year: "numeric" });
+
+  const riskLabel: Record<string, string> = {
+    high: "High Risk", moderate: "Moderate Risk", medium: "Moderate Risk", low: "Low Risk",
+  };
+  const riskColor: Record<string, string> = {
+    high: "text-red-400 border-red-500/30 bg-red-500/10",
+    moderate: "text-amber-400 border-amber-500/30 bg-amber-500/10",
+    medium: "text-amber-400 border-amber-500/30 bg-amber-500/10",
+    low: "text-green-400 border-green-500/30 bg-green-500/10",
+  };
+
   return (
     <div className="pt-24 pb-24 bg-montana-bg min-h-screen">
       <div className="mx-auto max-w-7xl px-6">
@@ -47,7 +87,7 @@ export default function AssessmentsPage() {
         </div>
 
         {/* Assessment Cards */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-16">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-10">
 
           {/* Security & Resilience Assessment */}
           <SpotlightCard customSize className="p-0 overflow-hidden flex flex-col">
@@ -66,6 +106,15 @@ export default function AssessmentsPage() {
               </p>
             </div>
             <div className="p-8 flex-1 flex flex-col">
+              {/* Last result badge */}
+              {securityScore !== null && securityRisk && lastSecurityAt && (
+                <div className={`mb-5 flex items-center gap-3 border px-4 py-3 text-sm ${riskColor[securityRisk] ?? "text-white/60 border-white/10 bg-white/5"}`}>
+                  <CheckCircle className="h-4 w-4 shrink-0" />
+                  <span>
+                    Last result: <strong>{securityScore}/20</strong> — {riskLabel[securityRisk] ?? securityRisk} &middot; {formatDate(lastSecurityAt)}
+                  </span>
+                </div>
+              )}
               <ul className="space-y-3 mb-8 flex-1">
                 <li className="flex items-start gap-3 text-sm text-montana-muted">
                   <AlertTriangle className="h-4 w-4 text-red-400 shrink-0 mt-0.5" />
@@ -84,7 +133,11 @@ export default function AssessmentsPage() {
                 <span className="text-xs text-montana-muted">10 questions &middot; ~3 minutes</span>
                 <Link href="/assessments/security">
                   <AnimatedButton variant="primary" className="gap-2">
-                    Start Pre-Assessment <ArrowRight className="h-4 w-4" />
+                    {securityScore !== null ? (
+                      <><RotateCcw className="h-4 w-4" /> Retake Assessment</>
+                    ) : (
+                      <>Start Pre-Assessment <ArrowRight className="h-4 w-4" /></>
+                    )}
                   </AnimatedButton>
                 </Link>
               </div>
@@ -108,6 +161,15 @@ export default function AssessmentsPage() {
               </p>
             </div>
             <div className="p-8 flex-1 flex flex-col">
+              {/* Last result badge */}
+              {popiaScore !== null && popiaRisk && lastPopiaAt && (
+                <div className={`mb-5 flex items-center gap-3 border px-4 py-3 text-sm ${riskColor[popiaRisk] ?? "text-white/60 border-white/10 bg-white/5"}`}>
+                  <CheckCircle className="h-4 w-4 shrink-0" />
+                  <span>
+                    Last result: <strong>{popiaScore}/20</strong> — {riskLabel[popiaRisk] ?? popiaRisk} &middot; {formatDate(lastPopiaAt)}
+                  </span>
+                </div>
+              )}
               <ul className="space-y-3 mb-8 flex-1">
                 <li className="flex items-start gap-3 text-sm text-montana-muted">
                   <Shield className="h-4 w-4 text-montana-pink shrink-0 mt-0.5" />
@@ -126,7 +188,11 @@ export default function AssessmentsPage() {
                 <span className="text-xs text-montana-muted">10 questions &middot; ~3 minutes</span>
                 <Link href="/assessments/popia">
                   <AnimatedButton variant="primary" className="gap-2">
-                    Start Pre-Assessment <ArrowRight className="h-4 w-4" />
+                    {popiaScore !== null ? (
+                      <><RotateCcw className="h-4 w-4" /> Retake Assessment</>
+                    ) : (
+                      <>Start Pre-Assessment <ArrowRight className="h-4 w-4" /></>
+                    )}
                   </AnimatedButton>
                 </Link>
               </div>
@@ -134,16 +200,18 @@ export default function AssessmentsPage() {
           </SpotlightCard>
         </div>
 
-        {/* Trust Bar */}
-        <div className="text-center border border-white/5 bg-white/[0.02] p-8">
+        {/* Trust Bar — moved above the fold, below the cards */}
+        <div className="text-center border border-white/5 bg-white/[0.02] p-6 mb-16">
           <p className="text-sm text-montana-muted mb-1">
             All assessment data is encrypted and handled in accordance with POPIA.
           </p>
           <p className="text-sm text-montana-muted mb-1">
-            Your results are confidential, we will never share your information with third parties. 
+            Your results are confidential — we will never share your information with third parties.
           </p>
           <p className="text-sm text-montana-muted">
-            For information on how Personally Identifiable Information (PII) is managed, refer to our privacy statement or PAIA manuals. 
+            For information on how Personally Identifiable Information (PII) is managed, refer to our{" "}
+            <Link href="/privacy" className="underline hover:text-white transition-colors">privacy statement</Link> or{" "}
+            <Link href="/paia" className="underline hover:text-white transition-colors">PAIA manuals</Link>.
           </p>
         </div>
 

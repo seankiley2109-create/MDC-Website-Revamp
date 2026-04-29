@@ -4,11 +4,12 @@ import Link from "next/link";
 import { GlassCard } from "@/components/ui/glass-card";
 import { SpotlightCard } from "@/components/ui/spotlight-card";
 import { AnimatedButton } from "@/components/ui/animated-button";
-import { SECURITY_SERVICES } from "@/lib/security-services";
+import { rankSecurityServicesByGaps } from "@/lib/security-services";
+import { createServerClient } from "@/lib/supabase/server";
 import {
   XCircle, AlertTriangle, CheckCircle, Award,
   Activity, ArrowRight, Database, ShieldAlert,
-  Monitor, Server, Clock, Shield, Zap, Eye, Lock,
+  Monitor, Server, Clock, Shield, Zap, Eye, Lock, FileText,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
@@ -63,10 +64,10 @@ const GAP_META: Record<string, { Icon: LucideIcon; description: string }> = {
 };
 
 const SERVICE_ICON: Record<string, { Icon: LucideIcon; color: string }> = {
-  "druva-saas-endpoint": { Icon: Database, color: "text-montana-pink" },
-  "druva-ransomware":    { Icon: ShieldAlert, color: "text-red-400" },
-  "maas360-mdm":         { Icon: Monitor, color: "text-amber-400" },
-  "ibm-enterprise-backup": { Icon: Server, color: "text-montana-pink" },
+  "druva-saas-endpoint":    { Icon: Database,    color: "text-montana-pink" },
+  "druva-ransomware":       { Icon: ShieldAlert,  color: "text-red-400" },
+  "maas360-mdm":            { Icon: Monitor,      color: "text-amber-400" },
+  "ibm-enterprise-backup":  { Icon: Server,       color: "text-montana-pink" },
 };
 
 export default async function SecurityResultsPage({
@@ -81,15 +82,22 @@ export default async function SecurityResultsPage({
     redirect("/assessments/security");
   }
 
+  const supabase = await createServerClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  const isAuthenticated = Boolean(user);
+
   const risk = String(params.risk ?? "Low Risk");
   const compliant = Number(params.compliant ?? 0);
   const partial = Number(params.partial ?? 0);
   const critical = Number(params.critical ?? 0);
-  const gaps = String(params.gaps ?? "")
+
+  const allGaps = String(params.gaps ?? "")
     .split(",")
     .map((s) => s.trim())
-    .filter(Boolean)
-    .slice(0, 3);
+    .filter(Boolean);
+
+  const displayedGaps = allGaps.slice(0, 3);
+  const hiddenGapCount = allGaps.length - displayedGaps.length;
 
   const isHigh = risk === "High Risk";
   const isModerate = risk === "Moderate Risk";
@@ -103,6 +111,8 @@ export default async function SecurityResultsPage({
     : isModerate
     ? "Gaps in your resilience architecture. Remediation recommended."
     : "Well-positioned. Optimisation opportunities exist to strengthen your resilience further.";
+
+  const rankedServices = rankSecurityServicesByGaps(allGaps);
 
   return (
     <div className="pt-24 pb-24 bg-montana-bg min-h-screen">
@@ -121,6 +131,20 @@ export default async function SecurityResultsPage({
             Based on your 10-question snapshot across data protection, endpoint security, and business continuity.
           </p>
         </div>
+
+        {/* Save results banner — shown only to unauthenticated users */}
+        {!isAuthenticated && (
+          <div className="mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border border-red-500/20 bg-red-500/5 backdrop-blur-sm px-5 py-4">
+            <p className="text-sm text-montana-muted leading-relaxed">
+              <span className="text-white font-semibold">Save your results permanently</span> — create a free account to track your security posture over time and access your report any time.
+            </p>
+            <Link href="/sign-up" className="shrink-0">
+              <AnimatedButton variant="outline" className="text-xs px-5 py-2 whitespace-nowrap">
+                Create free account →
+              </AnimatedButton>
+            </Link>
+          </div>
+        )}
 
         {/* Hero score card */}
         <SpotlightCard customSize className={`p-8 md:p-12 mb-12 border-t-4 ${borderClass}`}>
@@ -170,7 +194,7 @@ export default async function SecurityResultsPage({
         </SpotlightCard>
 
         {/* Key gap areas */}
-        {gaps.length > 0 && (
+        {displayedGaps.length > 0 && (
           <div className="mb-16">
             <div className="text-center mb-8">
               <h2 className="font-display text-2xl md:text-3xl font-bold text-white mb-3">Key Gap Areas</h2>
@@ -179,7 +203,7 @@ export default async function SecurityResultsPage({
               </p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {gaps.map((cat) => {
+              {displayedGaps.map((cat) => {
                 const meta = GAP_META[cat];
                 if (!meta) return null;
                 const { Icon } = meta;
@@ -196,22 +220,28 @@ export default async function SecurityResultsPage({
                 );
               })}
             </div>
+            {hiddenGapCount > 0 && (
+              <p className="text-center text-sm text-montana-muted mt-6">
+                +{hiddenGapCount} additional gap area{hiddenGapCount > 1 ? "s" : ""} identified — a full consultation will cover all findings.
+              </p>
+            )}
           </div>
         )}
 
-        {/* What Montana recommends */}
+        {/* What Montana recommends — ranked by gap relevance */}
         <div className="mb-16">
           <div className="text-center mb-10">
             <h2 className="font-display text-2xl md:text-3xl font-bold text-white mb-3">
               What Montana Recommends
             </h2>
             <p className="text-montana-muted max-w-2xl mx-auto">
-              Solutions that directly address the vulnerabilities identified in your assessment.
+              Solutions ranked by relevance to the vulnerabilities identified in your assessment.
             </p>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-            {SECURITY_SERVICES.map((svc) => {
+            {rankedServices.map((svc, idx) => {
+              const isRecommended = idx === 0 && allGaps.length > 0;
               const iconDef = SERVICE_ICON[svc.code];
               const Icon = iconDef?.Icon ?? Database;
               const iconColor = iconDef?.color ?? "text-montana-pink";
@@ -220,12 +250,12 @@ export default async function SecurityResultsPage({
                   customSize
                   key={svc.code}
                   className={`p-6 flex flex-col relative min-h-[200px] ${
-                    svc.recommended
+                    isRecommended
                       ? "border-montana-pink/50 shadow-2xl shadow-montana-pink/10"
                       : "hover:border-white/30 transition-colors"
                   }`}
                 >
-                  {svc.recommended && (
+                  {isRecommended && (
                     <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-montana-pink text-white text-xs font-bold px-4 py-1.5 rounded-full tracking-wider">
                       RECOMMENDED
                     </div>
@@ -242,8 +272,8 @@ export default async function SecurityResultsPage({
                     ))}
                   </ul>
                   <Link href={svc.posUrl}>
-                    <AnimatedButton variant={svc.recommended ? "primary" : "outline"} className="w-full text-xs py-2">
-                      {svc.recommended ? "Configure Solution" : "View Solution"}
+                    <AnimatedButton variant={isRecommended ? "primary" : "outline"} className="w-full text-xs py-2">
+                      {isRecommended ? "Configure Solution" : "View Solution"}
                     </AnimatedButton>
                   </Link>
                 </SpotlightCard>
@@ -252,11 +282,31 @@ export default async function SecurityResultsPage({
           </div>
         </div>
 
+        {/* Cross-assessment prompt */}
+        <div className="mb-12 border border-montana-pink/20 bg-montana-pink/5 p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="flex items-start gap-4">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-montana-pink/10 border border-montana-pink/20 shrink-0 mt-0.5">
+              <FileText className="h-5 w-5 text-montana-pink" />
+            </div>
+            <div>
+              <p className="font-semibold text-white text-sm mb-1">Have you checked your POPIA compliance?</p>
+              <p className="text-xs text-montana-muted leading-relaxed">
+                Your security gaps may carry POPIA obligations — particularly around breach notification, data safeguards, and data subject rights.
+              </p>
+            </div>
+          </div>
+          <Link href="/assessments/popia" className="shrink-0">
+            <AnimatedButton variant="outline" className="text-xs px-5 py-2 whitespace-nowrap gap-2">
+              Take POPIA Assessment <ArrowRight className="h-3.5 w-3.5" />
+            </AnimatedButton>
+          </Link>
+        </div>
+
         {/* CTAs */}
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <Link href="/contact">
+          <Link href="/contact?service=ransomware&ref=security-results">
             <AnimatedButton variant="primary" className="gap-2 px-8 py-4">
-              Book a Compliance Consultation <ArrowRight className="h-5 w-5" />
+              Book a Security Consultation <ArrowRight className="h-5 w-5" />
             </AnimatedButton>
           </Link>
           <Link href="/pos?tab=cloud">

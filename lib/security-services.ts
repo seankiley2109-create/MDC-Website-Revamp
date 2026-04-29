@@ -4,7 +4,8 @@ export interface SecurityService {
   description: string;
   posUrl: string;
   highlights: string[];
-  recommended?: boolean;
+  /** Gap categories from the security assessment this service directly addresses */
+  gapCategories: string[];
 }
 
 export const SECURITY_SERVICES: SecurityService[] = [
@@ -18,7 +19,7 @@ export const SECURITY_SERVICES: SecurityService[] = [
       'Instant granular and full-system recovery',
       'Immutable cloud storage with 99.999% SLA',
     ],
-    recommended: true,
+    gapCategories: ['Data Protection', 'SaaS Resilience', 'Recovery'],
   },
   {
     code: 'druva-ransomware',
@@ -30,6 +31,7 @@ export const SECURITY_SERVICES: SecurityService[] = [
       'Immutable and air-gapped storage',
       'Accelerated recovery with RTO/RPO guarantees',
     ],
+    gapCategories: ['Ransomware', 'Recovery', 'Threat Detection'],
   },
   {
     code: 'maas360-mdm',
@@ -41,6 +43,7 @@ export const SECURITY_SERVICES: SecurityService[] = [
       'Automated policy enforcement at scale',
       'Integrated zero-trust threat defence',
     ],
+    gapCategories: ['Endpoint Security', 'Device Compliance', 'Threat Detection', 'Integration'],
   },
   {
     code: 'ibm-enterprise-backup',
@@ -52,9 +55,22 @@ export const SECURITY_SERVICES: SecurityService[] = [
       'Multi-site geo-redundant replication',
       'Dedicated solution architect',
     ],
+    gapCategories: ['Data Protection', 'Business Continuity', 'Data Visibility', 'Integration'],
   },
 ];
 
 export function getSecurityService(code: string): SecurityService | undefined {
   return SECURITY_SERVICES.find(s => s.code === code);
+}
+
+/** Rank services by how many of the user's gap categories they address. */
+export function rankSecurityServicesByGaps(gaps: string[]): SecurityService[] {
+  const gapSet = new Set(gaps);
+  return [...SECURITY_SERVICES]
+    .map(svc => ({
+      svc,
+      score: svc.gapCategories.filter(c => gapSet.has(c)).length,
+    }))
+    .sort((a, b) => b.score - a.score)
+    .map(({ svc }) => svc);
 }

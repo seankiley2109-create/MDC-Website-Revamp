@@ -69,6 +69,12 @@ const SERVICE_DEFAULTS: Record<string, ServiceDefaults> = {
     message:
       "Hi,\n\nI'm interested in procuring a Microsoft 365 Business or Google Workspace Business licence through Montana Data Company, as a prerequisite for the SaaS Backup service.\n\nOur requirements:\n- Preferred platform (M365 / Google Workspace / unsure): \n- Number of users to license: \n- Current licensing situation (none / personal / expired): \n- Timeline: \n\nPlease reach out to help us get set up.",
   },
+  "popia": {
+    enquiryType: "compliance",
+    label: "POPIA Compliance Consulting",
+    message:
+      "Hi,\n\nI've completed the Montana POPIA pre-assessment and would like to discuss our compliance posture and next steps.\n\nOur situation:\n- Assessment risk level: [High / Moderate / Low]\n- Number of employees: \n- Industry / sector: \n- Current compliance status (fully compliant / partially compliant / not started): \n- Priority areas from assessment: \n\nPlease contact me to arrange a consultation.",
+  },
 };
 
 const ENQUIRY_TYPE_DEFAULTS: Partial<Record<EnquiryValue, { label: string; message: string }>> = {
@@ -78,6 +84,7 @@ const ENQUIRY_TYPE_DEFAULTS: Partial<Record<EnquiryValue, { label: string; messa
   "guardium":          { label: "IBM Guardium", message: SERVICE_DEFAULTS["guardium"].message },
   "quantum":           { label: "Quantum Security (PQC)", message: SERVICE_DEFAULTS["quantum"].message },
   "m365-licensing":    { label: "M365 / Google Workspace Licensing", message: SERVICE_DEFAULTS["m365-licensing"].message },
+  "compliance":        { label: "POPIA / Compliance", message: SERVICE_DEFAULTS["popia"].message },
 };
 
 const contactSchema = z.object({
