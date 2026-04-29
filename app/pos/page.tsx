@@ -614,10 +614,6 @@ function ConsultingSection({ preselected = [] }: { preselected?: string[] }) {
   };
 
   const selectedServices = POPIA_SERVICES.filter(s => selected.has(s.code));
-  const total = selectedServices
-    .filter(s => s.type === "once-off")
-    .reduce((sum, s) => sum + s.price, 0);
-  const hasRecurring = selectedServices.some(s => s.type === "recurring");
 
   const handleSubmit = async () => {
     if (!contact.name || !contact.email) {
@@ -663,7 +659,7 @@ function ConsultingSection({ preselected = [] }: { preselected?: string[] }) {
     <div className="max-w-4xl mx-auto space-y-6">
       <div className="text-center mb-8">
         <p className="text-montana-muted max-w-2xl mx-auto">
-          Fixed-price professional engagements. Select what you need and we&apos;ll confirm your booking and arrange payment.
+          Professional engagements tailored to your environment. Select the services you need and a consultant will be in touch to scope and confirm the engagement.
         </p>
       </div>
 
@@ -680,7 +676,7 @@ function ConsultingSection({ preselected = [] }: { preselected?: string[] }) {
                 : "border-white/10 bg-montana-surface/30 hover:border-white/20"
             }`}
           >
-            <div className="flex items-start justify-between gap-4">
+            <div className="flex items-start gap-4">
               <div className="flex items-start gap-4 flex-1">
                 <div className={`mt-0.5 h-5 w-5 rounded-sm border shrink-0 flex items-center justify-center ${
                   isSelected ? "border-montana-pink bg-montana-pink" : "border-white/30"
@@ -709,12 +705,6 @@ function ConsultingSection({ preselected = [] }: { preselected?: string[] }) {
                   </div>
                 </div>
               </div>
-              <div className="shrink-0 text-right">
-                <div className="text-lg font-bold text-white font-mono">
-                  R{service.price.toLocaleString()}
-                </div>
-                <div className="text-xs text-montana-muted">{service.type === "recurring" ? "/mo" : "once-off"}</div>
-              </div>
             </div>
           </button>
         );
@@ -729,18 +719,9 @@ function ConsultingSection({ preselected = [] }: { preselected?: string[] }) {
             {selectedServices.map(s => (
               <div key={s.code} className="flex justify-between text-sm">
                 <span className="text-montana-muted">{s.name}</span>
-                <span className="text-white font-mono">R{s.price.toLocaleString()}{s.type === "recurring" ? "/mo" : ""}</span>
               </div>
             ))}
-            {total > 0 && (
-              <div className="flex justify-between text-sm font-bold border-t border-white/10 pt-2 mt-2">
-                <span className="text-white">Once-off total</span>
-                <span className="text-montana-pink font-mono">R{total.toLocaleString()}</span>
-              </div>
-            )}
-            {hasRecurring && (
-              <p className="text-xs text-montana-muted pt-1">Monthly retainer invoiced via Sage after confirmation.</p>
-            )}
+            <p className="text-xs text-montana-muted pt-1">Pricing will be confirmed after consultation analysis.</p>
           </div>
 
           {/* Contact fields */}
