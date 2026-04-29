@@ -802,22 +802,22 @@ function ConsultingSection({ preselected = [] }: { preselected?: string[] }) {
             <div>
               <label className="text-xs font-medium text-white/60 block mb-1.5">Your Name *</label>
               <input type="text" value={contact.name} onChange={e => setContact(p => ({ ...p, name: e.target.value }))}
-                className="w-full border border-white/10 bg-montana-surface/50 px-3 py-2.5 text-sm text-white focus:border-montana-pink focus:outline-none" placeholder="Jane Doe" />
+                className="w-full border border-white/10 bg-montana-surface/50 px-3 py-3 text-sm text-white focus:border-montana-pink focus:outline-none" placeholder="Jane Doe" />
             </div>
             <div>
               <label className="text-xs font-medium text-white/60 block mb-1.5">Email Address *</label>
               <input type="email" value={contact.email} onChange={e => setContact(p => ({ ...p, email: e.target.value }))}
-                className="w-full border border-white/10 bg-montana-surface/50 px-3 py-2.5 text-sm text-white focus:border-montana-pink focus:outline-none" placeholder="jane@company.com" />
+                className="w-full border border-white/10 bg-montana-surface/50 px-3 py-3 text-sm text-white focus:border-montana-pink focus:outline-none" placeholder="jane@company.com" />
             </div>
             <div>
               <label className="text-xs font-medium text-white/60 block mb-1.5">Company</label>
               <input type="text" value={contact.company} onChange={e => setContact(p => ({ ...p, company: e.target.value }))}
-                className="w-full border border-white/10 bg-montana-surface/50 px-3 py-2.5 text-sm text-white focus:border-montana-pink focus:outline-none" placeholder="Acme Corp" />
+                className="w-full border border-white/10 bg-montana-surface/50 px-3 py-3 text-sm text-white focus:border-montana-pink focus:outline-none" placeholder="Acme Corp" />
             </div>
             <div>
               <label className="text-xs font-medium text-white/60 block mb-1.5">Notes</label>
               <input type="text" value={contact.notes} onChange={e => setContact(p => ({ ...p, notes: e.target.value }))}
-                className="w-full border border-white/10 bg-montana-surface/50 px-3 py-2.5 text-sm text-white focus:border-montana-pink focus:outline-none" placeholder="Preferred dates, context..." />
+                className="w-full border border-white/10 bg-montana-surface/50 px-3 py-3 text-sm text-white focus:border-montana-pink focus:outline-none" placeholder="Preferred dates, context..." />
             </div>
           </div>
 

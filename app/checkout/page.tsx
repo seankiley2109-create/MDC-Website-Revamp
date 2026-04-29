@@ -59,7 +59,7 @@ function Field({
 
 const inputClass =
   'w-full bg-white/5 border border-white/10 text-white placeholder-white/30 ' +
-  'px-3 py-2.5 pr-9 text-sm rounded input-focus disabled:opacity-50';
+  'px-3 py-3 pr-9 text-sm rounded input-focus disabled:opacity-50';
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 

@@ -544,7 +544,7 @@ export default async function PortalPage() {
             <div className="mt-6 space-y-2 pt-4 border-t border-white/5">
               {status === 'past_due' && (
                 <Link href="/billing" className="block">
-                  <AnimatedButton variant="primary" className="w-full text-sm py-2.5">
+                  <AnimatedButton variant="primary" className="w-full text-sm py-3">
                     <AlertTriangle className="h-4 w-4 mr-1.5" />
                     Resolve Payment
                   </AnimatedButton>

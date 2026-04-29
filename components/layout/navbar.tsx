@@ -223,7 +223,7 @@ export function Navbar() {
         </div>
 
         {/* Nav links */}
-        <div className="flex flex-col px-6 py-6 space-y-1">
+        <div className="flex flex-col px-6 py-6 space-y-2">
           {navLinks.map((link) => (
             <Link
               key={link.href}
@@ -253,20 +253,20 @@ export function Navbar() {
                 <Link
                   href="/portal"
                   onClick={() => setIsOpen(false)}
-                  className="flex items-center gap-2 py-2 text-sm text-montana-muted hover:text-white transition-colors"
+                  className="flex items-center gap-2 py-3 text-sm text-montana-muted hover:text-white transition-colors"
                 >
                   <LayoutDashboard className="h-4 w-4" /> Client Portal
                 </Link>
                 <Link
                   href="/billing"
                   onClick={() => setIsOpen(false)}
-                  className="flex items-center gap-2 py-2 text-sm text-montana-muted hover:text-white transition-colors"
+                  className="flex items-center gap-2 py-3 text-sm text-montana-muted hover:text-white transition-colors"
                 >
                   <CreditCard className="h-4 w-4" /> Billing &amp; Subscription
                 </Link>
                 <button
                   onClick={handleSignOut}
-                  className="flex items-center gap-2 py-2 text-sm text-red-400 hover:text-red-300 transition-colors w-full"
+                  className="flex items-center gap-2 py-3 text-sm text-red-400 hover:text-red-300 transition-colors w-full"
                 >
                   <LogOut className="h-4 w-4" /> Sign Out
                 </button>
@@ -276,14 +276,14 @@ export function Navbar() {
                 <Link
                   href="/sign-in"
                   onClick={() => setIsOpen(false)}
-                  className="block py-2.5 text-center text-sm font-medium text-montana-muted border border-white/10 hover:border-white/30 hover:text-white transition-colors"
+                  className="block py-3 text-center text-sm font-medium text-montana-muted border border-white/10 hover:border-white/30 hover:text-white transition-colors"
                 >
                   Sign In
                 </Link>
                 <Link
                   href="/sign-up"
                   onClick={() => setIsOpen(false)}
-                  className="block py-2.5 text-center text-sm font-medium text-white/70 hover:text-white transition-colors"
+                  className="block py-3 text-center text-sm font-medium text-white/70 hover:text-white transition-colors"
                 >
                   Create Account
                 </Link>

@@ -164,7 +164,7 @@ export default function ResourcesPage() {
                         <h3 className="font-display text-lg font-bold text-white mb-3 leading-snug">{item.title}</h3>
                         <p className="text-sm text-montana-muted leading-relaxed flex-1 mb-6">{item.description}</p>
                         <Link href={item.href}>
-                          <AnimatedButton variant="outline" className="w-full group/btn text-xs py-2.5">
+                          <AnimatedButton variant="outline" className="w-full group/btn text-xs py-3">
                             <Download className="h-3.5 w-3.5 mr-2 group-hover/btn:-translate-y-0.5 transition-transform" />
                             {item.cta}
                           </AnimatedButton>
