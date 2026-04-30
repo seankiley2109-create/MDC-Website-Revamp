@@ -95,6 +95,7 @@ const CONTACT_COLS = {
 const POS_COLS = {
   email:      'email_mm20vp3x',
   company:    'text_mm201srx',
+  name:       'text_mm2x5h10',
   services:   'text_mm208etp',
   date:       'date_mm2vak9c',
   notes:      'text_mm20785f',
@@ -466,6 +467,7 @@ export async function createConsultingLead(payload: ConsultingPayload): Promise<
 
   const columns: ColumnValueMap = {
     [POS_COLS.email]:      colEmail(payload.email),
+    [POS_COLS.name]:       payload.name,
     [POS_COLS.company]:    payload.company,
     [POS_COLS.services]:   detailLines.length ? detailLines.join('\n') : servicesSummary,
     [POS_COLS.date]:       colDate(new Date()),

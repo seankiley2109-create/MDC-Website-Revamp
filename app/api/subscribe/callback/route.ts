@@ -188,11 +188,60 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
           `[subscribe/callback] Profile updated for user: ${userId} — ` +
           `stacked ${newEntries.length} new entries (total now ${mergedEntries.length})`,
         );
+      }
 
-        // ── Send purchase confirmation email (non-critical, first-time only) ──────
-        // alreadyStacked means the webhook processed this reference before us —
-        // skip the email to avoid sending a duplicate confirmation.
-        if (!alreadyStacked) {
+      // ── Fetch purchase row for billing details, stamp reference, update Monday ──
+      // Runs regardless of whether the profile update succeeded.
+      const orderId = verifyData.metadata?.order_id;
+
+      type PurchaseRow = {
+        monday_item_id?:  string;
+        vat_number?:      string;
+        address_line1?:   string;
+        address_line2?:   string;
+        city?:            string;
+        province?:        string;
+        postal_code?:     string;
+        country?:         string;
+        discount_amount?: number;
+        discount_code?:   string;
+      };
+      let purchaseRow: PurchaseRow | null = null;
+
+      if (orderId) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const { data: pRow } = await (supabase.from('purchases') as any)
+          .select('monday_item_id, vat_number, address_line1, address_line2, city, province, postal_code, country, discount_amount, discount_code')
+          .eq('order_id', orderId)
+          .eq('user_id', userId)
+          .single();
+        purchaseRow = pRow as PurchaseRow | null;
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const { error: purchaseErr } = await (supabase.from('purchases') as any)
+          .update({ paystack_reference: reference })
+          .eq('order_id', orderId)
+          .eq('user_id', userId);
+        if (purchaseErr) {
+          console.error('[subscribe/callback] Failed to stamp paystack_reference on purchases:', purchaseErr.message);
+        }
+
+        const mondayItemId = purchaseRow?.monday_item_id;
+        if (mondayItemId) {
+          try {
+            await updateOrderPaymentStatus(mondayItemId, 'completed');
+            console.log('[subscribe/callback] Monday.com order status → completed:', mondayItemId);
+          } catch (err) {
+            console.error('[subscribe/callback] Failed to update Monday.com order status:', err);
+          }
+        }
+      }
+
+      // ── Send purchase confirmation email (non-critical, first-time only) ──────
+      // Intentionally outside the Supabase error check — fires on successful payment
+      // regardless of whether the profile update succeeded.
+      // alreadyStacked means this reference was already processed — skip to avoid duplicate.
+      if (!alreadyStacked) {
         const checkoutCart: CheckoutLineItem[] = (verifyData.metadata?.cart ?? [])
           .filter(l => l.product_code !== 'DISCOUNT')
           .map(l => ({
@@ -208,12 +257,24 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
 
         const checkoutPayload: CheckoutPayload = {
           customer: {
-            name:    existingProfile?.full_name    ?? verifyData.customer.email,
-            email:   verifyData.customer.email,
-            company: existingProfile?.company_name ?? 'Unknown Organisation',
+            name:      existingProfile?.full_name    ?? verifyData.customer.email,
+            email:     verifyData.customer.email,
+            company:   existingProfile?.company_name ?? 'Unknown Organisation',
+            vatNumber: purchaseRow?.vat_number       ?? undefined,
           },
+          billing: purchaseRow?.address_line1 ? {
+            address1:   purchaseRow.address_line1,
+            address2:   purchaseRow.address_line2  ?? undefined,
+            city:       purchaseRow.city            ?? '',
+            province:   purchaseRow.province        ?? '',
+            postalCode: purchaseRow.postal_code     ?? '',
+            country:    purchaseRow.country         ?? 'ZA',
+          } : undefined,
+          orderId:      orderId                                 ?? undefined,
           cart:         checkoutCart,
-          totalZAR:     verifyData.metadata?.total_zar ?? verifyData.amount / 100,
+          totalZAR:     verifyData.metadata?.total_zar         ?? verifyData.amount / 100,
+          discountZAR:  purchaseRow?.discount_amount           ?? verifyData.metadata?.discount_zar ?? 0,
+          discountCode: purchaseRow?.discount_code             ?? undefined,
           contractTerm,
           reference,
         };
@@ -225,37 +286,8 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
           console.error('[subscribe/callback] Checkout email threw:', emailResult.reason);
         } else if (!emailResult.value.success) {
           console.error('[subscribe/callback] Checkout email failed:', emailResult.value.error);
-        }
-        } // end if (!alreadyStacked)
-      }
-
-      // Stamp paystack_reference onto the purchases row and update Monday.com status
-      const orderId = verifyData.metadata?.order_id;
-      if (orderId) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const { data: purchaseRow } = await (supabase.from('purchases') as any)
-          .select('monday_item_id')
-          .eq('order_id', orderId)
-          .eq('user_id', userId)
-          .single();
-
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const { error: purchaseErr } = await (supabase.from('purchases') as any)
-          .update({ paystack_reference: reference })
-          .eq('order_id', orderId)
-          .eq('user_id', userId);
-        if (purchaseErr) {
-          console.error('[subscribe/callback] Failed to stamp paystack_reference on purchases:', purchaseErr.message);
-        }
-
-        const mondayItemId = (purchaseRow as { monday_item_id?: string } | null)?.monday_item_id;
-        if (mondayItemId) {
-          try {
-            await updateOrderPaymentStatus(mondayItemId, 'completed');
-            console.log('[subscribe/callback] Monday.com order status → completed:', mondayItemId);
-          } catch (err) {
-            console.error('[subscribe/callback] Failed to update Monday.com order status:', err);
-          }
+        } else {
+          console.log('[subscribe/callback] Checkout confirmation email sent for order:', orderId ?? reference);
         }
       }
     } catch (err) {

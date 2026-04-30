@@ -97,11 +97,15 @@ export interface CheckoutLineItem {
 }
 
 export interface CheckoutPayload {
-  customer:     { name: string; email: string; company: string };
-  cart:         CheckoutLineItem[];
-  totalZAR:     number;
-  contractTerm: 'monthly' | 'yearly';
-  reference:    string;
+  customer:      { name: string; email: string; company: string; vatNumber?: string };
+  billing?:      { address1: string; address2?: string; city: string; province: string; postalCode: string; country: string };
+  cart:          CheckoutLineItem[];
+  orderId?:      string;
+  totalZAR:      number;
+  discountZAR?:  number;
+  discountCode?: string;
+  contractTerm:  'monthly' | 'yearly';
+  reference:     string;
 }
 
 // ---------------------------------------------------------------------------
@@ -637,6 +641,9 @@ function checkoutStaffHtml(p: CheckoutPayload): string {
       fieldRow('Name',          p.customer.name) +
       fieldRow('Email',         `<a href="mailto:${p.customer.email}" style="color:#f24567;">${p.customer.email}</a>`) +
       fieldRow('Company',       p.customer.company) +
+      (p.customer.vatNumber ? fieldRow('VAT Number', p.customer.vatNumber) : '') +
+      (p.billing ? fieldRow('Billing Address', [p.billing.address1, p.billing.address2, p.billing.city, p.billing.province, p.billing.postalCode, p.billing.country].filter(Boolean).join(', ')) : '') +
+      (p.orderId ? fieldRow('Order ID', p.orderId) : '') +
       fieldRow('Contract Term', p.contractTerm === 'yearly' ? 'Annual' : 'Monthly') +
       fieldRow('Reference',     p.reference) +
       fieldRow('Submitted',     new Date().toLocaleString('en-ZA', { dateStyle: 'full', timeStyle: 'short', timeZone: 'Africa/Johannesburg' }))
@@ -651,6 +658,10 @@ function checkoutStaffHtml(p: CheckoutPayload): string {
         <th style="padding:10px 12px;font-size:12px;font-weight:700;color:#fff;text-align:right;text-transform:uppercase;letter-spacing:1px;">Total</th>
       </tr>
       ${cartRows}
+      ${p.discountZAR && p.discountZAR > 0 ? `<tr>
+        <td colspan="3" style="padding:10px 12px;font-size:14px;color:#16a34a;text-align:right;">${p.discountCode ? `Discount (${p.discountCode.toUpperCase()})` : 'Discount'}</td>
+        <td style="padding:10px 12px;font-size:14px;font-weight:700;color:#16a34a;text-align:right;">−R ${p.discountZAR.toLocaleString('en-ZA', { minimumFractionDigits: 2 })}</td>
+      </tr>` : ''}
       <tr style="background:#f4f4f5;">
         <td colspan="3" style="padding:12px;font-size:13px;font-weight:700;color:#18181b;text-align:right;text-transform:uppercase;letter-spacing:1px;">Grand Total</td>
         <td style="padding:12px;font-size:15px;font-weight:700;color:#f24567;text-align:right;">R ${p.totalZAR.toLocaleString('en-ZA', { minimumFractionDigits: 2 })}</td>
@@ -680,6 +691,16 @@ function checkoutAutoHtml(p: CheckoutPayload): string {
     <p style="margin:0 0 20px;font-size:15px;color:#3f3f46;">Hi ${p.customer.name},</p>
     <p style="margin:0 0 20px;font-size:15px;color:#3f3f46;">Your payment has been confirmed. Welcome to Montana Data Company — your services are now being provisioned.</p>
 
+    ${sectionHeading('Invoice Details')}
+    ${dataTable(
+      (p.orderId      ? fieldRow('Order ID',      p.orderId) : '') +
+      fieldRow('Company',       p.customer.company) +
+      (p.customer.vatNumber ? fieldRow('VAT Number', p.customer.vatNumber) : '') +
+      (p.billing      ? fieldRow('Billing Address', [p.billing.address1, p.billing.address2, p.billing.city, p.billing.province, p.billing.postalCode, p.billing.country].filter(Boolean).join(', ')) : '') +
+      fieldRow('Reference',     p.reference) +
+      fieldRow('Date',          new Date().toLocaleDateString('en-ZA', { dateStyle: 'long', timeZone: 'Africa/Johannesburg' }))
+    )}
+
     ${sectionHeading('Your Purchase')}
     <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f9f9fa;border:1px solid #e4e4e7;border-radius:6px;overflow:hidden;margin:0 0 24px;">
       <tr style="background:#18181b;">
@@ -688,11 +709,17 @@ function checkoutAutoHtml(p: CheckoutPayload): string {
         <th style="padding:10px 12px;font-size:12px;font-weight:700;color:#fff;text-align:right;text-transform:uppercase;letter-spacing:1px;">Total</th>
       </tr>
       ${cartRows}
+      ${p.discountZAR && p.discountZAR > 0 ? `<tr>
+        <td colspan="2" style="padding:10px 12px;font-size:14px;color:#16a34a;">${p.discountCode ? `Discount (${p.discountCode.toUpperCase()})` : 'Discount'}</td>
+        <td style="padding:10px 12px;font-size:14px;font-weight:700;color:#16a34a;text-align:right;">−R ${p.discountZAR.toLocaleString('en-ZA', { minimumFractionDigits: 2 })}</td>
+      </tr>` : ''}
+      <tr style="background:#f4f4f5;">
+        <td colspan="2" style="padding:12px;font-size:13px;font-weight:700;color:#18181b;text-align:right;text-transform:uppercase;letter-spacing:1px;">Grand Total (excl. VAT)</td>
+        <td style="padding:12px;font-size:15px;font-weight:700;color:#f24567;text-align:right;">R ${p.totalZAR.toLocaleString('en-ZA', { minimumFractionDigits: 2 })}</td>
+      </tr>
     </table>
     ${dataTable(
-      fieldRow('Grand Total',    `R ${p.totalZAR.toLocaleString('en-ZA', { minimumFractionDigits: 2 })}`) +
-      fieldRow('Billing Cycle',  p.contractTerm === 'yearly' ? 'Annual' : 'Monthly') +
-      fieldRow('Reference',      p.reference)
+      fieldRow('Billing Cycle', p.contractTerm === 'yearly' ? 'Annual' : 'Monthly')
     )}
 
     ${sectionHeading('What Happens Next')}
