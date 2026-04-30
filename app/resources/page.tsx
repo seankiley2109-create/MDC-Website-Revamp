@@ -1,11 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { FileText, Shield, Lock, Database, ArrowRight, Download, BookOpen, CheckSquare } from 'lucide-react';
 import Link from 'next/link';
 import { SpotlightCard } from '@/components/ui/spotlight-card';
 import { AnimatedButton } from '@/components/ui/animated-button';
 import { ResourceDownloadModal, type DownloadResource } from '@/components/resources/ResourceDownloadModal';
+import { createBrowserClient } from '@/lib/supabase/browser';
 
 const resources = [
   {
@@ -130,9 +131,31 @@ const typeIcons: Record<string, React.ElementType> = {
 
 export default function ResourcesPage() {
   const [activeResource, setActiveResource] = useState<DownloadResource | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const directDownloadRef = useRef<HTMLAnchorElement>(null);
+
+  useEffect(() => {
+    const supabase = createBrowserClient();
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setIsAuthenticated(!!session);
+    });
+  }, []);
+
+  function handleDownloadClick(resource: DownloadResource) {
+    if (isAuthenticated && directDownloadRef.current) {
+      directDownloadRef.current.href     = resource.file;
+      directDownloadRef.current.download = resource.filename;
+      directDownloadRef.current.click();
+    } else {
+      setActiveResource(resource);
+    }
+  }
 
   return (
     <>
+      {/* Hidden anchor for authenticated direct downloads */}
+      <a ref={directDownloadRef} href="#" className="hidden" aria-hidden="true" />
+
       <div className="pt-24 pb-24 bg-montana-bg min-h-screen">
         <div className="mx-auto max-w-7xl px-6">
 
@@ -178,7 +201,7 @@ export default function ResourcesPage() {
                           <h3 className="font-display text-lg font-bold text-white mb-3 leading-snug">{item.title}</h3>
                           <p className="text-sm text-montana-muted leading-relaxed flex-1 mb-6">{item.description}</p>
                           <button
-                            onClick={() => setActiveResource({ title: item.title, file: item.file, filename: item.filename })}
+                            onClick={() => handleDownloadClick({ title: item.title, file: item.file, filename: item.filename })}
                             className="w-full"
                           >
                             <AnimatedButton variant="outline" className="w-full group/btn text-xs py-3 pointer-events-none">
