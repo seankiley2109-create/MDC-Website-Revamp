@@ -123,16 +123,64 @@ export default function CheckoutPage() {
     }
   }, [router]);
 
-  // Pre-fill email from authenticated user
+  // Pre-fill from authenticated user + profile
   useEffect(() => {
     let active = true;
     const supabase = createBrowserClient();
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      if (active && user?.email) {
+
+    (async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!active || !user) return;
+
+      if (user.email) {
         setEmail(user.email);
         setValue('email', user.email);
       }
-    });
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data: profile } = await (supabase.from('profiles') as any)
+        .select('full_name,phone,company_name,vat_number,address_line1,address_line2,city,province,postal_code,country')
+        .eq('id', user.id)
+        .single();
+
+      if (!active || !profile) return;
+
+      if (profile.full_name) {
+        const spaceIdx = (profile.full_name as string).indexOf(' ');
+        if (spaceIdx === -1) {
+          setValue('firstName', profile.full_name);
+        } else {
+          setValue('firstName', (profile.full_name as string).slice(0, spaceIdx));
+          setValue('lastName',  (profile.full_name as string).slice(spaceIdx + 1));
+        }
+      }
+      if (profile.phone)        setValue('phone',      profile.phone);
+      if (profile.company_name) setValue('company',    profile.company_name);
+      if (profile.vat_number)   setValue('vatNumber',  profile.vat_number);
+      if (profile.address_line1) setValue('address1',  profile.address_line1);
+      if (profile.address_line2) setValue('address2',  profile.address_line2);
+      if (profile.city)         setValue('city',       profile.city);
+      if (profile.postal_code)  setValue('postalCode', profile.postal_code);
+      if (profile.country)      setValue('country',    profile.country);
+
+      // Province: profile stores codes (GP, WC, …) — map to checkout full names
+      const PROVINCE_MAP: Record<string, string> = {
+        GP:  'Gauteng',
+        WC:  'Western Cape',
+        KZN: 'KwaZulu-Natal',
+        EC:  'Eastern Cape',
+        FS:  'Free State',
+        LP:  'Limpopo',
+        MP:  'Mpumalanga',
+        NC:  'Northern Cape',
+        NW:  'North West',
+      };
+      if (profile.province) {
+        const mapped = PROVINCE_MAP[profile.province as string] ?? profile.province;
+        setValue('province', mapped);
+      }
+    })();
+
     return () => { active = false; };
   }, [setValue]);
 
