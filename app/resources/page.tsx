@@ -1,7 +1,8 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { FileText, Shield, Lock, Database, ArrowRight, Download, BookOpen, CheckSquare } from 'lucide-react';
+import { FileText, Shield, Lock, Database, ArrowRight, Download, BookOpen, CheckSquare, Eye } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { SpotlightCard } from '@/components/ui/spotlight-card';
 import { AnimatedButton } from '@/components/ui/animated-button';
@@ -133,6 +134,8 @@ export default function ResourcesPage() {
   const [activeResource, setActiveResource] = useState<DownloadResource | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const directDownloadRef = useRef<HTMLAnchorElement>(null);
+  const viewAnchorRef     = useRef<HTMLAnchorElement>(null);
+  const router = useRouter();
 
   useEffect(() => {
     const supabase = createBrowserClient();
@@ -151,10 +154,20 @@ export default function ResourcesPage() {
     }
   }
 
+  function handleViewClick(file: string) {
+    if (isAuthenticated && viewAnchorRef.current) {
+      viewAnchorRef.current.href = file;
+      viewAnchorRef.current.click();
+    } else {
+      router.push('/sign-in?redirect=/resources');
+    }
+  }
+
   return (
     <>
-      {/* Hidden anchor for authenticated direct downloads */}
+      {/* Hidden anchors for authenticated actions */}
       <a ref={directDownloadRef} href="#" className="hidden" aria-hidden="true" />
+      <a ref={viewAnchorRef} href="#" target="_blank" rel="noopener noreferrer" className="hidden" aria-hidden="true" />
 
       <div className="pt-24 pb-24 bg-montana-bg min-h-screen">
         <div className="mx-auto max-w-7xl px-6">
@@ -200,15 +213,26 @@ export default function ResourcesPage() {
                           </div>
                           <h3 className="font-display text-lg font-bold text-white mb-3 leading-snug">{item.title}</h3>
                           <p className="text-sm text-montana-muted leading-relaxed flex-1 mb-6">{item.description}</p>
-                          <button
-                            onClick={() => handleDownloadClick({ title: item.title, file: item.file, filename: item.filename })}
-                            className="w-full"
-                          >
-                            <AnimatedButton variant="outline" className="w-full group/btn text-xs py-3 pointer-events-none">
-                              <Download className="h-3.5 w-3.5 mr-2 group-hover/btn:-translate-y-0.5 transition-transform" />
-                              {item.cta}
-                            </AnimatedButton>
-                          </button>
+                          <div className="flex gap-3">
+                            <button
+                              onClick={() => handleViewClick(item.file)}
+                              className="flex-1"
+                            >
+                              <AnimatedButton variant="outline" className="w-full text-xs py-3 pointer-events-none">
+                                <Eye className="h-3.5 w-3.5 mr-2" />
+                                View
+                              </AnimatedButton>
+                            </button>
+                            <button
+                              onClick={() => handleDownloadClick({ title: item.title, file: item.file, filename: item.filename })}
+                              className="flex-1"
+                            >
+                              <AnimatedButton variant="outline" className="w-full group/btn text-xs py-3 pointer-events-none">
+                                <Download className="h-3.5 w-3.5 mr-2 group-hover/btn:-translate-y-0.5 transition-transform" />
+                                {item.cta}
+                              </AnimatedButton>
+                            </button>
+                          </div>
                         </SpotlightCard>
                       );
                     })}
