@@ -214,24 +214,22 @@ export default function ResourcesPage() {
                           <h3 className="font-display text-lg font-bold text-white mb-3 leading-snug">{item.title}</h3>
                           <p className="text-sm text-montana-muted leading-relaxed flex-1 mb-6">{item.description}</p>
                           <div className="flex gap-3">
-                            <button
+                            <AnimatedButton
+                              variant="primary"
+                              className="flex-1 text-xs py-3"
                               onClick={() => handleViewClick(item.file)}
-                              className="flex-1"
                             >
-                              <AnimatedButton variant="outline" className="w-full text-xs py-3 pointer-events-none">
-                                <Eye className="h-3.5 w-3.5 mr-2" />
-                                View
-                              </AnimatedButton>
-                            </button>
-                            <button
+                              <Eye className="h-3.5 w-3.5 mr-2" />
+                              View
+                            </AnimatedButton>
+                            <AnimatedButton
+                              variant="outline"
+                              className="flex-1 text-xs py-3"
                               onClick={() => handleDownloadClick({ title: item.title, file: item.file, filename: item.filename })}
-                              className="flex-1"
                             >
-                              <AnimatedButton variant="outline" className="w-full group/btn text-xs py-3 pointer-events-none">
-                                <Download className="h-3.5 w-3.5 mr-2 group-hover/btn:-translate-y-0.5 transition-transform" />
-                                {item.cta}
-                              </AnimatedButton>
-                            </button>
+                              <Download className="h-3.5 w-3.5 mr-2" />
+                              {item.cta}
+                            </AnimatedButton>
                           </div>
                         </SpotlightCard>
                       );
