@@ -683,7 +683,7 @@ export async function createOrderSubitem(
     [SUBITEM_COLS.lineTotal]:   String(line.line_total.toFixed(2)),
     [SUBITEM_COLS.orderId]:     orderId,
     ...(SUBITEM_USER_EMAILS_COL && userEmails?.length
-      ? { [SUBITEM_USER_EMAILS_COL]: colLongText(userEmails.join('\n')) }
+      ? { [SUBITEM_USER_EMAILS_COL]: userEmails.join(', ') }
       : {}
     ),
   };

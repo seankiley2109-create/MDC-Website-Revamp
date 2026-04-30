@@ -212,9 +212,12 @@ export async function processOrder(
       for (const line of cart) {
         try {
           const emailsForLine = userEmailContext?.find(ctx => ctx.serviceId === line.service_id)?.emails;
-          await createOrderSubitem(mondayResult.itemId, orderId, line, emailsForLine);
+          const subResult = await createOrderSubitem(mondayResult.itemId, orderId, line, emailsForLine);
+          if (!subResult.success) {
+            console.error('[order] Subitem failed for', line.name, ':', subResult.error);
+          }
         } catch (err) {
-          console.error('[order] Subitem failed for', line.name, ':', err);
+          console.error('[order] Subitem threw for', line.name, ':', err);
         }
       }
 
