@@ -7,7 +7,7 @@ import { useSearchParams } from "next/navigation";
 import * as z from "zod";
 import { SpotlightCard } from "@/components/ui/spotlight-card";
 import { AnimatedButton } from "@/components/ui/animated-button";
-import { Phone, Mail, Facebook, Linkedin, Clock, Shield, MessageSquare, Building2, Check, X } from "lucide-react";
+import { Phone, Mail, Facebook, Linkedin, Clock, Shield, MessageSquare, Building2, Check, X, MapPin } from "lucide-react";
 import Link from "next/link";
 import { createBrowserClient } from "@/lib/supabase/browser";
 
@@ -502,6 +502,57 @@ function ContactFormInner() {
             </SpotlightCard>
           </div>
         </div>
+
+        {/* Head Office Map */}
+        <div className="mt-16 md:mt-24">
+          <div className="flex items-center gap-3 mb-6">
+            <MapPin className="h-5 w-5 text-montana-pink shrink-0" />
+            <h3 className="font-display text-lg font-bold text-white">Head Office</h3>
+          </div>
+          <div className="border border-white/10 overflow-hidden">
+            <div className="grid grid-cols-1 lg:grid-cols-3">
+              {/* Address panel */}
+              <div className="bg-white/[0.03] border-b border-white/10 lg:border-b-0 lg:border-r border-white/10 p-8 flex flex-col justify-center gap-6">
+                <div>
+                  <div className="text-xs text-montana-muted/60 uppercase tracking-wider mb-2">Physical Address</div>
+                  <address className="not-italic text-sm text-white leading-relaxed">
+                    Suite 24, Frazzitta Business Park<br />
+                    Cnr Langeberg &amp; Batis Roads<br />
+                    Durbanville<br />
+                    Western Cape, 7550<br />
+                    South Africa
+                  </address>
+                </div>
+                <div>
+                  <div className="text-xs text-montana-muted/60 uppercase tracking-wider mb-2">Office Hours</div>
+                  <p className="text-sm text-white">Mon–Fri, 08:00–17:00 SAST</p>
+                </div>
+                <a
+                  href="https://maps.google.com/?q=Frazzitta+Business+Park,+Durbanville,+Western+Cape,+South+Africa"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-montana-pink hover:text-white transition-colors"
+                >
+                  <MapPin className="h-3.5 w-3.5" />
+                  Open in Google Maps
+                </a>
+              </div>
+              {/* Map iframe */}
+              <div className="lg:col-span-2 relative h-72 lg:h-auto min-h-[300px]">
+                <div className="absolute inset-0 border-l-0 border-montana-pink/10 pointer-events-none z-10" />
+                <iframe
+                  src="https://maps.google.com/maps?q=Frazzitta+Business+Park,+Durbanville,+Western+Cape,+7550,+South+Africa&output=embed&z=15"
+                  className="w-full h-full grayscale contrast-[0.85] opacity-80"
+                  style={{ filter: "grayscale(0.1) invert(0.9) hue-rotate(180deg) brightness(0.9) contrast(0.9)" }}
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                  title="Montana Data Company Head Office"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
       </div>
     </div>
   );
