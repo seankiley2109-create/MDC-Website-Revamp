@@ -96,7 +96,7 @@ export function SupportForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} noValidate className="space-y-5 max-w-2xl">
+    <form onSubmit={handleSubmit} noValidate className="space-y-5 w-full">
       {/* Subject */}
       <div>
         <label htmlFor="st-subject" className={labelClass}>Subject</label>
@@ -113,7 +113,7 @@ export function SupportForm() {
       </div>
 
       {/* Category + Priority row */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div>
           <label htmlFor="st-category" className={labelClass}>Category</label>
           <select

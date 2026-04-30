@@ -173,62 +173,60 @@ export function ProfileForm({ initialData, userEmail }: ProfileFormProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-8 max-w-2xl">
+    <form onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-8 w-full">
 
       {/* ── Section A: Personal Details ───────────────────────────────────── */}
       <div>
         <p className="text-xs font-semibold text-montana-pink uppercase tracking-widest mb-4">
           Personal Details
         </p>
-        <div className="space-y-4">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label htmlFor="pf-fullname" className={labelClass}>Full Name</label>
-              <input
-                id="pf-fullname"
-                type="text"
-                placeholder="Your full name"
-                className={fieldClass}
-                disabled={isSubmitting}
-                {...register("full_name")}
-              />
-            </div>
-            <div>
-              <label htmlFor="pf-email" className={labelClass}>Work Email</label>
-              <input
-                id="pf-email"
-                type="email"
-                value={userEmail}
-                readOnly
-                className={`${fieldClass} opacity-50 cursor-not-allowed`}
-                title="Email is managed via your account settings"
-              />
-              <p className="text-xs text-montana-muted mt-1">Managed via your account</p>
-            </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div>
+            <label htmlFor="pf-fullname" className={labelClass}>Full Name</label>
+            <input
+              id="pf-fullname"
+              type="text"
+              placeholder="Your full name"
+              className={fieldClass}
+              disabled={isSubmitting}
+              {...register("full_name")}
+            />
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label htmlFor="pf-phone" className={labelClass}>Phone Number</label>
-              <input
-                id="pf-phone"
-                type="tel"
-                placeholder="+27 (0)__ ___ ____"
-                className={fieldClass}
-                disabled={isSubmitting}
-                {...register("phone")}
-              />
-            </div>
-            <div>
-              <label htmlFor="pf-avatar" className={labelClass}>Avatar URL <span className="text-montana-muted/50 normal-case font-normal">(optional)</span></label>
-              <input
-                id="pf-avatar"
-                type="url"
-                placeholder="https://…"
-                className={fieldClass}
-                disabled={isSubmitting}
-                {...register("avatar_url")}
-              />
-            </div>
+          <div>
+            <label htmlFor="pf-email" className={labelClass}>Work Email</label>
+            <input
+              id="pf-email"
+              type="email"
+              value={userEmail}
+              readOnly
+              className={`${fieldClass} opacity-50 cursor-not-allowed`}
+              title="Email is managed via your account settings"
+            />
+            <p className="text-xs text-montana-muted mt-1">Managed via your account</p>
+          </div>
+          <div>
+            <label htmlFor="pf-phone" className={labelClass}>Phone Number</label>
+            <input
+              id="pf-phone"
+              type="tel"
+              placeholder="+27 (0)__ ___ ____"
+              className={fieldClass}
+              disabled={isSubmitting}
+              {...register("phone")}
+            />
+          </div>
+          <div>
+            <label htmlFor="pf-avatar" className={labelClass}>
+              Avatar URL <span className="text-montana-muted/50 normal-case font-normal">(optional)</span>
+            </label>
+            <input
+              id="pf-avatar"
+              type="url"
+              placeholder="https://…"
+              className={fieldClass}
+              disabled={isSubmitting}
+              {...register("avatar_url")}
+            />
           </div>
         </div>
       </div>
@@ -324,31 +322,33 @@ export function ProfileForm({ initialData, userEmail }: ProfileFormProps) {
           Address
         </p>
         <div className="space-y-4">
-          <div>
-            <label htmlFor="pf-addr1" className={labelClass}>Address Line 1</label>
-            <input
-              id="pf-addr1"
-              type="text"
-              placeholder="Street address"
-              className={fieldClass}
-              disabled={isSubmitting}
-              {...register("address_line1")}
-            />
-          </div>
-          <div>
-            <label htmlFor="pf-addr2" className={labelClass}>
-              Address Line 2 <span className="text-montana-muted/50 normal-case font-normal">(optional)</span>
-            </label>
-            <input
-              id="pf-addr2"
-              type="text"
-              placeholder="Suite, floor, building…"
-              className={fieldClass}
-              disabled={isSubmitting}
-              {...register("address_line2")}
-            />
-          </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label htmlFor="pf-addr1" className={labelClass}>Address Line 1</label>
+              <input
+                id="pf-addr1"
+                type="text"
+                placeholder="Street address"
+                className={fieldClass}
+                disabled={isSubmitting}
+                {...register("address_line1")}
+              />
+            </div>
+            <div>
+              <label htmlFor="pf-addr2" className={labelClass}>
+                Address Line 2 <span className="text-montana-muted/50 normal-case font-normal">(optional)</span>
+              </label>
+              <input
+                id="pf-addr2"
+                type="text"
+                placeholder="Suite, floor, building…"
+                className={fieldClass}
+                disabled={isSubmitting}
+                {...register("address_line2")}
+              />
+            </div>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <div>
               <label htmlFor="pf-city" className={labelClass}>City</label>
               <input
@@ -375,8 +375,6 @@ export function ProfileForm({ initialData, userEmail }: ProfileFormProps) {
                 ))}
               </select>
             </div>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label htmlFor="pf-postal" className={labelClass}>Postal Code</label>
               <input
