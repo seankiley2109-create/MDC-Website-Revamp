@@ -109,6 +109,17 @@ export interface CheckoutPayload {
 }
 
 // ---------------------------------------------------------------------------
+// Resource download types
+// ---------------------------------------------------------------------------
+
+export interface ResourceDownloadPayload {
+  name:          string;
+  email:         string;
+  resourceTitle: string;
+  resourceFile:  string; // public path, e.g. /resources/immutable-backups.pdf
+}
+
+// ---------------------------------------------------------------------------
 // Consulting enquiry types
 // ---------------------------------------------------------------------------
 
@@ -969,6 +980,85 @@ function posQuoteSummaryHtml(p: POSPayload): string {
 
   return shell(`Your Montana Data Solution Summary — ${solutionName}`, body);
 }
+
+// ===========================================================================
+// RESOURCE DOWNLOAD — Staff Notification
+// ===========================================================================
+
+function resourceDownloadStaffHtml(p: ResourceDownloadPayload): string {
+  const appUrl = process.env.APP_URL ?? 'https://montanadc.com';
+  const body = `
+    <p style="margin:0 0 20px;font-size:15px;color:#3f3f46;">A visitor has downloaded a resource from the website.</p>
+
+    ${sectionHeading('Lead Details')}
+    ${dataTable(
+      fieldRow('Name',     p.name) +
+      fieldRow('Email',    `<a href="mailto:${p.email}" style="color:#f24567;">${p.email}</a>`) +
+      fieldRow('Resource', p.resourceTitle) +
+      fieldRow('File',     `<a href="${appUrl}${p.resourceFile}" style="color:#f24567;">${p.resourceFile}</a>`) +
+      fieldRow('Time',     new Date().toLocaleString('en-ZA', { dateStyle: 'full', timeStyle: 'short', timeZone: 'Africa/Johannesburg' }))
+    )}
+
+    ${divider()}
+    <p style="margin:0;text-align:center;">${ctaButton('Follow Up with ' + p.name, `mailto:${p.email}?subject=${encodeURIComponent('Following up on your ' + p.resourceTitle + ' download')}`)}</p>
+  `;
+  return shell(`[Resource Download] ${p.resourceTitle}`, body);
+}
+
+// ===========================================================================
+// RESOURCE DOWNLOAD — Auto-Responder
+// ===========================================================================
+
+function resourceDownloadAutoHtml(p: ResourceDownloadPayload): string {
+  const appUrl = process.env.APP_URL ?? 'https://montanadc.com';
+  const downloadUrl = `${appUrl}${p.resourceFile}`;
+  const body = `
+    <p style="margin:0 0 20px;font-size:15px;color:#3f3f46;">Hi ${p.name},</p>
+    <p style="margin:0 0 20px;font-size:15px;color:#3f3f46;">Your download is ready. Click the button below to access <strong>${p.resourceTitle}</strong> at any time.</p>
+
+    ${divider()}
+    <p style="margin:0 0 24px;text-align:center;">${ctaButton('Download ' + p.resourceTitle, downloadUrl)}</p>
+    ${divider()}
+
+    <p style="margin:24px 0 0;font-size:14px;color:#71717a;">If you have questions about this topic or would like to speak with an advisor, reply to this email or call us on <a href="tel:+27871883843" style="color:#f24567;">+27 (0)87 188 3843</a>.</p>
+  `;
+  return shell(`Your download: ${p.resourceTitle}`, body);
+}
+
+export async function sendResourceDownloadEmails(p: ResourceDownloadPayload): Promise<EmailResult> {
+  try {
+    const [staff, auto] = await Promise.all([
+      resend.emails.send({
+        from:    FROM_ADDRESS,
+        to:      [SALES_EMAIL],
+        replyTo: p.email,
+        subject: `[Resource Download] ${p.resourceTitle} — ${p.name}`,
+        html:    resourceDownloadStaffHtml(p),
+      }),
+      resend.emails.send({
+        from:    FROM_ADDRESS,
+        to:      [p.email],
+        replyTo: SALES_EMAIL,
+        subject: `Your download: ${p.resourceTitle} — Montana Data Company`,
+        html:    resourceDownloadAutoHtml(p),
+      }),
+    ]);
+
+    if (staff.error || auto.error) {
+      console.error('[email] Resource download email errors:', staff.error, auto.error);
+      return { success: false, error: 'Failed to send emails.' };
+    }
+
+    return { success: true };
+  } catch (err) {
+    console.error('[email] sendResourceDownloadEmails error:', err);
+    return { success: false, error: 'Email service unavailable.' };
+  }
+}
+
+// ===========================================================================
+// POS — Quote Summary (sent to prospect after CRM lead is created)
+// ===========================================================================
 
 export async function sendPOSQuoteSummary(
   payload: POSPayload,
