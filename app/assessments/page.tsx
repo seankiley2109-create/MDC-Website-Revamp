@@ -49,17 +49,29 @@ export default async function AssessmentsPage() {
       <div className="mx-auto max-w-7xl px-6">
 
         {/* Hero */}
-        <div className="py-16 md:py-24 text-center max-w-4xl mx-auto">
-          <div className="inline-flex items-center border border-white/10 bg-montana-surface/80 backdrop-blur-sm px-4 py-1.5 text-xs font-bold tracking-widest text-montana-muted uppercase mb-8">
-            <span className="flex h-2 w-2 bg-montana-pink mr-3 shadow-[0_0_8px_#F24567]"></span>
-            Free Risk Assessments
+        <div className="py-16 md:py-24">
+          <div className="flex flex-col lg:flex-row items-center gap-12 max-w-6xl mx-auto">
+            <div className="flex-1 text-center lg:text-left">
+              <div className="inline-flex items-center border border-white/10 bg-montana-surface/80 backdrop-blur-sm px-4 py-1.5 text-xs font-bold tracking-widest text-montana-muted uppercase mb-8">
+                <span className="flex h-2 w-2 bg-montana-pink mr-3 shadow-[0_0_8px_#F24567]"></span>
+                Free Risk Assessments
+              </div>
+              <h1 className="font-display text-4xl md:text-6xl font-bold tracking-tight text-white mb-6">
+                How exposed is your <span className="text-montana-gradient">business?</span>
+              </h1>
+              <p className="text-lg md:text-xl text-montana-muted leading-relaxed max-w-2xl">
+                Most organisations don&apos;t know their true risk level until it&apos;s too late. Take one of our free assessments to uncover critical gaps in under 5 minutes.
+              </p>
+            </div>
+            <div className="flex-1 flex justify-center">
+              <img
+                src="/illustrations/assessment.svg"
+                alt=""
+                aria-hidden="true"
+                className="w-full max-w-md opacity-90"
+              />
+            </div>
           </div>
-          <h1 className="font-display text-4xl md:text-6xl font-bold tracking-tight text-white mb-6">
-            How exposed is your <span className="text-montana-gradient">business?</span>
-          </h1>
-          <p className="text-lg md:text-xl text-montana-muted leading-relaxed max-w-2xl mx-auto">
-            Most organisations don&apos;t know their true risk level until it&apos;s too late. Take one of our free assessments to uncover critical gaps in under 5 minutes.
-          </p>
         </div>
 
         {/* Mini-assessment disclaimer */}

@@ -76,6 +76,12 @@ export default function AboutPage() {
             </div>
           </div>
           <div>
+            <img
+              src="/illustrations/team.svg"
+              alt=""
+              aria-hidden="true"
+              className="w-full max-w-xs mx-auto mb-8 opacity-90"
+            />
             <SpotlightCard customSize className="p-8 border-montana-pink/20">
               <div className="text-xs font-bold tracking-widest text-montana-muted uppercase mb-6">What We Deliver</div>
               <ul className="space-y-4">

@@ -173,17 +173,29 @@ export default function ResourcesPage() {
         <div className="mx-auto max-w-7xl px-6">
 
           {/* Hero */}
-          <div className="py-16 md:py-20 max-w-3xl">
-            <div className="inline-flex items-center border border-white/10 bg-montana-surface/80 backdrop-blur-sm px-4 py-1.5 text-xs font-bold tracking-widest text-montana-muted uppercase mb-8">
-              <span className="flex h-2 w-2 bg-montana-pink mr-3 shadow-[0_0_8px_#F24567]"></span>
-              Resources & Insights
+          <div className="py-16 md:py-20">
+            <div className="flex flex-col lg:flex-row items-center gap-12">
+              <div className="flex-1">
+                <div className="inline-flex items-center border border-white/10 bg-montana-surface/80 backdrop-blur-sm px-4 py-1.5 text-xs font-bold tracking-widest text-montana-muted uppercase mb-8">
+                  <span className="flex h-2 w-2 bg-montana-pink mr-3 shadow-[0_0_8px_#F24567]"></span>
+                  Resources & Insights
+                </div>
+                <h1 className="font-display text-4xl md:text-6xl font-bold tracking-tight text-white mb-6">
+                  Knowledge that builds <span className="text-montana-gradient">resilience.</span>
+                </h1>
+                <p className="text-lg text-montana-muted leading-relaxed max-w-2xl">
+                  Practical guides, compliance frameworks, and technical whitepapers. Everything your team needs to make informed decisions about data protection, governance, and cyber resilience.
+                </p>
+              </div>
+              <div className="flex-1 flex justify-center">
+                <img
+                  src="/illustrations/resource.svg"
+                  alt=""
+                  aria-hidden="true"
+                  className="w-full max-w-xs opacity-90"
+                />
+              </div>
             </div>
-            <h1 className="font-display text-4xl md:text-6xl font-bold tracking-tight text-white mb-6">
-              Knowledge that builds <span className="text-montana-gradient">resilience.</span>
-            </h1>
-            <p className="text-lg text-montana-muted leading-relaxed max-w-2xl">
-              Practical guides, compliance frameworks, and technical whitepapers. Everything your team needs to make informed decisions about data protection, governance, and cyber resilience.
-            </p>
           </div>
 
           {/* Resources by Category */}

@@ -207,17 +207,29 @@ function ContactFormInner() {
       <div className="mx-auto max-w-7xl px-6">
 
         {/* Hero */}
-        <div className="py-10 md:py-20 max-w-3xl">
-          <div className="inline-flex items-center border border-white/10 bg-montana-surface/80 backdrop-blur-sm px-4 py-1.5 text-xs font-bold tracking-widest text-montana-muted uppercase mb-8">
-            <span className="flex h-2 w-2 bg-montana-pink mr-3 shadow-[0_0_8px_#F24567]"></span>
-            Get in Touch
+        <div className="py-10 md:py-20">
+          <div className="flex flex-col lg:flex-row items-center gap-12">
+            <div className="flex-1">
+              <div className="inline-flex items-center border border-white/10 bg-montana-surface/80 backdrop-blur-sm px-4 py-1.5 text-xs font-bold tracking-widest text-montana-muted uppercase mb-8">
+                <span className="flex h-2 w-2 bg-montana-pink mr-3 shadow-[0_0_8px_#F24567]"></span>
+                Get in Touch
+              </div>
+              <h1 className="font-display text-4xl md:text-6xl font-bold tracking-tight text-white mb-6">
+                Let&apos;s talk about your <span className="text-montana-gradient">data resilience.</span>
+              </h1>
+              <p className="text-lg text-montana-muted leading-relaxed max-w-2xl">
+                Whether you&apos;re evaluating a new solution, need support on an existing deployment, or want to explore a channel partnership — our advisory team is ready to assist.
+              </p>
+            </div>
+            <div className="flex-shrink-0 flex justify-center">
+              <img
+                src="/illustrations/contact.svg"
+                alt=""
+                aria-hidden="true"
+                className="w-full max-w-md opacity-90"
+              />
+            </div>
           </div>
-          <h1 className="font-display text-4xl md:text-6xl font-bold tracking-tight text-white mb-6">
-            Let&apos;s talk about your <span className="text-montana-gradient">data resilience.</span>
-          </h1>
-          <p className="text-lg text-montana-muted leading-relaxed max-w-2xl">
-            Whether you&apos;re evaluating a new solution, need support on an existing deployment, or want to explore a channel partnership — our advisory team is ready to assist.
-          </p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">

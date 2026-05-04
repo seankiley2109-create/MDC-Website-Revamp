@@ -52,9 +52,11 @@ export default function ServicesPage() {
             </div>
             <h2 className="font-display text-3xl md:text-4xl font-bold text-white">Backup & Data Protection</h2>
           </div>
-          <p className="text-montana-muted text-lg mb-8 max-w-3xl">
-            The cost of downtime far exceeds the cost of protection. We offer two distinct architectures to match your operational scale and complexity.
-          </p>
+          <div className="flex flex-col lg:flex-row items-center gap-8 mb-8">
+            <p className="text-montana-muted text-lg flex-1">
+              The cost of downtime far exceeds the cost of protection. We offer two distinct architectures to match your operational scale and complexity.
+            </p>
+          </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* IBM */}

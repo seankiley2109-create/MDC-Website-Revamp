@@ -22,7 +22,8 @@
       "Bash(node -e \"const m = require\\('react-email'\\); console.log\\(Object.keys\\(m\\).slice\\(0,20\\)\\)\")",
       "Bash(node -e \"const m = require\\('react-email'\\); console.log\\(Object.keys\\(m\\)\\)\")",
       "Bash(npx email *)",
-      "Bash(kill %1)"
+      "Bash(kill %1)",
+      "WebFetch(domain:undraw.co)"
     ]
   }
 }

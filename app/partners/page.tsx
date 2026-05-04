@@ -153,29 +153,41 @@ export default function PartnersPage() {
       <div className="mx-auto max-w-7xl px-6">
 
         {/* Hero */}
-        <div className="py-10 md:py-20 max-w-4xl">
-          <div className="inline-flex items-center border border-white/10 bg-montana-surface/80 backdrop-blur-sm px-4 py-1.5 text-xs font-bold tracking-widest text-montana-muted uppercase mb-8">
-            <span className="flex h-2 w-2 bg-montana-pink mr-3 shadow-[0_0_8px_#F24567]" />
-            Reseller Programme
-          </div>
-          <h1 className="font-display text-4xl md:text-6xl font-bold tracking-tight text-white mb-6">
-            Grow your business with{' '}
-            <span className="text-montana-gradient">enterprise data protection.</span>
-          </h1>
-          <p className="text-lg text-montana-muted leading-relaxed max-w-2xl mb-10">
-            Become a Montana reseller and bring enterprise-grade backup, compliance, and security solutions to your clients — backed by our advisory team, technical support, and full product portfolio.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4">
-            <Link href="/contact?type=partnership">
-              <AnimatedButton variant="primary" className="w-full sm:w-auto px-8 py-4 text-lg">
-                Apply to Become a Reseller
-              </AnimatedButton>
-            </Link>
-            <Link href="#tiers">
-              <AnimatedButton variant="outline" className="w-full sm:w-auto px-8 py-4 text-lg">
-                View Partnership Tiers
-              </AnimatedButton>
-            </Link>
+        <div className="py-10 md:py-20">
+          <div className="flex flex-col lg:flex-row items-center gap-12">
+            <div className="flex-1">
+              <div className="inline-flex items-center border border-white/10 bg-montana-surface/80 backdrop-blur-sm px-4 py-1.5 text-xs font-bold tracking-widest text-montana-muted uppercase mb-8">
+                <span className="flex h-2 w-2 bg-montana-pink mr-3 shadow-[0_0_8px_#F24567]" />
+                Reseller Programme
+              </div>
+              <h1 className="font-display text-4xl md:text-6xl font-bold tracking-tight text-white mb-6">
+                Grow your business with{' '}
+                <span className="text-montana-gradient">enterprise data protection.</span>
+              </h1>
+              <p className="text-lg text-montana-muted leading-relaxed max-w-2xl mb-10">
+                Become a Montana reseller and bring enterprise-grade backup, compliance, and security solutions to your clients — backed by our advisory team, technical support, and full product portfolio.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4">
+                <Link href="/contact?type=partnership">
+                  <AnimatedButton variant="primary" className="w-full sm:w-auto px-8 py-4 text-lg">
+                    Apply to Become a Reseller
+                  </AnimatedButton>
+                </Link>
+                <Link href="#tiers">
+                  <AnimatedButton variant="outline" className="w-full sm:w-auto px-8 py-4 text-lg">
+                    View Partnership Tiers
+                  </AnimatedButton>
+                </Link>
+              </div>
+            </div>
+            <div className="flex-1 flex justify-center">
+              <img
+                src="/illustrations/partner.svg"
+                alt=""
+                aria-hidden="true"
+                className="w-full max-w-md opacity-90"
+              />
+            </div>
           </div>
         </div>
 
