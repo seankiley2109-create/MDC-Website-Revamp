@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse }  from 'next/server';
 import { createHmac }                from 'crypto';
 import { createServiceRoleClient }   from '@/lib/supabase/server';
-import { updateOrderPaymentStatus }  from '@/lib/monday';
+import { updateOrderPaymentStatus, createTechnicalOnboardingItem } from '@/lib/monday';
 
 // ─── Paystack event shape (minimal) ──────────────────────────────────────────
 
@@ -125,13 +125,52 @@ async function handleChargeSuccess(data: ChargeSuccessData): Promise<void> {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const { data: purchaseRow } = await (supabase as any)
         .from('purchases')
-        .select('monday_item_id')
+        .select('monday_item_id, company, customer_name, customer_email, customer_phone, order_notes, cart')
         .eq('order_id', orderId)
         .single();
-      const mondayItemId = (purchaseRow as { monday_item_id?: string } | null)?.monday_item_id;
-      if (mondayItemId) {
-        await updateOrderPaymentStatus(mondayItemId, 'completed');
-        console.log('[webhook] Monday.com order status → completed:', mondayItemId);
+
+      type PurchaseRow = {
+        monday_item_id?:  string;
+        company?:         string;
+        customer_name?:   string;
+        customer_email?:  string;
+        customer_phone?:  string;
+        order_notes?:     string;
+        cart?:            { name: string; product_code: string; quantity: number }[];
+      };
+
+      const row = purchaseRow as PurchaseRow | null;
+
+      if (row?.monday_item_id) {
+        await updateOrderPaymentStatus(row.monday_item_id, 'completed');
+        console.log('[webhook] Monday.com order status → completed:', row.monday_item_id);
+      }
+
+      // Create a technical onboarding item so the tech team can begin provisioning
+      if (row?.company && row?.customer_email) {
+        const nameParts  = (row.customer_name ?? '').trim().split(' ');
+        const firstName  = nameParts[0] ?? '';
+        const lastName   = nameParts.slice(1).join(' ') || firstName;
+
+        try {
+          const onboardingResult = await createTechnicalOnboardingItem({
+            orderId,
+            company:      row.company,
+            firstName,
+            lastName,
+            contactEmail: row.customer_email,
+            contactPhone: row.customer_phone ?? '',
+            orderNotes:   row.order_notes,
+            cart:         row.cart ?? [],
+          });
+          if (onboardingResult.success && !onboardingResult.skipped) {
+            console.log('[webhook] Technical onboarding item created:', onboardingResult.itemId);
+          } else if (!onboardingResult.skipped) {
+            console.error('[webhook] Technical onboarding item failed:', onboardingResult.error);
+          }
+        } catch (err) {
+          console.error('[webhook] createTechnicalOnboardingItem threw:', err);
+        }
       }
     } catch (err) {
       console.error('[webhook] Failed to update Monday.com order status:', err);

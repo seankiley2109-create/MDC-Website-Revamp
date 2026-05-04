@@ -10,21 +10,39 @@
  *
  * ─────────────────────────────────────────────────────────────────────────────
  * BOARD 4 — "Support Tickets"  (env: MONDAY_SUPPORT_BOARD_ID)
- *   Column name        Type        ID used here
- *   ────────────────── ─────────── ──────────────
- *   Email              Email       email
- *   Company            Text        text
- *   Category           Status      status
- *   Priority           Status      status_1
- *   Message            Long Text   long_text
- *   Ticket Status      Status      status_2
+ *   Board ID: 1790887512
+ *   Used for both inbound support tickets and post-purchase technical onboarding items.
  *
- *   Status labels for "Category":
- *     Technical | Billing | Compliance | General
+ *   Column name              Type        ID
+ *   ────────────────────     ─────────── ──────────────────────
+ *   Name                     name        name
+ *   Products to Implement    subtasks    subtasks_mkpwd44v
+ *   Assignee                 people      person
+ *   Product Group            Status      single_selectybdu6s7
+ *   Job Status               Status      status
+ *   Priority                 Status      status_1
+ *   Creation Date            Date        date_mkrvfmta
+ *   Montana Rep              Dropdown    dropdown_mm1qt87g
+ *   Supporting Documents     File        file_mm1mgqhc
+ *   Customer Company         Text        text_mkzz2dz9
+ *   Due date                 Date        date
+ *   Order ID / Quote ID      Text        text_mkzzjzq1
+ *   Customer Contact Name    Text        text_mkpdnarc
+ *   Customer Contact Email   Email       email_mkpdb7c4
+ *   Customer Contact Phone   Text        text_mkrwbc8y
+ *   Order Notes              Long Text   long_text_mm004f49
+ *   Domain                   Text        text_mkrvqq4b
+ *   Requestor First Name     Text        text_mm012px8
+ *   Requestor Last Name      Text        text_mm01ty6w
+ *
+ *   Subitems ("Products to be Implemented") columns:
+ *     Product Code   Text     text_mkrcpmje
+ *     Quantity       Numbers  numeric_mkrcgce0
+ *
+ *   Status labels for "Job Status":
+ *     Working on it | Done | Stuck | (verify in board settings)
  *   Status labels for "Priority":
- *     Low | Normal | High | Critical
- *   Status labels for "Ticket Status":
- *     New | In Progress | Awaiting Client | Resolved | Closed
+ *     High | Medium | Low | (verify in board settings)
  *
  * ─────────────────────────────────────────────────────────────────────────────
  * BOARD 1 — "Website Leads"  (env: MONDAY_CONTACT_BOARD_ID)
@@ -107,7 +125,7 @@ const CONSULTING_SUBITEM_COLS = {
   productCode: 'text_mm2vxwwn',
 } as const;
 
-/** Column IDs for the "Support Tickets" board. */
+/** Column IDs for the "Support Tickets" board — inbound support ticket form. */
 const SUPPORT_COLS = {
   email:        'email_mm20vp3x',
   company:      'text_mm201srx',
@@ -115,6 +133,27 @@ const SUPPORT_COLS = {
   priority:     'color_mm20shcj',
   message:      'text_mm208etp',
   ticketStatus: 'color_mm20qe7',
+} as const;
+
+/** Column IDs for the "Support Tickets" board — technical onboarding items created on payment. */
+const TECH_BOARD_COLS = {
+  jobStatus:    'status',
+  priority:     'status_1',
+  creationDate: 'date_mkrvfmta',
+  company:      'text_mkzz2dz9',
+  orderId:      'text_mkzzjzq1',
+  contactName:  'text_mkpdnarc',
+  contactEmail: 'email_mkpdb7c4',
+  contactPhone: 'text_mkrwbc8y',
+  orderNotes:   'long_text_mm004f49',
+  firstName:    'text_mm012px8',
+  lastName:     'text_mm01ty6w',
+} as const;
+
+/** Column IDs for the subitems board attached to Support Tickets ("Products to be Implemented"). */
+const TECH_SUBITEM_COLS = {
+  productCode: 'text_mkrcpmje',
+  quantity:    'numeric_mkrcgce0',
 } as const;
 
 /** Column IDs for the "Assessment Leads" board. */
@@ -660,6 +699,77 @@ export async function updateOrderPaymentStatus(
   }
 
   return { success: true, itemId: mondayItemId };
+}
+
+// ─── Technical onboarding types ──────────────────────────────────────────────
+
+export interface TechnicalOnboardingPayload {
+  orderId:      string;
+  company:      string;
+  firstName:    string;
+  lastName:     string;
+  contactEmail: string;
+  contactPhone: string;
+  orderNotes?:  string;
+  cart: {
+    name:         string;
+    product_code: string;
+    quantity:     number;
+  }[];
+}
+
+/**
+ * Creates a technical onboarding item on the "Support Tickets" board.
+ * Called after payment confirmation so tech can begin provisioning.
+ * Returns { skipped: true } when MONDAY_SUPPORT_BOARD_ID is not configured.
+ */
+export async function createTechnicalOnboardingItem(
+  payload: TechnicalOnboardingPayload,
+): Promise<MondayResult> {
+  const boardId = process.env.MONDAY_SUPPORT_BOARD_ID;
+  if (!boardId) return { success: true, skipped: true };
+
+  const today = new Date();
+
+  const columns: ColumnValueMap = {
+    [TECH_BOARD_COLS.jobStatus]:    colStatus('Working on it'),
+    [TECH_BOARD_COLS.priority]:     colStatus('High'),
+    [TECH_BOARD_COLS.creationDate]: colDate(today),
+    [TECH_BOARD_COLS.company]:      payload.company,
+    [TECH_BOARD_COLS.orderId]:      payload.orderId,
+    [TECH_BOARD_COLS.contactName]:  `${payload.firstName} ${payload.lastName}`,
+    [TECH_BOARD_COLS.contactEmail]: colEmail(payload.contactEmail),
+    [TECH_BOARD_COLS.contactPhone]: payload.contactPhone,
+    [TECH_BOARD_COLS.firstName]:    payload.firstName,
+    [TECH_BOARD_COLS.lastName]:     payload.lastName,
+    ...(payload.orderNotes && { [TECH_BOARD_COLS.orderNotes]: colLongText(payload.orderNotes) }),
+  };
+
+  const parentResult = await createItem(
+    boardId,
+    `${payload.company} — New Onboarding [${payload.orderId}]`,
+    columns,
+  );
+
+  if (!parentResult.success || !parentResult.itemId) return parentResult;
+
+  for (const line of payload.cart) {
+    await mondayGraphQL<{ create_subitem: { id: string } }>(
+      CREATE_SUBITEM_MUTATION,
+      {
+        parentItemId: parentResult.itemId,
+        itemName:     line.name,
+        columnValues: JSON.stringify({
+          [TECH_SUBITEM_COLS.productCode]: line.product_code,
+          [TECH_SUBITEM_COLS.quantity]:    String(line.quantity),
+        }),
+      },
+    ).catch((err: unknown) => {
+      console.error('[monday] onboarding subitem creation failed:', err);
+    });
+  }
+
+  return parentResult;
 }
 
 /**

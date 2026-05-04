@@ -24,7 +24,7 @@
 
 import { NextRequest, NextResponse }             from 'next/server';
 import { createServiceRoleClient }               from '@/lib/supabase/server';
-import { updateOrderPaymentStatus }              from '@/lib/monday';
+import { updateOrderPaymentStatus, createTechnicalOnboardingItem } from '@/lib/monday';
 import type { CartLineItem }                     from '@/app/api/subscribe/route';
 import { sendCheckoutConfirmationEmails, type CheckoutPayload, type CheckoutLineItem } from '@/lib/email';
 
@@ -196,6 +196,9 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
 
       type PurchaseRow = {
         monday_item_id?:  string;
+        customer_name?:   string;
+        customer_phone?:  string;
+        order_notes?:     string;
         vat_number?:      string;
         address_line1?:   string;
         address_line2?:   string;
@@ -211,7 +214,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       if (orderId) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const { data: pRow } = await (supabase.from('purchases') as any)
-          .select('monday_item_id, vat_number, address_line1, address_line2, city, province, postal_code, country, discount_amount, discount_code')
+          .select('monday_item_id, customer_name, customer_phone, order_notes, vat_number, address_line1, address_line2, city, province, postal_code, country, discount_amount, discount_code')
           .eq('order_id', orderId)
           .eq('user_id', userId)
           .single();
@@ -234,6 +237,38 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
           } catch (err) {
             console.error('[subscribe/callback] Failed to update Monday.com order status:', err);
           }
+        }
+      }
+
+      // ── Create technical onboarding item (non-critical, first-time only) ───────
+      if (!alreadyStacked && orderId) {
+        const onboardingCart = (verifyData.metadata?.cart ?? [])
+          .filter(l => l.product_code !== 'DISCOUNT')
+          .map(l => ({ name: l.name, product_code: l.product_code, quantity: l.quantity }));
+
+        const nameParts = (purchaseRow?.customer_name ?? existingProfile?.full_name ?? '').trim().split(' ');
+        const firstName = nameParts[0] ?? '';
+        const lastName  = nameParts.slice(1).join(' ') || firstName;
+        const company   = existingProfile?.company_name ?? 'Unknown Organisation';
+
+        try {
+          const onboardingResult = await createTechnicalOnboardingItem({
+            orderId,
+            company,
+            firstName,
+            lastName,
+            contactEmail: verifyData.customer.email,
+            contactPhone: purchaseRow?.customer_phone ?? '',
+            orderNotes:   purchaseRow?.order_notes,
+            cart:         onboardingCart,
+          });
+          if (onboardingResult.success && !onboardingResult.skipped) {
+            console.log('[subscribe/callback] Technical onboarding item created:', onboardingResult.itemId);
+          } else if (!onboardingResult.skipped) {
+            console.error('[subscribe/callback] Technical onboarding item failed:', onboardingResult.error);
+          }
+        } catch (err) {
+          console.error('[subscribe/callback] createTechnicalOnboardingItem threw:', err);
         }
       }
 
