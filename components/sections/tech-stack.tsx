@@ -14,7 +14,7 @@ const techLogos = [
 
 export function TechStack() {
   return (
-    <section id="tech-stack" className="py-16 md:py-24 border-y border-white/5 overflow-hidden">
+    <section id="tech-stack" className="bg-montana-bg/80 py-16 md:py-24 overflow-hidden">
       <div className="mx-auto max-w-7xl px-6 mb-8 md:mb-12 text-center">
         <h2 className="text-sm font-mono font-semibold tracking-widest text-montana-muted uppercase">
           Powered by Industry Leading Technology

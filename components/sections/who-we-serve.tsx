@@ -28,7 +28,7 @@ const audiences = [
 
 export function WhoWeServe() {
   return (
-    <section id="who-we-serve" className="py-16 md:py-24 bg-montana-surface/30 border-y border-white/5">
+    <section id="who-we-serve" className="py-16 md:py-24">
       <div className="mx-auto max-w-7xl px-6">
         <div className="mb-10 md:mb-16 text-center">
           <h2 className="font-display text-3xl md:text-5xl font-bold tracking-tight text-white mb-4">
