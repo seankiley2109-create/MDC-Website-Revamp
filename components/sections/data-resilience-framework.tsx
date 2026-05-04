@@ -205,7 +205,7 @@ export function DataResilienceFramework() {
                 <circle
                   cx={SVG_CX}
                   cy={SVG_CY}
-                  r="33"
+                  r="52"
                   fill="var(--color-montana-surface)"
                   stroke="rgba(255,255,255,0.14)"
                   strokeWidth="1"
@@ -214,9 +214,11 @@ export function DataResilienceFramework() {
 
               {/* Hub label */}
               <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 pointer-events-none">
-                <span className="font-display text-[10px] font-black tracking-widest text-montana-gradient leading-none select-none">
-                  MDC
-                </span>
+                <img
+                  src="/logos/montana-logo.svg"
+                  alt="Montana Data Company"
+                  className="w-55 h-55 object-contain select-none"
+                />
               </div>
 
               {/* Node buttons */}

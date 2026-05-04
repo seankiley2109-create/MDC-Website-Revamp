@@ -12,10 +12,10 @@ export default function Home() {
     <>
       <Hero />
       <TrustStrip />
-      <WhoWeServe />
       <ClientLogos />
-      <DataResilienceFramework />
+      <WhoWeServe />
       <Services />
+      <DataResilienceFramework />
       <TechStack />
       <WhyMontana />
     </>
