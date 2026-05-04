@@ -8,7 +8,7 @@ import { POPIA_SERVICES } from "@/lib/popia-services";
 import {
   XCircle, AlertTriangle, CheckCircle, Award,
   Activity, ArrowRight, Users, Scale, UserCheck,
-  Shield, Eye, FileText, Lock, ShieldAlert,
+  Shield, Eye, FileText, Lock, ShieldAlert, Clock,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { createServerClient } from "@/lib/supabase/server";
@@ -183,7 +183,7 @@ export default async function PopiaResultsPage({
 
         {/* Hero score card */}
         <SpotlightCard customSize className={`p-8 md:p-12 mb-12 border-t-4 ${borderClass}`}>
-          <div className="text-center mb-12">
+          <div className="text-center mb-8">
             <div className="relative inline-block mb-6">
               <div
                 className={`inline-flex h-40 w-40 items-center justify-center rounded-full bg-montana-surface border-4 ${borderClass} shadow-[0_0_40px_rgba(0,0,0,0.4)]`}
@@ -201,29 +201,33 @@ export default async function PopiaResultsPage({
               )}
             </div>
 
-            <h2 className="font-display text-7xl md:text-8xl font-bold text-white mb-2">{score}</h2>
-            <p className="text-xl text-white/40 mb-4">out of 20</p>
+            <div className="flex items-baseline justify-center gap-3 mb-4">
+              <span className="font-display text-8xl md:text-9xl font-bold text-white leading-none">{score}</span>
+              <span className="text-2xl text-white/40 font-light">/ 20</span>
+            </div>
 
-            <div className={`inline-flex items-center px-6 py-2 rounded-full ${bgClass} bg-opacity-10 border ${borderClass} mb-6`}>
+            <div className={`inline-flex items-center px-6 py-2 rounded-full ${bgClass} bg-opacity-10 border ${borderClass} mb-5`}>
               <Activity className={`h-4 w-4 mr-2 ${colorClass}`} />
               <span className={`font-bold uppercase tracking-widest text-sm ${colorClass}`}>{risk}</span>
             </div>
 
-            <p className="text-xl text-montana-muted max-w-2xl mx-auto leading-relaxed">{message}</p>
+            <p className="text-lg text-montana-muted max-w-2xl mx-auto leading-relaxed">{message}</p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 border-t border-white/10 pt-8">
-            <div className="text-center p-4 sm:border-r border-white/10">
-              <div className="text-4xl font-bold text-white mb-1">{compliant}</div>
-              <div className="text-xs text-montana-muted uppercase tracking-wider">Fully Compliant</div>
-            </div>
-            <div className="text-center p-4 sm:border-r border-white/10">
-              <div className="text-4xl font-bold text-white mb-1">{partial}</div>
-              <div className="text-xs text-montana-muted uppercase tracking-wider">Partial Controls</div>
-            </div>
-            <div className="text-center p-4">
-              <div className="text-4xl font-bold text-montana-pink mb-1">{critical}</div>
-              <div className="text-xs text-montana-muted uppercase tracking-wider">Critical Gaps</div>
+          <div className="rounded-lg bg-white/[0.03] border border-white/10">
+            <div className="grid grid-cols-1 sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-white/10">
+              <div className="text-center px-4 py-5">
+                <div className="text-4xl font-bold text-white mb-1">{compliant}</div>
+                <div className="text-xs text-montana-muted uppercase tracking-wider">Fully Compliant</div>
+              </div>
+              <div className="text-center px-4 py-5">
+                <div className="text-4xl font-bold text-white mb-1">{partial}</div>
+                <div className="text-xs text-montana-muted uppercase tracking-wider">Partial Controls</div>
+              </div>
+              <div className="text-center px-4 py-5">
+                <div className="text-4xl font-bold text-montana-pink mb-1">{critical}</div>
+                <div className="text-xs text-montana-muted uppercase tracking-wider">Critical Gaps</div>
+              </div>
             </div>
           </div>
         </SpotlightCard>
@@ -244,7 +248,7 @@ export default async function PopiaResultsPage({
                 const { Icon } = meta;
                 const cta = GAP_CTA[cat];
                 return (
-                  <GlassCard key={cat} className="flex flex-col gap-4">
+                  <GlassCard key={cat} className="flex flex-col gap-4 min-h-[200px]">
                     <div className="flex items-center gap-3">
                       <div className="flex h-10 w-10 items-center justify-center rounded-full bg-montana-pink/10 border border-montana-pink/20 shrink-0">
                         <Icon className="h-5 w-5 text-montana-pink" />
@@ -284,55 +288,55 @@ export default async function PopiaResultsPage({
             </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 pt-4">
             {recommendedServices.map((svc, idx) => {
               const isRecommended = idx === 0;
               const posUrl = `/pos?tab=consulting&services=${svc.code}`;
               return (
-                <SpotlightCard
-                  customSize
-                  key={svc.code}
-                  className={`p-8 flex flex-col relative min-h-[260px] ${
-                    isRecommended
-                      ? "border-montana-pink/50 shadow-2xl shadow-montana-pink/10 lg:-translate-y-4"
-                      : "hover:border-white/30 transition-colors"
-                  }`}
-                >
+                <div key={svc.code} className="flex flex-col">
                   {isRecommended && (
-                    <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-montana-pink text-white text-xs font-bold px-4 py-1.5 rounded-full tracking-wider">
-                      RECOMMENDED
+                    <div className="flex justify-center -mb-3 relative z-10">
+                      <span className="bg-montana-pink text-white text-xs font-bold px-4 py-1.5 rounded-full tracking-wider shadow-lg shadow-montana-pink/30">
+                        RECOMMENDED
+                      </span>
                     </div>
                   )}
-                  <h3 className="font-bold text-white text-lg mb-1">{svc.name}</h3>
-                  <p className="text-montana-muted text-sm mb-4 flex-1">{svc.description}</p>
-                  <div className="text-2xl font-bold text-white font-mono mb-1">
-                    R{svc.price.toLocaleString()}
-                    <span className="text-sm font-normal text-montana-muted ml-1">
-                      {svc.type === "recurring" ? "/mo" : "once-off"}
-                    </span>
-                  </div>
-                  <div className="text-xs text-montana-muted mb-6">{svc.duration}</div>
-                  <ul className="space-y-2 mb-8 text-sm text-white/80 flex-1">
-                    {svc.includes.map((item) => (
-                      <li key={item} className="flex items-start gap-2">
-                        <CheckCircle className="h-4 w-4 text-montana-pink shrink-0 mt-0.5" />
-                        {item}
-                      </li>
-                    ))}
-                  </ul>
-                  <Link href={posUrl}>
-                    <AnimatedButton variant={isRecommended ? "primary" : "outline"} className="w-full">
-                      {svc.code === "SE-PA002" ? "Book Assessment" : "Select Service"}
-                    </AnimatedButton>
-                  </Link>
-                </SpotlightCard>
+                  <SpotlightCard
+                    customSize
+                    className={`p-8 flex flex-col flex-1 ${
+                      isRecommended
+                        ? "border-montana-pink/50 shadow-2xl shadow-montana-pink/10 lg:-translate-y-2"
+                        : "hover:border-white/30 transition-colors"
+                    }`}
+                  >
+                    <h3 className="font-bold text-white text-lg mb-1">{svc.name}</h3>
+                    <p className="text-montana-muted text-sm mb-4 flex-1">{svc.description}</p>
+                    <div className="inline-flex items-center gap-1.5 text-xs text-montana-muted border border-white/10 px-3 py-1.5 mb-5 self-start">
+                      <Clock className="h-3.5 w-3.5 shrink-0" />
+                      {svc.duration}
+                    </div>
+                    <ul className="space-y-2 mb-6 text-sm text-white/80">
+                      {svc.includes.map((item) => (
+                        <li key={item} className="flex items-start gap-2">
+                          <CheckCircle className="h-4 w-4 text-montana-pink shrink-0 mt-0.5" />
+                          {item}
+                        </li>
+                      ))}
+                    </ul>
+                    <Link href={posUrl} className="mt-auto">
+                      <AnimatedButton variant={isRecommended ? "primary" : "outline"} className="w-full">
+                        {svc.code === "SE-PA002" ? "Book Assessment" : "Select Service"}
+                      </AnimatedButton>
+                    </Link>
+                  </SpotlightCard>
+                </div>
               );
             })}
           </div>
         </div>
 
         {/* Cross-assessment prompt */}
-        <div className="mb-12 border border-red-500/20 bg-red-500/5 p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div className="mb-12 border border-red-500/30 border-l-2 border-l-red-500/60 bg-red-500/[0.08] p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div className="flex items-start gap-4">
             <div className="flex h-10 w-10 items-center justify-center rounded-full bg-red-500/10 border border-red-500/20 shrink-0 mt-0.5">
               <ShieldAlert className="h-5 w-5 text-red-400" />
