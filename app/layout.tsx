@@ -55,7 +55,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {/* BACKGROUND LAYERS */}
         <div className="fixed inset-0 -z-50 overflow-hidden pointer-events-none">
           {/* 1. The Tech Grid */}
-          <div className="absolute inset-0 bg-grid-pattern opacity-30" />
+          <div className="absolute inset-0 bg-grid-pattern opacity-40" />
           
           {/* 2. The Branded Radial Glow */}
           <div className="absolute -top-[20%] left-1/2 -translate-x-1/2 w-[80%] h-[60%] bg-montana-magenta/15 blur-[120px] rounded-full" />

@@ -149,7 +149,7 @@ const tiers = [
 
 export default function PartnersPage() {
   return (
-    <div className="pt-24 pb-16 md:pb-24 bg-montana-bg min-h-screen">
+    <div className="pt-24 pb-16 md:pb-24 min-h-screen">
       <div className="mx-auto max-w-7xl px-6">
 
         {/* Hero */}

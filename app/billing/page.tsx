@@ -370,7 +370,7 @@ export default async function BillingPage({
   const totalProducts     = resolvedLines.length;
 
   return (
-    <div className="pt-24 pb-24 bg-montana-bg min-h-screen">
+    <div className="pt-24 pb-24 min-h-screen">
       <div className="mx-auto max-w-5xl px-6">
 
         {/* ── Header ─────────────────────────────────────────────────────── */}

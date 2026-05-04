@@ -95,7 +95,7 @@ export function Hero() {
   }
 
   return (
-    <section className="relative min-h-screen flex items-center justify-center pt-24 pb-12 overflow-hidden bg-montana-bg">
+    <section className="relative min-h-screen flex items-center justify-center pt-24 pb-12 overflow-hidden">
       {/* Geometric Background / Subtle Linework */}
       <div className="absolute inset-0 -z-10 bg-[linear-gradient(to_right,#ffffff05_1px,transparent_1px),linear-gradient(to_bottom,#ffffff05_1px,transparent_1px)] bg-[size:40px_40px]" />
       <div className="absolute left-0 right-0 top-0 -z-10 m-auto h-[500px] w-[500px] rounded-full bg-montana-magenta opacity-10 blur-[120px]" />

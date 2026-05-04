@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 
 export default function AboutPage() {
   return (
-    <div className="pt-24 pb-12 bg-montana-bg min-h-screen">
+    <div className="pt-24 pb-12 min-h-screen">
       <div className="mx-auto max-w-7xl px-6">
 
         {/* Hero Section */}

@@ -115,7 +115,7 @@ export default async function SecurityResultsPage({
   const rankedServices = rankSecurityServicesByGaps(allGaps);
 
   return (
-    <div className="pt-24 pb-24 bg-montana-bg min-h-screen">
+    <div className="pt-24 pb-24 min-h-screen">
       <div className="mx-auto max-w-7xl px-6">
 
         {/* Page header */}

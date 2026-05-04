@@ -44,7 +44,7 @@ function ListItem({ children }: { children: React.ReactNode }) {
 
 export default function PrivacyPage() {
   return (
-    <div className="pt-24 pb-24 bg-montana-bg min-h-screen">
+    <div className="pt-24 pb-24 min-h-screen">
       <div className="mx-auto max-w-4xl px-6">
 
         {/* Header */}

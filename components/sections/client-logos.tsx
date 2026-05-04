@@ -19,7 +19,7 @@ const logos = [
 
 export function ClientLogos() {
   return (
-    <section className="py-16 md:py-24 border-b border-white/5 bg-montana-bg overflow-hidden">
+    <section className="py-16 md:py-24 border-b border-white/5 overflow-hidden">
       <div className="mx-auto max-w-7xl px-6 mb-10 md:mb-16 text-center">
         <h2 className="font-display text-2xl md:text-3xl font-bold text-white mb-4">
           Trusted by organisations that can&apos;t afford failure

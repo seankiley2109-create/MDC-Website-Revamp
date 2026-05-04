@@ -203,7 +203,7 @@ function ContactFormInner() {
   };
 
   return (
-    <div className="pt-24 pb-16 md:pb-24 bg-montana-bg min-h-screen">
+    <div className="pt-24 pb-16 md:pb-24 min-h-screen">
       <div className="mx-auto max-w-7xl px-6">
 
         {/* Hero */}
@@ -560,7 +560,7 @@ function ContactFormInner() {
 
 export default function ContactPage() {
   return (
-    <Suspense fallback={<div className="pt-24 pb-16 bg-montana-bg min-h-screen" />}>
+    <Suspense fallback={<div className="pt-24 pb-16 min-h-screen" />}>
       <ContactFormInner />
     </Suspense>
   );

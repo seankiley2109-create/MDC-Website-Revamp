@@ -382,7 +382,7 @@ export default function PopiaAssessment() {
   if (riskPercentage > 60) riskColor = "bg-red-500";
 
   return (
-    <div className="pt-24 pb-24 bg-montana-bg min-h-screen">
+    <div className="pt-24 pb-24 min-h-screen">
       <div className="mx-auto max-w-7xl px-6">
         <div className="mb-12 text-center">
           <div className="inline-flex items-center border border-white/10 bg-montana-surface/80 backdrop-blur-sm px-4 py-1.5 text-xs font-bold tracking-widest text-montana-muted uppercase mb-6">

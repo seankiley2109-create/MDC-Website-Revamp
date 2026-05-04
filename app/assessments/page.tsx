@@ -45,7 +45,7 @@ export default async function AssessmentsPage() {
   };
 
   return (
-    <div className="pt-24 pb-24 bg-montana-bg min-h-screen">
+    <div className="pt-24 pb-24 min-h-screen">
       <div className="mx-auto max-w-7xl px-6">
 
         {/* Hero */}

@@ -169,7 +169,7 @@ export default function ResourcesPage() {
       <a ref={directDownloadRef} href="#" className="hidden" aria-hidden="true" />
       <a ref={viewAnchorRef} href="#" target="_blank" rel="noopener noreferrer" className="hidden" aria-hidden="true" />
 
-      <div className="pt-24 pb-24 bg-montana-bg min-h-screen">
+      <div className="pt-24 pb-24 min-h-screen">
         <div className="mx-auto max-w-7xl px-6">
 
           {/* Hero */}

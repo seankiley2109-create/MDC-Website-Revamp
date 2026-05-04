@@ -315,7 +315,7 @@ export default async function PortalPage() {
   const displayCompany = profile.company_name ?? '';
 
   return (
-    <main className="min-h-screen bg-montana-bg pt-24 pb-20">
+    <main className="min-h-screen pt-24 pb-20">
       <div className="mx-auto max-w-6xl px-6">
 
         {/* ── 1. Greeting ───────────────────────────────────────────────────── */}

@@ -1257,7 +1257,7 @@ function POSForm() {
 
 export default function POSPage() {
   return (
-    <div className="pt-24 pb-32 bg-montana-bg min-h-screen">
+    <div className="pt-24 pb-32 min-h-screen">
       <div className="mx-auto max-w-7xl px-6">
 
         <div className="mb-10 max-w-3xl">

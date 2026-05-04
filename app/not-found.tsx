@@ -13,7 +13,7 @@ const quickLinks = [
 
 export default function NotFound() {
   return (
-    <div className="min-h-screen bg-montana-bg flex items-center justify-center px-6 pt-24 pb-24">
+    <div className="min-h-screen flex items-center justify-center px-6 pt-24 pb-24">
       <div className="max-w-2xl w-full text-center">
 
         {/* 404 display */}
