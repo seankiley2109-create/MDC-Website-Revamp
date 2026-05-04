@@ -163,9 +163,11 @@ async function handleChargeSuccess(data: ChargeSuccessData): Promise<void> {
             orderNotes:   row.order_notes,
             cart:         row.cart ?? [],
           });
-          if (onboardingResult.success && !onboardingResult.skipped) {
+          if (onboardingResult.skipped) {
+            console.warn('[webhook] Technical onboarding skipped — MONDAY_SUPPORT_BOARD_ID not set');
+          } else if (onboardingResult.success) {
             console.log('[webhook] Technical onboarding item created:', onboardingResult.itemId);
-          } else if (!onboardingResult.skipped) {
+          } else {
             console.error('[webhook] Technical onboarding item failed:', onboardingResult.error);
           }
         } catch (err) {
