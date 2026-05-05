@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
+import Image from "next/image";
 import type { CartLineItem } from "@/app/api/subscribe/route";
 import Link from "next/link";
 import { SpotlightCard } from "@/components/ui/spotlight-card";
@@ -70,6 +71,7 @@ const CLOUD_SERVICES: {
   tagline:     string;
   description: string;
   unitLabel:   string;
+  imageSrc:    string | null;
 }[] = [
   {
     id:          "druva-m365",
@@ -78,6 +80,7 @@ const CLOUD_SERVICES: {
     tagline:     "SaaS Backup",
     description: "Cloud backup for M365 Exchange, SharePoint, Teams, OneDrive, and Google Workspace. 3× copies stored in South Africa.",
     unitLabel:   "users",
+    imageSrc:    "/products/Druva-Microsoft-365-01-xlg.png",
   },
   {
     id:          "druva-endpoint",
@@ -86,6 +89,7 @@ const CLOUD_SERVICES: {
     tagline:     "Laptop & Desktop Backup",
     description: "Secure cloud backup for laptops and desktops with fast file and full-system recovery. 3× copies stored in South Africa.",
     unitLabel:   "endpoints",
+    imageSrc:    "/products/Druva-End-Points-01-xlg.png",
   },
   {
     id:          "druva-server",
@@ -94,6 +98,7 @@ const CLOUD_SERVICES: {
     tagline:     "Server Backup",
     description: "Cloud-native backup for hybrid server environments using Druva Phoenix Enterprise Edition. 3× copies in South Africa.",
     unitLabel:   "server",
+    imageSrc:    "/products/Druva-Phoenix-Enterprise-01-xlg.png",
   },
   {
     id:          "maas360",
@@ -102,6 +107,7 @@ const CLOUD_SERVICES: {
     tagline:     "Device Management",
     description: "Unified endpoint management and threat defense. Secure corporate data across all mobile devices, tablets, and BYOD environments.",
     unitLabel:   "devices",
+    imageSrc:    "/products/maas360-logo.png",
   },
 ];
 
@@ -171,6 +177,8 @@ function ServiceConfigCard({
   service,
   config,
   inCart,
+  isExpanded,
+  onToggle,
   isFocused,
   onFocusConsumed,
   userEmails,
@@ -182,6 +190,8 @@ function ServiceConfigCard({
   service:             typeof CLOUD_SERVICES[number];
   config:              ServiceConfig;
   inCart:              boolean;
+  isExpanded:          boolean;
+  onToggle:            () => void;
   isFocused?:          boolean;
   onFocusConsumed?:    () => void;
   userEmails:          string;
@@ -230,7 +240,6 @@ function ServiceConfigCard({
     onAddToCart(service.id);
   };
 
-  // Annual saving vs paying monthly × 12
   const monthlyPlanId = planId.replace("-annual", "-monthly");
   const annualSaving  = config.billingPeriod === "annual"
     ? getAnnualSaving(service.id, monthlyPlanId)
@@ -245,320 +254,374 @@ function ServiceConfigCard({
           {toastMsg}
         </div>
       )}
-    <SpotlightCard customSize className={`transition-all ${inCart ? "border-montana-pink/40 bg-montana-magenta/5" : ""} ${isFocused && !inCart ? "border-white/40 ring-1 ring-white/20" : ""}`}>
-      {/* Header */}
-      <div className="flex items-start justify-between gap-4 mb-5">
-        <div className="flex items-center gap-3">
-          <div className={`inline-flex h-10 w-10 items-center justify-center rounded-sm border ${inCart ? "bg-montana-pink/20 border-montana-pink/40" : "bg-montana-surface border-white/10"}`}>
+      <SpotlightCard customSize className={`transition-all duration-200 ${inCart ? "border-montana-pink/40 bg-montana-magenta/5" : ""} ${isFocused && !inCart ? "border-white/40 ring-1 ring-white/20" : ""}`}>
+
+        {/* ── Collapsed Header (always visible) ── */}
+        <button
+          type="button"
+          onClick={onToggle}
+          className="w-full flex items-center gap-3 sm:gap-4 text-left group"
+        >
+          {/* Icon */}
+          <div className={`shrink-0 inline-flex h-10 w-10 items-center justify-center rounded-sm border transition-colors ${
+            inCart
+              ? "bg-montana-pink/20 border-montana-pink/40"
+              : "bg-montana-surface border-white/10 group-hover:border-white/20"
+          }`}>
             <Icon className={`h-5 w-5 ${inCart ? "text-montana-pink" : "text-white/70"}`} />
           </div>
-          <div>
-            <div className="text-xs font-bold tracking-widest text-montana-muted uppercase mb-0.5">{service.tagline}</div>
-            <h3 className="font-display font-bold text-white text-lg leading-tight">{service.name}</h3>
-          </div>
-        </div>
-        {inCart && (
-          <button
-            type="button"
-            onClick={() => onRemoveFromCart(service.id)}
-            className="text-montana-muted hover:text-white transition-colors mt-1 shrink-0"
-            title="Remove from cart"
-          >
-            <X className="h-4 w-4" />
-          </button>
-        )}
-      </div>
 
-      <p className="text-sm text-montana-muted mb-5 leading-relaxed">{service.description}</p>
-
-      {/* M365 / Google Workspace licence prerequisite notice */}
-      {service.id === "druva-m365" && (
-        <div className="mb-5 border border-blue-400/20 bg-blue-400/5 rounded-sm p-4 space-y-3">
-          <div className="flex items-start gap-2.5">
-            <Info className="h-4 w-4 text-blue-400 mt-0.5 shrink-0" />
-            <div>
-              <p className="text-xs font-bold text-blue-300 mb-1 uppercase tracking-wider">Licence Prerequisite</p>
-              <p className="text-xs text-blue-200/70 leading-relaxed">
-                This service requires an active <span className="text-white font-semibold">Microsoft 365 Business</span> or <span className="text-white font-semibold">Google Workspace Business</span> licence for each user being backed up. Your existing licences are used — no additional Microsoft or Google subscription is included.
-              </p>
-            </div>
-          </div>
-          <div className="ml-6.5 border-t border-blue-400/10 pt-3 flex items-center justify-between gap-3 flex-wrap">
-            <p className="text-xs text-blue-200/60">
-              Don&apos;t have a business licence yet? We can procure and set one up for you.
-            </p>
-            <Link
-              href="/contact?service=m365-licensing&ref=pos"
-              className="shrink-0 inline-flex items-center gap-1.5 text-xs font-bold text-blue-300 hover:text-white hover-interactive"
-            >
-              Get help with licensing <ArrowRight className="h-3 w-3" />
-            </Link>
-          </div>
-        </div>
-      )}
-
-      {/* Storage Tier */}
-      {dims.storageTiers && (
-        <div className="mb-4">
-          <div className="text-xs font-bold tracking-wider text-white/50 uppercase mb-2">Storage per {isServer ? "server" : service.unitLabel.slice(0, -1)}</div>
-          <div className="flex flex-wrap gap-2">
-            {dims.storageTiers.map(tier => (
-              <button
-                key={tier}
-                type="button"
-                onClick={() => onConfigChange(service.id, { storageTier: tier })}
-                className={`px-3 py-1.5 text-xs font-bold border transition-colors ${
-                  config.storageTier === tier
-                    ? "border-montana-pink bg-montana-pink/20 text-white"
-                    : "border-white/10 text-montana-muted hover:border-white/30 hover:text-white"
-                }`}
-              >
-                {tier}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Protection Level */}
-      {dims.protectionLevels && (
-        <div className="mb-4">
-          <div className="text-xs font-bold tracking-wider text-white/50 uppercase mb-2">Protection Level</div>
-          <div className="grid grid-cols-2 gap-2">
-            {dims.protectionLevels.map(level => {
-              const testPlanId = composePlanId(service.id, { ...config, protectionLevel: level });
-              const testEntry  = getProductEntry(service.id, testPlanId);
-              return (
-                <button
-                  key={level}
-                  type="button"
-                  onClick={() => onConfigChange(service.id, { protectionLevel: level })}
-                  className={`text-left px-3 py-2 border text-xs transition-colors ${
-                    config.protectionLevel === level
-                      ? "border-montana-pink bg-montana-pink/10 text-white"
-                      : "border-white/10 text-montana-muted hover:border-white/30"
-                  }`}
-                >
-                  <div className="font-bold capitalize mb-0.5">{level}</div>
-                  <div className="text-montana-muted text-[10px]">
-                    {level === "standard" ? "Backup + 3× SA copies" : "+ Ransomware Detection & Recovery"}
-                  </div>
-                  {testEntry && (
-                    <div className={`font-mono mt-1 ${config.protectionLevel === level ? "text-montana-pink" : "text-white/40"}`}>
-                      {formatZAR(testEntry.unitPrice)}/{config.billingPeriod === "annual" ? "yr" : "mo"}
-                    </div>
-                  )}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-      )}
-
-      {/* Billing Period */}
-      {dims.billingPeriods.length > 1 && (
-        <div className="mb-4">
-          <div className="text-xs font-bold tracking-wider text-white/50 uppercase mb-2">Billing</div>
-          <div className="flex gap-2">
-            {dims.billingPeriods.map(period => {
-              const testPlanId = composePlanId(service.id, { ...config, billingPeriod: period });
-              const testEntry  = getProductEntry(service.id, testPlanId);
-              const saving     = period === "annual" ? getAnnualSaving(service.id, composePlanId(service.id, { ...config, billingPeriod: "monthly" })) : 0;
-              return (
-                <button
-                  key={period}
-                  type="button"
-                  onClick={() => onConfigChange(service.id, { billingPeriod: period })}
-                  className={`flex-1 text-left px-3 py-2 border text-xs transition-colors ${
-                    config.billingPeriod === period
-                      ? "border-montana-pink bg-montana-pink/10 text-white"
-                      : "border-white/10 text-montana-muted hover:border-white/30"
-                  }`}
-                >
-                  <div className="font-bold capitalize">{period === "annual" ? "Annual (12-month)" : "Month-to-Month"}</div>
-                  {testEntry && (
-                    <div className={`font-mono text-[10px] mt-0.5 ${config.billingPeriod === period ? "text-montana-pink" : "text-white/40"}`}>
-                      {formatZAR(testEntry.unitPrice)}/{period === "annual" ? "yr" : "mo"}
-                    </div>
-                  )}
-                  {saving > 0 && period === "annual" && (
-                    <div className="text-[10px] text-emerald-400 mt-0.5">Save {formatZAR(saving * (isServer ? 1 : config.quantity))}</div>
-                  )}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-      )}
-
-      {/* Quantity */}
-      {!isServer && entry && (
-        <div className="mb-5">
-          <div className="text-xs font-bold tracking-wider text-white/50 uppercase mb-2">
-            Number of {service.unitLabel}
-          </div>
-          <div className="flex items-center gap-3">
-            <button
-              type="button"
-              onClick={() => { quantityTouched.current = true; setPendingSync(null); onConfigChange(service.id, { quantity: Math.max(1, config.quantity - 1) }); }}
-              className="h-8 w-8 flex items-center justify-center border border-white/10 text-white/70 hover:border-white/30 hover:text-white transition-colors"
-            >
-              <Minus className="h-3 w-3" />
-            </button>
-            <input
-              type="number"
-              min="1"
-              value={config.quantity}
-              onChange={e => { quantityTouched.current = true; setPendingSync(null); onConfigChange(service.id, { quantity: Math.max(1, parseInt(e.target.value) || 1) }); }}
-              className="w-20 text-center border border-white/10 bg-montana-surface/50 py-1.5 text-white text-sm focus:border-montana-pink focus:outline-none"
-            />
-            <button
-              type="button"
-              onClick={() => { quantityTouched.current = true; setPendingSync(null); onConfigChange(service.id, { quantity: config.quantity + 1 }); }}
-              className="h-8 w-8 flex items-center justify-center border border-white/10 text-white/70 hover:border-white/30 hover:text-white transition-colors"
-            >
-              <Plus className="h-3 w-3" />
-            </button>
-            <span className="text-xs text-montana-muted">{service.unitLabel}</span>
-          </div>
-        </div>
-      )}
-
-      {/* User Email Capture — M365 / endpoint only */}
-      {needsEmails && (
-        <div className="mb-5">
-          <div className="text-xs font-bold tracking-wider text-white/50 uppercase mb-1 flex items-center gap-1.5">
-            {service.id === "druva-m365" ? "M365 / Google Workspace User Emails" : "Endpoint User Emails"}
-            <span className="text-red-400">*</span>
-          </div>
-          <p className="text-xs text-montana-muted mb-2">
-            Paste the email addresses of the users to be protected, one per line or comma-separated. Required for provisioning.
-          </p>
-          <textarea
-            rows={4}
-            value={userEmails}
-            onChange={e => {
-              onUserEmailsChange(service.id, e.target.value);
-              if (emailError) setEmailError(null);
-              if (pendingSync) setPendingSync(null);
-            }}
-            onBlur={e => {
-              const emails = e.target.value.split(/[\n,;]+/).map(s => s.trim()).filter(s => s.includes('@'));
-              if (emails.length > 0 && emails.length !== config.quantity) {
-                if (quantityTouched.current && config.quantity > 1) {
-                  setPendingSync({ emailCount: emails.length, currentQty: config.quantity });
-                } else {
-                  onConfigChange(service.id, { quantity: emails.length });
-                  quantityTouched.current = false;
-                  showToast(`Quantity updated to match ${emails.length} email address${emails.length !== 1 ? 'es' : ''}`);
-                }
-              }
-            }}
-            placeholder={"user@company.com\nuser2@company.com"}
-            className={`w-full border bg-montana-surface/50 px-3 py-2 text-xs text-white placeholder:text-white/20 focus:outline-none resize-none font-mono ${
-              emailError ? "border-red-400/60 focus:border-red-400" : "border-white/10 focus:border-montana-pink"
-            }`}
-          />
-          {emailError && (
-            <p className="text-xs text-red-400 mt-1.5 flex items-center gap-1">
-              <AlertCircle className="h-3 w-3 shrink-0" />
-              {emailError}
-            </p>
-          )}
-          {pendingSync && (
-            <div className="mt-1.5 border border-montana-orange/40 bg-montana-orange/5 px-3 py-2 flex items-center gap-2 flex-wrap">
-              <p className="text-xs text-montana-orange flex-1 min-w-0">
-                You entered {pendingSync.emailCount} email{pendingSync.emailCount !== 1 ? 's' : ''} but quantity is {pendingSync.currentQty}. Update to {pendingSync.emailCount}?
-              </p>
-              <div className="flex gap-2 shrink-0">
-                <button
-                  type="button"
-                  onClick={() => {
-                    onConfigChange(service.id, { quantity: pendingSync.emailCount });
-                    quantityTouched.current = false;
-                    showToast(`Quantity updated to match ${pendingSync.emailCount} email address${pendingSync.emailCount !== 1 ? 'es' : ''}`);
-                    setPendingSync(null);
-                  }}
-                  className="text-[10px] font-bold border border-montana-orange/40 text-montana-orange hover:bg-montana-orange/10 px-2 py-1 transition-colors whitespace-nowrap"
-                >
-                  Update to {pendingSync.emailCount}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setPendingSync(null)}
-                  className="text-[10px] font-bold border border-white/20 text-white/50 hover:text-white px-2 py-1 transition-colors"
-                >
-                  Keep {pendingSync.currentQty}
-                </button>
-              </div>
-            </div>
-          )}
-          {countMismatch && !emailError && !pendingSync && (
-            <div className="mt-1.5 flex flex-wrap items-start gap-2">
-              <p className="text-xs text-montana-orange flex-1 min-w-0">
-                {parsedEmails.length} email{parsedEmails.length !== 1 ? "s" : ""} entered — you configured {config.quantity} {service.unitLabel}. Adjust the quantity or add the remaining emails.
-              </p>
-              <button
-                type="button"
-                onClick={() => {
-                  onConfigChange(service.id, { quantity: parsedEmails.length });
-                  showToast(`Quantity updated to match ${parsedEmails.length} email address${parsedEmails.length !== 1 ? 'es' : ''}`);
-                }}
-                className="shrink-0 text-[10px] font-bold border border-montana-orange/40 text-montana-orange hover:bg-montana-orange/10 px-2 py-1 transition-colors whitespace-nowrap"
-              >
-                Match quantity to email count ({parsedEmails.length})
-              </button>
-            </div>
-          )}
-          {countMatch && (
-            <p className="text-xs text-emerald-400 mt-1.5">
-              ✓ {parsedEmails.length} email{parsedEmails.length !== 1 ? "s" : ""} match the configured quantity.
-            </p>
-          )}
-        </div>
-      )}
-
-      {/* Price + Add to Cart */}
-      {valid && entry && (
-        <div className="border-t border-white/10 pt-4 flex items-center justify-between gap-4">
-          <div>
-            <div className="text-xs text-montana-muted">
-              {isServer ? "Flat rate" : `${formatZAR(unitPrice)} × ${config.quantity} ${service.unitLabel}`}
-            </div>
-            <div className="text-xl font-bold text-white font-mono">
-              {formatZAR(lineTotal)}
-              <span className="text-xs font-normal text-montana-muted ml-1">
-                /{config.billingPeriod === "annual" ? "yr" : "mo"} ex VAT
-              </span>
-            </div>
-            {annualSaving > 0 && (
-              <div className="text-xs text-emerald-400">
-                Saving {formatZAR(annualSaving * (isServer ? 1 : config.quantity))} vs monthly
+          {/* Text */}
+          <div className="flex-1 min-w-0">
+            <div className="text-[10px] font-bold tracking-widest text-montana-muted uppercase mb-0.5 truncate">{service.tagline}</div>
+            <h3 className="font-display font-bold text-white text-base leading-tight truncate">{service.name}</h3>
+            {inCart && (
+              <div className="flex items-center gap-1 mt-0.5">
+                <CheckCircle2 className="h-3 w-3 text-emerald-400 shrink-0" />
+                <span className="text-[10px] font-bold text-emerald-400">In cart</span>
               </div>
             )}
           </div>
-          {inCart ? (
-            <div className="flex items-center gap-2 text-xs text-emerald-400 font-bold">
-              <CheckCircle2 className="h-4 w-4" />
-              In cart
-            </div>
-          ) : (
-            <AnimatedButton
-              variant="outline"
-              onClick={handleAddToCart}
-              className="shrink-0 text-sm py-2 px-4"
-            >
-              Add to Cart
-            </AnimatedButton>
-          )}
-        </div>
-      )}
-      {!valid && (
-        <div className="border-t border-white/10 pt-4 text-xs text-montana-muted">
-          Select options above to see pricing.
-        </div>
-      )}
-    </SpotlightCard>
+
+          {/* Product image */}
+          <div className="relative hidden sm:flex shrink-0 w-32 h-[4.5rem] overflow-hidden border border-white/5 bg-montana-surface/40 items-center justify-center">
+            {service.imageSrc ? (
+              <Image
+                src={service.imageSrc}
+                alt={service.name}
+                fill
+                className="object-contain p-1.5"
+                sizes="128px"
+              />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-slate-800 via-purple-950/60 to-slate-900">
+                <Icon className="h-7 w-7 text-purple-400/50" />
+              </div>
+            )}
+          </div>
+
+          {/* Price */}
+          <div className="shrink-0 text-right min-w-[4.5rem]">
+            {valid ? (
+              <>
+                <div className="text-[9px] font-bold tracking-widest text-montana-muted uppercase">from</div>
+                <div className="font-mono font-bold text-white text-sm leading-tight">{formatZAR(unitPrice)}</div>
+                <div className="text-[9px] text-montana-muted">/{config.billingPeriod === "annual" ? "yr" : "mo"}</div>
+              </>
+            ) : (
+              <div className="text-xs text-montana-muted">Configure</div>
+            )}
+          </div>
+
+          {/* Chevron */}
+          <ChevronDown className={`h-4 w-4 text-montana-muted shrink-0 transition-transform duration-200 ${isExpanded ? "rotate-180" : ""}`} />
+        </button>
+
+        {/* ── Expanded Config Content ── */}
+        {isExpanded && (
+          <div className="mt-5 pt-5 border-t border-white/10">
+            <p className="text-sm text-montana-muted mb-5 leading-relaxed">{service.description}</p>
+
+            {/* M365 licence prerequisite notice */}
+            {service.id === "druva-m365" && (
+              <div className="mb-5 border border-blue-400/20 bg-blue-400/5 rounded-sm p-4 space-y-3">
+                <div className="flex items-start gap-2.5">
+                  <Info className="h-4 w-4 text-blue-400 mt-0.5 shrink-0" />
+                  <div>
+                    <p className="text-xs font-bold text-blue-300 mb-1 uppercase tracking-wider">Licence Prerequisite</p>
+                    <p className="text-xs text-blue-200/70 leading-relaxed">
+                      This service requires an active <span className="text-white font-semibold">Microsoft 365 Business</span> or <span className="text-white font-semibold">Google Workspace Business</span> licence for each user being backed up. Your existing licences are used — no additional Microsoft or Google subscription is included.
+                    </p>
+                  </div>
+                </div>
+                <div className="ml-6.5 border-t border-blue-400/10 pt-3 flex items-center justify-between gap-3 flex-wrap">
+                  <p className="text-xs text-blue-200/60">
+                    Don&apos;t have a business licence yet? We can procure and set one up for you.
+                  </p>
+                  <Link
+                    href="/contact?service=m365-licensing&ref=pos"
+                    className="shrink-0 inline-flex items-center gap-1.5 text-xs font-bold text-blue-300 hover:text-white hover-interactive"
+                  >
+                    Get help with licensing <ArrowRight className="h-3 w-3" />
+                  </Link>
+                </div>
+              </div>
+            )}
+
+            {/* Storage Tier */}
+            {dims.storageTiers && (
+              <div className="mb-4">
+                <div className="text-xs font-bold tracking-wider text-white/50 uppercase mb-2">Storage per {isServer ? "server" : service.unitLabel.slice(0, -1)}</div>
+                <div className="flex flex-wrap gap-2">
+                  {dims.storageTiers.map(tier => (
+                    <button
+                      key={tier}
+                      type="button"
+                      onClick={() => onConfigChange(service.id, { storageTier: tier })}
+                      className={`px-3 py-1.5 text-xs font-bold border transition-colors ${
+                        config.storageTier === tier
+                          ? "border-montana-pink bg-montana-pink/20 text-white"
+                          : "border-white/10 text-montana-muted hover:border-white/30 hover:text-white"
+                      }`}
+                    >
+                      {tier}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Protection Level */}
+            {dims.protectionLevels && (
+              <div className="mb-4">
+                <div className="text-xs font-bold tracking-wider text-white/50 uppercase mb-2">Protection Level</div>
+                <div className="grid grid-cols-2 gap-2">
+                  {dims.protectionLevels.map(level => {
+                    const testPlanId = composePlanId(service.id, { ...config, protectionLevel: level });
+                    const testEntry  = getProductEntry(service.id, testPlanId);
+                    return (
+                      <button
+                        key={level}
+                        type="button"
+                        onClick={() => onConfigChange(service.id, { protectionLevel: level })}
+                        className={`text-left px-3 py-2 border text-xs transition-colors ${
+                          config.protectionLevel === level
+                            ? "border-montana-pink bg-montana-pink/10 text-white"
+                            : "border-white/10 text-montana-muted hover:border-white/30"
+                        }`}
+                      >
+                        <div className="font-bold capitalize mb-0.5">{level}</div>
+                        <div className="text-montana-muted text-[10px]">
+                          {level === "standard" ? "Backup + 3× SA copies" : "+ Ransomware Detection & Recovery"}
+                        </div>
+                        {testEntry && (
+                          <div className={`font-mono mt-1 ${config.protectionLevel === level ? "text-montana-pink" : "text-white/40"}`}>
+                            {formatZAR(testEntry.unitPrice)}/{config.billingPeriod === "annual" ? "yr" : "mo"}
+                          </div>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* Billing Period */}
+            {dims.billingPeriods.length > 1 && (
+              <div className="mb-4">
+                <div className="text-xs font-bold tracking-wider text-white/50 uppercase mb-2">Billing</div>
+                <div className="flex gap-2">
+                  {dims.billingPeriods.map(period => {
+                    const testPlanId = composePlanId(service.id, { ...config, billingPeriod: period });
+                    const testEntry  = getProductEntry(service.id, testPlanId);
+                    const saving     = period === "annual" ? getAnnualSaving(service.id, composePlanId(service.id, { ...config, billingPeriod: "monthly" })) : 0;
+                    return (
+                      <button
+                        key={period}
+                        type="button"
+                        onClick={() => onConfigChange(service.id, { billingPeriod: period })}
+                        className={`flex-1 text-left px-3 py-2 border text-xs transition-colors ${
+                          config.billingPeriod === period
+                            ? "border-montana-pink bg-montana-pink/10 text-white"
+                            : "border-white/10 text-montana-muted hover:border-white/30"
+                        }`}
+                      >
+                        <div className="font-bold capitalize">{period === "annual" ? "Annual (12-month)" : "Month-to-Month"}</div>
+                        {testEntry && (
+                          <div className={`font-mono text-[10px] mt-0.5 ${config.billingPeriod === period ? "text-montana-pink" : "text-white/40"}`}>
+                            {formatZAR(testEntry.unitPrice)}/{period === "annual" ? "yr" : "mo"}
+                          </div>
+                        )}
+                        {saving > 0 && period === "annual" && (
+                          <div className="text-[10px] text-emerald-400 mt-0.5">Save {formatZAR(saving * (isServer ? 1 : config.quantity))}</div>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* Quantity */}
+            {!isServer && entry && (
+              <div className="mb-5">
+                <div className="text-xs font-bold tracking-wider text-white/50 uppercase mb-2">
+                  Number of {service.unitLabel}
+                </div>
+                <div className="flex items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={() => { quantityTouched.current = true; setPendingSync(null); onConfigChange(service.id, { quantity: Math.max(1, config.quantity - 1) }); }}
+                    className="h-8 w-8 flex items-center justify-center border border-white/10 text-white/70 hover:border-white/30 hover:text-white transition-colors"
+                  >
+                    <Minus className="h-3 w-3" />
+                  </button>
+                  <input
+                    type="number"
+                    min="1"
+                    value={config.quantity}
+                    onChange={e => { quantityTouched.current = true; setPendingSync(null); onConfigChange(service.id, { quantity: Math.max(1, parseInt(e.target.value) || 1) }); }}
+                    className="w-20 text-center border border-white/10 bg-montana-surface/50 py-1.5 text-white text-sm focus:border-montana-pink focus:outline-none"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => { quantityTouched.current = true; setPendingSync(null); onConfigChange(service.id, { quantity: config.quantity + 1 }); }}
+                    className="h-8 w-8 flex items-center justify-center border border-white/10 text-white/70 hover:border-white/30 hover:text-white transition-colors"
+                  >
+                    <Plus className="h-3 w-3" />
+                  </button>
+                  <span className="text-xs text-montana-muted">{service.unitLabel}</span>
+                </div>
+              </div>
+            )}
+
+            {/* User Email Capture */}
+            {needsEmails && (
+              <div className="mb-5">
+                <div className="text-xs font-bold tracking-wider text-white/50 uppercase mb-1 flex items-center gap-1.5">
+                  {service.id === "druva-m365" ? "M365 / Google Workspace User Emails" : "Endpoint User Emails"}
+                  <span className="text-red-400">*</span>
+                </div>
+                <p className="text-xs text-montana-muted mb-2">
+                  Paste the email addresses of the users to be protected, one per line or comma-separated. Required for provisioning.
+                </p>
+                <textarea
+                  rows={4}
+                  value={userEmails}
+                  onChange={e => {
+                    onUserEmailsChange(service.id, e.target.value);
+                    if (emailError) setEmailError(null);
+                    if (pendingSync) setPendingSync(null);
+                  }}
+                  onBlur={e => {
+                    const emails = e.target.value.split(/[\n,;]+/).map(s => s.trim()).filter(s => s.includes('@'));
+                    if (emails.length > 0 && emails.length !== config.quantity) {
+                      if (quantityTouched.current && config.quantity > 1) {
+                        setPendingSync({ emailCount: emails.length, currentQty: config.quantity });
+                      } else {
+                        onConfigChange(service.id, { quantity: emails.length });
+                        quantityTouched.current = false;
+                        showToast(`Quantity updated to match ${emails.length} email address${emails.length !== 1 ? 'es' : ''}`);
+                      }
+                    }
+                  }}
+                  placeholder={"user@company.com\nuser2@company.com"}
+                  className={`w-full border bg-montana-surface/50 px-3 py-2 text-xs text-white placeholder:text-white/20 focus:outline-none resize-none font-mono ${
+                    emailError ? "border-red-400/60 focus:border-red-400" : "border-white/10 focus:border-montana-pink"
+                  }`}
+                />
+                {emailError && (
+                  <p className="text-xs text-red-400 mt-1.5 flex items-center gap-1">
+                    <AlertCircle className="h-3 w-3 shrink-0" />
+                    {emailError}
+                  </p>
+                )}
+                {pendingSync && (
+                  <div className="mt-1.5 border border-montana-orange/40 bg-montana-orange/5 px-3 py-2 flex items-center gap-2 flex-wrap">
+                    <p className="text-xs text-montana-orange flex-1 min-w-0">
+                      You entered {pendingSync.emailCount} email{pendingSync.emailCount !== 1 ? 's' : ''} but quantity is {pendingSync.currentQty}. Update to {pendingSync.emailCount}?
+                    </p>
+                    <div className="flex gap-2 shrink-0">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          onConfigChange(service.id, { quantity: pendingSync.emailCount });
+                          quantityTouched.current = false;
+                          showToast(`Quantity updated to match ${pendingSync.emailCount} email address${pendingSync.emailCount !== 1 ? 'es' : ''}`);
+                          setPendingSync(null);
+                        }}
+                        className="text-[10px] font-bold border border-montana-orange/40 text-montana-orange hover:bg-montana-orange/10 px-2 py-1 transition-colors whitespace-nowrap"
+                      >
+                        Update to {pendingSync.emailCount}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setPendingSync(null)}
+                        className="text-[10px] font-bold border border-white/20 text-white/50 hover:text-white px-2 py-1 transition-colors"
+                      >
+                        Keep {pendingSync.currentQty}
+                      </button>
+                    </div>
+                  </div>
+                )}
+                {countMismatch && !emailError && !pendingSync && (
+                  <div className="mt-1.5 flex flex-wrap items-start gap-2">
+                    <p className="text-xs text-montana-orange flex-1 min-w-0">
+                      {parsedEmails.length} email{parsedEmails.length !== 1 ? "s" : ""} entered — you configured {config.quantity} {service.unitLabel}. Adjust the quantity or add the remaining emails.
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        onConfigChange(service.id, { quantity: parsedEmails.length });
+                        showToast(`Quantity updated to match ${parsedEmails.length} email address${parsedEmails.length !== 1 ? 'es' : ''}`);
+                      }}
+                      className="shrink-0 text-[10px] font-bold border border-montana-orange/40 text-montana-orange hover:bg-montana-orange/10 px-2 py-1 transition-colors whitespace-nowrap"
+                    >
+                      Match quantity to email count ({parsedEmails.length})
+                    </button>
+                  </div>
+                )}
+                {countMatch && (
+                  <p className="text-xs text-emerald-400 mt-1.5">
+                    ✓ {parsedEmails.length} email{parsedEmails.length !== 1 ? "s" : ""} match the configured quantity.
+                  </p>
+                )}
+              </div>
+            )}
+
+            {/* Price + Actions */}
+            {valid && entry && (
+              <div className="border-t border-white/10 pt-4 flex items-center justify-between gap-4">
+                <div>
+                  <div className="text-xs text-montana-muted">
+                    {isServer ? "Flat rate" : `${formatZAR(unitPrice)} × ${config.quantity} ${service.unitLabel}`}
+                  </div>
+                  <div className="text-xl font-bold text-white font-mono">
+                    {formatZAR(lineTotal)}
+                    <span className="text-xs font-normal text-montana-muted ml-1">
+                      /{config.billingPeriod === "annual" ? "yr" : "mo"} ex VAT
+                    </span>
+                  </div>
+                  {annualSaving > 0 && (
+                    <div className="text-xs text-emerald-400">
+                      Saving {formatZAR(annualSaving * (isServer ? 1 : config.quantity))} vs monthly
+                    </div>
+                  )}
+                </div>
+                {inCart ? (
+                  <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2 text-xs text-emerald-400 font-bold">
+                      <CheckCircle2 className="h-4 w-4" />
+                      In cart
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => onRemoveFromCart(service.id)}
+                      className="text-montana-muted hover:text-red-400 transition-colors"
+                      title="Remove from cart"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                  </div>
+                ) : (
+                  <AnimatedButton
+                    variant="outline"
+                    onClick={handleAddToCart}
+                    className="shrink-0 text-sm py-2 px-4"
+                  >
+                    Add to Cart
+                  </AnimatedButton>
+                )}
+              </div>
+            )}
+            {!valid && (
+              <div className="border-t border-white/10 pt-4 text-xs text-montana-muted">
+                Select options above to see pricing.
+              </div>
+            )}
+          </div>
+        )}
+      </SpotlightCard>
     </div>
   );
 }
@@ -906,9 +969,10 @@ function POSForm() {
   // Comma-separated POPIA service codes, e.g. ?services=SE-PA002,SE-PZ001
   // Callers must not URL-encode the comma or use ?services=A&services=B
   const preselectedServices = searchParams.get("services")?.split(",").filter(Boolean) ?? [];
-  const [configs, setConfigs]       = useState<Record<SelfServeServiceId, ServiceConfig>>({ ...DEFAULT_CONFIGS });
-  const [cartIds, setCartIds]       = useState<Set<SelfServeServiceId>>(new Set());
-  const [userEmails, setUserEmails] = useState<Partial<Record<SelfServeServiceId, string>>>({});
+  const [configs, setConfigs]           = useState<Record<SelfServeServiceId, ServiceConfig>>({ ...DEFAULT_CONFIGS });
+  const [cartIds, setCartIds]           = useState<Set<SelfServeServiceId>>(new Set());
+  const [expandedServices, setExpanded] = useState<Set<SelfServeServiceId>>(new Set());
+  const [userEmails, setUserEmails]     = useState<Partial<Record<SelfServeServiceId, string>>>({});
   const [discountCode, setDiscount] = useState("");
   const [isSubmitting, setSubmit]   = useState(false);
   const [submitError, setError]     = useState<string | null>(null);
@@ -1022,16 +1086,38 @@ function POSForm() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Auto-expand the service targeted by ?service= URL param
+  useEffect(() => {
+    if (focusedService) {
+      setExpanded(prev => new Set([...prev, focusedService]));
+    }
+  }, [focusedService]);
+
   const updateConfig = useCallback((serviceId: SelfServeServiceId, updates: Partial<ServiceConfig>) => {
     setConfigs(prev => ({ ...prev, [serviceId]: { ...prev[serviceId], ...updates } }));
   }, []);
 
+  const toggleExpanded = useCallback((serviceId: SelfServeServiceId) => {
+    setExpanded(prev => {
+      const next = new Set(prev);
+      if (next.has(serviceId)) next.delete(serviceId);
+      else next.add(serviceId);
+      return next;
+    });
+  }, []);
+
   const addToCart = useCallback((serviceId: SelfServeServiceId) => {
     setCartIds(prev => new Set([...prev, serviceId]));
+    setExpanded(prev => new Set([...prev, serviceId]));
   }, []);
 
   const removeFromCart = useCallback((serviceId: SelfServeServiceId | string) => {
     setCartIds(prev => {
+      const next = new Set(prev);
+      next.delete(serviceId as SelfServeServiceId);
+      return next;
+    });
+    setExpanded(prev => {
       const next = new Set(prev);
       next.delete(serviceId as SelfServeServiceId);
       return next;
@@ -1178,6 +1264,8 @@ function POSForm() {
                 service={service}
                 config={configs[service.id]}
                 inCart={cartIds.has(service.id)}
+                isExpanded={expandedServices.has(service.id)}
+                onToggle={() => toggleExpanded(service.id)}
                 isFocused={focusedService === service.id}
                 onFocusConsumed={() => setFocusedService(null)}
                 userEmails={userEmails[service.id] ?? ""}
