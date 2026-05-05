@@ -77,7 +77,7 @@ export default function ResourceDownloadAutoEmail(p: ResourceDownloadEmailProps)
 
       <Divider />
       <Section style={{ textAlign: 'center', marginBottom: '24px' }}>
-        <CTAButton href={downloadUrl}>Download {p.resourceTitle}</CTAButton>
+        <CTAButton href={downloadUrl}>Download</CTAButton>
       </Section>
       <Divider />
 

@@ -24,6 +24,7 @@ export type EnquiryType =
   | 'existing-client'
   | 'partnership'
   | 'compliance'
+  | 'ransomware'
   | 'general';
 
 export interface ContactEmailProps {
@@ -50,6 +51,7 @@ const enquiryLabels: Record<EnquiryType, string> = {
   'existing-client':   'Existing Client Support',
   'partnership':       'Channel Partnership',
   'compliance':        'POPIA / Compliance Consulting',
+  'ransomware':        'Ransomware Protection',
   'general':           'General Enquiry',
 };
 

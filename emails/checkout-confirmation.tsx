@@ -25,12 +25,25 @@ export interface CheckoutLineItem {
   line_total: number;
 }
 
+export interface CheckoutBillingAddress {
+  address1:   string;
+  address2?:  string;
+  city:       string;
+  province:   string;
+  postalCode: string;
+  country:    string;
+}
+
 export interface CheckoutEmailProps {
-  customer:     { name: string; email: string; company: string };
+  customer:     { name: string; email: string; company: string; vatNumber?: string };
+  billing?:     CheckoutBillingAddress;
   cart:         CheckoutLineItem[];
   totalZAR:     number;
+  discountZAR?: number;
+  discountCode?: string;
   contractTerm: 'monthly' | 'yearly';
   reference:    string;
+  orderId?:     string;
 }
 
 export const PreviewProps: CheckoutEmailProps = {

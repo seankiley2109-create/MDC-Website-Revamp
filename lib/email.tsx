@@ -139,12 +139,25 @@ export interface CheckoutLineItem {
   line_total: number;
 }
 
+export interface CheckoutBillingAddress {
+  address1:   string;
+  address2?:  string;
+  city:       string;
+  province:   string;
+  postalCode: string;
+  country:    string;
+}
+
 export interface CheckoutPayload {
-  customer:     { name: string; email: string; company: string };
+  customer:     { name: string; email: string; company: string; vatNumber?: string };
+  billing?:     CheckoutBillingAddress;
   cart:         CheckoutLineItem[];
   totalZAR:     number;
+  discountZAR?: number;
+  discountCode?: string;
   contractTerm: 'monthly' | 'yearly';
   reference:    string;
+  orderId?:     string;
 }
 
 // ---------------------------------------------------------------------------
@@ -174,6 +187,7 @@ export async function sendContactEmails(p: ContactPayload): Promise<EmailResult>
       'existing-client':   'Existing Client Support',
       'partnership':       'Channel Partnership',
       'compliance':        'POPIA / Compliance Consulting',
+      'ransomware':        'Ransomware Protection',
       'general':           'General Enquiry',
     };
 
