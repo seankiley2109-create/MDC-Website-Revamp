@@ -243,7 +243,8 @@ const questions = [
   },
 ];
 
-function buildResultsUrl(finalAnswers: Record<number, number>, score: number): string {
+// Fallback URL using query params — used when the API doesn't return an assessmentId.
+function buildFallbackUrl(finalAnswers: Record<number, number>, score: number): string {
   const risk = score <= 7 ? "High Risk" : score <= 14 ? "Moderate Risk" : "Low Risk";
   const compliant = Object.values(finalAnswers).filter((v) => v === 2).length;
   const partial = Object.values(finalAnswers).filter((v) => v === 1).length;
@@ -324,10 +325,10 @@ export default function SecurityAssessment() {
   // Silently submit the assessment using profile data and navigate to results.
   const autoSubmitFromProfile = useCallback(async (finalAnswers: Record<number, number>) => {
     const finalScore = Object.values(finalAnswers).reduce((a, b) => a + b, 0);
-    const url = buildResultsUrl(finalAnswers, finalScore);
+    const fallbackUrl = buildFallbackUrl(finalAnswers, finalScore);
     if (!authedProfile) {
       console.error("[security] autoSubmitFromProfile called with no authedProfile — skipping");
-      router.push(url);
+      router.push(fallbackUrl);
       return;
     }
     const profileLead = {
@@ -336,8 +337,9 @@ export default function SecurityAssessment() {
       email:   authedProfile.email,
     };
     setLeadForm(profileLead);
+    let navigateTo = fallbackUrl;
     try {
-      await fetch("/api/assessment", {
+      const res = await fetch("/api/assessment", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -348,11 +350,14 @@ export default function SecurityAssessment() {
           user_id: authedProfile.id,
         }),
       });
+      const data = await res.json();
+      if (data.assessmentId) {
+        navigateTo = `/assessments/security/results/${data.assessmentId}`;
+      }
     } catch (err) {
       console.error("[security] auto-submit failed:", err);
-    } finally {
-      router.push(url);
     }
+    router.push(navigateTo);
   }, [authedProfile, router]);
 
   useEffect(() => {
@@ -394,8 +399,10 @@ export default function SecurityAssessment() {
   const submitLead = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
+    const fallbackUrl = buildFallbackUrl(answers, totalScore);
+    let navigateTo = fallbackUrl;
     try {
-      await fetch("/api/assessment", {
+      const res = await fetch("/api/assessment", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -405,11 +412,15 @@ export default function SecurityAssessment() {
           score: totalScore,
         }),
       });
-      router.push(buildResultsUrl(answers, totalScore));
+      const data = await res.json();
+      if (data.assessmentId) {
+        navigateTo = `/assessments/security/results/${data.assessmentId}`;
+      }
     } catch (error) {
       console.error(error);
     } finally {
       setIsSubmitting(false);
+      router.push(navigateTo);
     }
   };
 

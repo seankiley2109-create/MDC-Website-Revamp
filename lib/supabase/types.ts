@@ -111,6 +111,21 @@ export interface AssessmentSession {
   updated_at: string;
 }
 
+export interface Assessment {
+  id:         string;
+  user_id:    string | null;
+  type:       'popia' | 'security';
+  score:      number;
+  risk_level: string;
+  answers:    Record<string, number>;
+  gaps:       string[];
+  compliant:  number;
+  partial:    number;
+  critical:   number;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface Purchase {
   id:                 string;
   user_id:            string | null;
@@ -169,6 +184,12 @@ export type Database = {
         Row:    AssessmentSession;
         Insert: Omit<AssessmentSession, 'created_at' | 'updated_at'> & { created_at?: string; updated_at?: string };
         Update: Partial<AssessmentSession>;
+        Relationships: [];
+      };
+      assessments: {
+        Row:    Assessment;
+        Insert: Omit<Assessment, 'id' | 'created_at' | 'updated_at'> & { id?: string; created_at?: string; updated_at?: string };
+        Update: Partial<Assessment>;
         Relationships: [];
       };
     };

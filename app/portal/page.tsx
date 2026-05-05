@@ -21,7 +21,7 @@ import {
   Clock, ChevronRight, Zap, BarChart3, Shield, FileCheck,
   Plus, Package,
 } from 'lucide-react';
-import { createServerClient }    from '@/lib/supabase/server';
+import { createServerClient, createServiceRoleClient } from '@/lib/supabase/server';
 import { SpotlightCard } from '@/components/ui/spotlight-card';
 import { AnimatedButton }        from '@/components/ui/animated-button';
 import { SupportForm }           from './support-form';
@@ -268,6 +268,29 @@ export default async function PortalPage() {
 
   const profile = profileData as Profile | null;
   if (!profile) redirect('/billing?reason=setup');
+
+  // ── Latest assessment IDs (for "View results" links) ──────────────────────
+  const serviceRole = createServiceRoleClient();
+  const [{ data: latestPopia }, { data: latestSecurity }] = await Promise.all([
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (serviceRole.from('assessments') as any)
+      .select('id')
+      .eq('user_id', user.id)
+      .eq('type', 'popia')
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle(),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (serviceRole.from('assessments') as any)
+      .select('id')
+      .eq('user_id', user.id)
+      .eq('type', 'security')
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle(),
+  ]);
+  const latestPopiaId    = (latestPopia    as { id: string } | null)?.id;
+  const latestSecurityId = (latestSecurity as { id: string } | null)?.id;
 
   const status    = profile.plan_status;
   const statusCfg = STATUS_CONFIG[status];
@@ -620,9 +643,16 @@ export default async function PortalPage() {
                       </div>
                     )}
                   </div>
-                  <Link href="/assessments/popia" className="text-xs text-montana-pink hover:underline mt-auto">
-                    Retake assessment →
-                  </Link>
+                  <div className="flex items-center gap-4 mt-auto">
+                    {latestPopiaId && (
+                      <Link href={`/assessments/popia/results/${latestPopiaId}`} className="text-xs text-montana-pink hover:underline">
+                        View results →
+                      </Link>
+                    )}
+                    <Link href="/assessments/popia" className="text-xs text-montana-muted hover:text-white hover-interactive">
+                      Retake →
+                    </Link>
+                  </div>
                 </>
               ) : (
                 <>
@@ -681,9 +711,16 @@ export default async function PortalPage() {
                       </div>
                     )}
                   </div>
-                  <Link href="/assessments/security" className="text-xs text-montana-pink hover:underline mt-auto">
-                    Retake assessment →
-                  </Link>
+                  <div className="flex items-center gap-4 mt-auto">
+                    {latestSecurityId && (
+                      <Link href={`/assessments/security/results/${latestSecurityId}`} className="text-xs text-montana-pink hover:underline">
+                        View results →
+                      </Link>
+                    )}
+                    <Link href="/assessments/security" className="text-xs text-montana-muted hover:text-white hover-interactive">
+                      Retake →
+                    </Link>
+                  </div>
                 </>
               ) : (
                 <>

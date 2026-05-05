@@ -22,6 +22,35 @@ const schema = z.object({
   user_id: z.string().uuid().optional(),
 });
 
+// Question-to-category mappings — mirrors the form page question arrays.
+const QUESTION_CATEGORIES: Record<'security' | 'popia', string[]> = {
+  security: [
+    'Data Protection', 'SaaS Resilience', 'Ransomware', 'Recovery',
+    'Endpoint Security', 'Device Compliance', 'Threat Detection',
+    'Data Visibility', 'Business Continuity', 'Integration',
+  ],
+  popia: [
+    'Governance', 'Governance', 'Lawful Processing', 'Lawful Processing',
+    'Consent', 'Processing Integrity', 'Data Quality', 'Transparency',
+    'Security', 'Data Subject Rights',
+  ],
+};
+
+function computeGaps(type: 'security' | 'popia', answers: Record<string, number>): string[] {
+  const categories = QUESTION_CATEGORIES[type];
+  const catScores: Record<string, { total: number; count: number }> = {};
+  categories.forEach((cat, i) => {
+    const s = answers[String(i)] ?? 0;
+    if (!catScores[cat]) catScores[cat] = { total: 0, count: 0 };
+    catScores[cat].total += s;
+    catScores[cat].count += 1;
+  });
+  return Object.entries(catScores)
+    .filter(([, v]) => v.total / v.count < 2)
+    .sort(([, a], [, b]) => a.total / a.count - b.total / b.count)
+    .map(([cat]) => cat);
+}
+
 function resolveRiskLevel(type: AssessmentType, score: number): RiskLevel {
   if (type === 'security') {
     if (score <= 7)  return 'High Risk';
@@ -52,6 +81,7 @@ export async function POST(request: Request) {
     const partial        = answerValues.filter(v => v === 1).length;
     const criticalGaps   = answerValues.filter(v => v === 0).length;
     const riskLevel      = resolveRiskLevel(type as AssessmentType, score);
+    const gaps           = computeGaps(type, answers);
 
     const payload: AssessmentPayload = {
       type: type as AssessmentType,
@@ -66,12 +96,14 @@ export async function POST(request: Request) {
       criticalGaps,
     };
 
-    // ── Persist assessment results to Supabase ───────────────────────────
-    try {
-      const supabase = await createServerClient();
-      const { data: { user: sessionUser } } = await supabase.auth.getUser();
-      const serviceRole = createServiceRoleClient();
+    // ── Shared Supabase clients ───────────────────────────────────────────
+    const supabase     = await createServerClient();
+    const serviceRole  = createServiceRoleClient();
+    const { data: { user: sessionUser } } = await supabase.auth.getUser();
+    const resolvedUserId = sessionUser?.id ?? user_id ?? null;
 
+    // ── Persist assessment summary to profiles ────────────────────────────
+    try {
       if (type === 'popia') {
         const dbRiskLevel: PopiaRiskLevel =
           riskLevel === 'High Risk'     ? 'high'   :
@@ -85,39 +117,24 @@ export async function POST(request: Request) {
         };
 
         if (sessionUser) {
-          // Path A — server-side session: update by auth user ID
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const { error } = await (serviceRole.from('profiles') as any)
-            .update(assessmentUpdate)
-            .eq('id', sessionUser.id);
-          if (error) {
-            console.error('[assessment] POPIA Supabase update (auth) failed:', error.message);
-          } else {
-            console.log(`[assessment] POPIA profile updated — user: ${sessionUser.id}, score: ${score}`);
-          }
+            .update(assessmentUpdate).eq('id', sessionUser.id);
+          if (error) console.error('[assessment] POPIA profile update (auth) failed:', error.message);
+          else console.log(`[assessment] POPIA profile updated — user: ${sessionUser.id}, score: ${score}`);
         } else if (user_id) {
-          // Path B — client-provided user_id (auth bypass flow): update by ID
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const { error } = await (serviceRole.from('profiles') as any)
-            .update(assessmentUpdate)
-            .eq('id', user_id);
-          if (error) {
-            console.error('[assessment] POPIA Supabase update (user_id) failed:', error.message);
-          } else {
-            console.log(`[assessment] POPIA profile updated — user_id: ${user_id}, score: ${score}`);
-          }
+            .update(assessmentUpdate).eq('id', user_id);
+          if (error) console.error('[assessment] POPIA profile update (user_id) failed:', error.message);
+          else console.log(`[assessment] POPIA profile updated — user_id: ${user_id}, score: ${score}`);
         } else {
-          // Path C — anonymous: update existing profile by email match if present
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const { error, count } = await (serviceRole.from('profiles') as any)
-            .update(assessmentUpdate)
-            .eq('email', lead.email)
+            .update(assessmentUpdate).eq('email', lead.email)
             .select('id', { count: 'exact', head: true });
-          if (error) {
-            console.error('[assessment] POPIA Supabase update (email match) failed:', error.message);
-          } else {
-            console.log(`[assessment] POPIA anon sync — email: ${lead.email}, rows: ${count ?? 0}`);
-          }
+          if (error) console.error('[assessment] POPIA anon email-match failed:', error.message);
+          else console.log(`[assessment] POPIA anon sync — email: ${lead.email}, rows: ${count ?? 0}`);
         }
       }
 
@@ -136,55 +153,69 @@ export async function POST(request: Request) {
         if (sessionUser) {
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const { error } = await (serviceRole.from('profiles') as any)
-            .update(assessmentUpdate)
-            .eq('id', sessionUser.id);
-          if (error) {
-            console.error('[assessment] Security Supabase update (auth) failed:', error.message);
-          } else {
-            console.log(`[assessment] Security profile updated — user: ${sessionUser.id}, score: ${score}`);
-          }
+            .update(assessmentUpdate).eq('id', sessionUser.id);
+          if (error) console.error('[assessment] Security profile update (auth) failed:', error.message);
+          else console.log(`[assessment] Security profile updated — user: ${sessionUser.id}, score: ${score}`);
         } else if (user_id) {
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const { error } = await (serviceRole.from('profiles') as any)
-            .update(assessmentUpdate)
-            .eq('id', user_id);
-          if (error) {
-            console.error('[assessment] Security Supabase update (user_id) failed:', error.message);
-          } else {
-            console.log(`[assessment] Security profile updated — user_id: ${user_id}, score: ${score}`);
-          }
+            .update(assessmentUpdate).eq('id', user_id);
+          if (error) console.error('[assessment] Security profile update (user_id) failed:', error.message);
+          else console.log(`[assessment] Security profile updated — user_id: ${user_id}, score: ${score}`);
         } else {
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const { error, count } = await (serviceRole.from('profiles') as any)
-            .update(assessmentUpdate)
-            .eq('email', lead.email)
+            .update(assessmentUpdate).eq('email', lead.email)
             .select('id', { count: 'exact', head: true });
-          if (error) {
-            console.error('[assessment] Security Supabase update (email match) failed:', error.message);
-          } else {
-            console.log(`[assessment] Security anon sync — email: ${lead.email}, rows: ${count ?? 0}`);
-          }
+          if (error) console.error('[assessment] Security anon email-match failed:', error.message);
+          else console.log(`[assessment] Security anon sync — email: ${lead.email}, rows: ${count ?? 0}`);
         }
       }
     } catch (err) {
-      // Non-fatal — lead capture and results page still work
       console.error('[assessment] Unexpected error saving to profile:', err);
     }
 
-    // Run email delivery and CRM creation in parallel
+    // ── Insert full results into assessments table ────────────────────────
+    let assessmentId: string | undefined;
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data: inserted, error: insertError } = await (serviceRole.from('assessments') as any)
+        .insert({
+          user_id:    resolvedUserId,
+          type,
+          score,
+          risk_level: riskLevel,
+          answers,
+          gaps,
+          compliant:  fullyCompliant,
+          partial,
+          critical:   criticalGaps,
+        })
+        .select('id')
+        .single();
+
+      if (insertError) {
+        console.error('[assessment] assessments insert failed:', insertError.message);
+      } else {
+        assessmentId = (inserted as { id: string }).id;
+        console.log(`[assessment] assessments row created — id: ${assessmentId}`);
+      }
+    } catch (err) {
+      console.error('[assessment] Unexpected error inserting into assessments:', err);
+    }
+
+    // ── Email delivery and CRM creation (non-critical, run in parallel) ───
     const [emailResult, mondayResult] = await Promise.allSettled([
       sendAssessmentEmails(payload),
       createAssessmentLead(payload),
     ]);
 
-    // Email is non-critical for assessments — don't block the results page
     if (emailResult.status === 'rejected') {
       console.error('[assessment] Email send threw:', emailResult.reason);
     } else if (!emailResult.value.success) {
       console.error('[assessment] Email send failed:', emailResult.value.error);
     }
 
-    // monday.com is non-critical
     if (mondayResult.status === 'rejected') {
       console.error('[assessment] monday.com item creation threw:', mondayResult.reason);
     } else if (!mondayResult.value.success) {
@@ -193,7 +224,6 @@ export async function POST(request: Request) {
       console.log('[assessment] monday.com item created:', mondayResult.value.itemId);
     }
 
-    // Always return the computed results so the assessment page can display them
     return NextResponse.json({
       success: true,
       message: 'Assessment processed successfully.',
@@ -202,6 +232,7 @@ export async function POST(request: Request) {
       fullyCompliant,
       partial,
       criticalGaps,
+      assessmentId,
     });
   } catch (error) {
     console.error('[assessment] Unexpected error:', error);

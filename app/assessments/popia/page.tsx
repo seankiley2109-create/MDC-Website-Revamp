@@ -220,7 +220,8 @@ const questions = [
   },
 ];
 
-function buildResultsUrl(finalAnswers: Record<number, number>, score: number, sessionId?: string): string {
+// Fallback URL using query params — used when the API doesn't return an assessmentId.
+function buildFallbackUrl(finalAnswers: Record<number, number>, score: number, sessionId?: string): string {
   const risk = score <= 8 ? "High Risk" : score <= 14 ? "Moderate Risk" : "Low Risk";
   const compliant = Object.values(finalAnswers).filter((v) => v === 2).length;
   const partial = Object.values(finalAnswers).filter((v) => v === 1).length;
@@ -302,14 +303,15 @@ export default function PopiaAssessment() {
     const finalScore = Object.values(finalAnswers).reduce((a, b) => a + b, 0);
 
     if (authedProfile) {
-      const url = buildResultsUrl(finalAnswers, finalScore);
+      const fallbackUrl = buildFallbackUrl(finalAnswers, finalScore);
       const profileLead = {
         name:    authedProfile.full_name    ?? "Portal User",
         company: authedProfile.company_name ?? "N/A",
         email:   authedProfile.email,
       };
+      let navigateTo = fallbackUrl;
       try {
-        await fetch("/api/assessment", {
+        const res = await fetch("/api/assessment", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -320,25 +322,34 @@ export default function PopiaAssessment() {
             user_id: authedProfile.id,
           }),
         });
+        const data = await res.json();
+        if (data.assessmentId) {
+          navigateTo = `/assessments/popia/results/${data.assessmentId}`;
+        }
       } catch (err) {
         console.error("[popia] profile save failed:", err);
       }
-      router.push(url);
+      router.push(navigateTo);
     } else {
       const sid = sessionIdRef.current;
-      const url = buildResultsUrl(finalAnswers, finalScore, sid || undefined);
+      const fallbackUrl = buildFallbackUrl(finalAnswers, finalScore, sid || undefined);
+      let navigateTo = fallbackUrl;
       if (sid) {
         try {
-          await fetch("/api/assessment-session", {
+          const res = await fetch("/api/assessment-session", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ session_id: sid, type: "popia", score: finalScore, answers: finalAnswers }),
           });
+          const data = await res.json();
+          if (data.assessmentId) {
+            navigateTo = `/assessments/popia/results/${data.assessmentId}`;
+          }
         } catch (err) {
           console.error("[popia] session save failed:", err);
         }
       }
-      router.push(url);
+      router.push(navigateTo);
     }
   }, [authedProfile, router]);
 
