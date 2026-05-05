@@ -128,7 +128,6 @@ export default function PAIAPage() {
           </div>
           <div className="border-t border-white/5 pt-6 mt-6 flex flex-col sm:flex-row gap-4">
             <Link href="/privacy" className="text-sm text-montana-pink hover:underline">Privacy Statement</Link>
-            <Link href="/terms" className="text-sm text-montana-pink hover:underline">Terms &amp; Conditions</Link>
             <Link href="/contact" className="text-sm text-montana-muted hover:text-white hover-interactive">Contact Us</Link>
           </div>
         </SpotlightCard>

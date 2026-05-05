@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { Menu, X, User, CreditCard, LogOut, ChevronDown, Zap, LayoutDashboard } from "lucide-react";
 import { AnimatedButton } from "@/components/ui/animated-button";
 import { createBrowserClient } from "@/lib/supabase/browser";
@@ -20,6 +20,7 @@ const navLinks = [
 
 export function Navbar() {
   const router = useRouter();
+  const pathname = usePathname();
   const [isOpen, setIsOpen]           = useState(false);
   const [user, setUser]               = useState<SupabaseUser | null>(null);
   const [authLoading, setAuthLoading] = useState(true);
@@ -103,7 +104,7 @@ export function Navbar() {
             <Link
               key={link.href}
               href={link.href}
-              className="hover:text-montana-pink hover-interactive"
+              className={`hover:text-montana-pink hover-interactive ${pathname === link.href ? "text-montana-pink" : ""}`}
             >
               {link.label}
             </Link>
@@ -229,7 +230,7 @@ export function Navbar() {
               key={link.href}
               href={link.href}
               onClick={() => setIsOpen(false)}
-              className="block py-3 text-lg font-medium text-white hover:text-montana-pink hover-interactive border-b border-white/5"
+              className={`block py-3 text-lg font-medium hover:text-montana-pink hover-interactive border-b border-white/5 ${pathname === link.href ? "text-montana-pink" : "text-white"}`}
             >
               {link.label}
             </Link>

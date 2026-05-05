@@ -320,11 +320,11 @@ export default function PrivacyPage() {
                 <div className="flex items-start gap-2 mt-3">
                   <MapPin className="h-3.5 w-3.5 mt-0.5 shrink-0" />
                   <address className="not-italic leading-relaxed">
-                    The Information Officer<br />
-                    Suite 126, First Floor<br />
-                    Willowbridge Centre<br />
-                    Carl Cronje Drive, Tyger Valley<br />
-                    7530
+                    Suite 24, Frazzitta Business Park<br />
+                    Cnr Langeberg &amp; Batis Roads<br />
+                    Durbanville<br />
+                    Western Cape, 7550<br />
+                    South Africa
                   </address>
                 </div>
               </div>
