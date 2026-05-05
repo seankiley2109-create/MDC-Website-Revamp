@@ -140,6 +140,7 @@ const TECH_BOARD_COLS = {
   jobStatus:    'status',
   priority:     'status_1',
   creationDate: 'date_mkrvfmta',
+  montanaRep:   'dropdown_mm1qt87g',
   company:      'text_mkzz2dz9',
   orderId:      'text_mkzzjzq1',
   contactName:  'text_mkpdnarc',
@@ -150,10 +151,14 @@ const TECH_BOARD_COLS = {
   lastName:     'text_mm01ty6w',
 } as const;
 
+/** Montana Rep dropdown option ID for website-originated orders (label: "Website", id: 4). */
+const WEBSITE_REP_OPTION_ID = 4;
+
 /** Column IDs for the subitems board attached to Support Tickets ("Products to be Implemented"). */
 const TECH_SUBITEM_COLS = {
-  productCode: 'text_mkrcpmje',
-  quantity:    'numeric_mkrcgce0',
+  productCode:        'text_mkrcpmje',
+  quantity:           'numeric_mkrcgce0',
+  provisioningEmails: 'text_mm31k6yj',
 } as const;
 
 /** Column IDs for the "Assessment Leads" board. */
@@ -270,7 +275,8 @@ type ColumnValueMap = Record<
   | { email: string; text: string }
   | { label: string }
   | { text: string }
-  | { date: string }       // ← add this line
+  | { date: string }
+  | { ids: number[] }
 >;
 
 // ─── GraphQL executor ─────────────────────────────────────────────────────────
@@ -715,6 +721,7 @@ export interface TechnicalOnboardingPayload {
     name:         string;
     product_code: string;
     quantity:     number;
+    emails?:      string[];
   }[];
 }
 
@@ -735,6 +742,7 @@ export async function createTechnicalOnboardingItem(
     [TECH_BOARD_COLS.jobStatus]:    colStatus('Working on it'),
     [TECH_BOARD_COLS.priority]:     colStatus('High'),
     [TECH_BOARD_COLS.creationDate]: colDate(today),
+    [TECH_BOARD_COLS.montanaRep]:   { ids: [WEBSITE_REP_OPTION_ID] },
     [TECH_BOARD_COLS.company]:      payload.company,
     [TECH_BOARD_COLS.orderId]:      payload.orderId,
     [TECH_BOARD_COLS.contactName]:  `${payload.firstName} ${payload.lastName}`,
@@ -762,6 +770,9 @@ export async function createTechnicalOnboardingItem(
         columnValues: JSON.stringify({
           [TECH_SUBITEM_COLS.productCode]: line.product_code,
           [TECH_SUBITEM_COLS.quantity]:    String(line.quantity),
+          ...(line.emails?.length
+            ? { [TECH_SUBITEM_COLS.provisioningEmails]: line.emails.join(', ') }
+            : {}),
         }),
       },
     ).catch((err: unknown) => {

@@ -245,9 +245,17 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
 
         // ── Create technical onboarding item — first hit only ──────────────────
         if (isFirstProcessing) {
+          const userEmailContext = (verifyData.metadata as Record<string, unknown> | null)
+            ?.user_email_context as { serviceId: string; emails: string[] }[] | undefined;
+
           const onboardingCart = (verifyData.metadata?.cart ?? [])
             .filter(l => l.product_code !== 'DISCOUNT')
-            .map(l => ({ name: l.name, product_code: l.product_code, quantity: l.quantity }));
+            .map(l => ({
+              name:         l.name,
+              product_code: l.product_code,
+              quantity:     l.quantity,
+              emails:       userEmailContext?.find(ctx => ctx.serviceId === l.service_id)?.emails,
+            }));
 
           const nameParts = (purchaseRow?.customer_name ?? existingProfile?.full_name ?? '').trim().split(' ');
           const firstName = nameParts[0] ?? '';
