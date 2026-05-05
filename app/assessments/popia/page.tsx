@@ -220,37 +220,6 @@ const questions = [
   },
 ];
 
-// Fallback URL using query params — used when the API doesn't return an assessmentId.
-function buildFallbackUrl(finalAnswers: Record<number, number>, score: number, sessionId?: string): string {
-  const risk = score <= 8 ? "High Risk" : score <= 14 ? "Moderate Risk" : "Low Risk";
-  const compliant = Object.values(finalAnswers).filter((v) => v === 2).length;
-  const partial = Object.values(finalAnswers).filter((v) => v === 1).length;
-  const critical = Object.values(finalAnswers).filter((v) => v === 0).length;
-
-  const catScores: Record<string, { total: number; count: number }> = {};
-  questions.forEach((q, i) => {
-    const s = finalAnswers[i] ?? 0;
-    if (!catScores[q.category]) catScores[q.category] = { total: 0, count: 0 };
-    catScores[q.category].total += s;
-    catScores[q.category].count += 1;
-  });
-  const gaps = Object.entries(catScores)
-    .filter(([, v]) => v.total / v.count < 2)
-    .sort(([, a], [, b]) => a.total / a.count - b.total / b.count)
-    .map(([cat]) => cat)
-    .join(",");
-
-  const params = new URLSearchParams({
-    score: String(score),
-    risk,
-    compliant: String(compliant),
-    partial: String(partial),
-    critical: String(critical),
-    ...(gaps ? { gaps } : {}),
-    ...(sessionId ? { sid: sessionId } : {}),
-  });
-  return `/assessments/popia/results?${params.toString()}`;
-}
 
 type AuthedProfile = {
   id: string;
@@ -266,6 +235,7 @@ export default function PopiaAssessment() {
   const [authedProfile, setAuthedProfile] = useState<AuthedProfile | null>(null);
   const [isAuthChecking, setIsAuthChecking] = useState(true);
   const [pendingFinalAnswers, setPendingFinalAnswers] = useState<Record<number, number> | null>(null);
+  const [submitError, setSubmitError] = useState<string | null>(null);
   // Stable session ID for anonymous result persistence (generated once on mount).
   const sessionIdRef = useRef<string>('');
   useEffect(() => { sessionIdRef.current = crypto.randomUUID(); }, []);
@@ -302,14 +272,16 @@ export default function PopiaAssessment() {
   const saveAndNavigate = useCallback(async (finalAnswers: Record<number, number>) => {
     const finalScore = Object.values(finalAnswers).reduce((a, b) => a + b, 0);
 
+    const handleError = (msg: string) => {
+      setSubmitError(msg);
+    };
+
     if (authedProfile) {
-      const fallbackUrl = buildFallbackUrl(finalAnswers, finalScore);
       const profileLead = {
         name:    authedProfile.full_name    ?? "Portal User",
         company: authedProfile.company_name ?? "N/A",
         email:   authedProfile.email,
       };
-      let navigateTo = fallbackUrl;
       try {
         const res = await fetch("/api/assessment", {
           method: "POST",
@@ -324,16 +296,16 @@ export default function PopiaAssessment() {
         });
         const data = await res.json();
         if (data.assessmentId) {
-          navigateTo = `/assessments/popia/results/${data.assessmentId}`;
+          router.push(`/assessments/popia/results/${data.assessmentId}`);
+        } else {
+          handleError("Your results couldn't be saved. Please try again.");
         }
       } catch (err) {
         console.error("[popia] profile save failed:", err);
+        handleError("Something went wrong. Please check your connection and try again.");
       }
-      router.push(navigateTo);
     } else {
       const sid = sessionIdRef.current;
-      const fallbackUrl = buildFallbackUrl(finalAnswers, finalScore, sid || undefined);
-      let navigateTo = fallbackUrl;
       if (sid) {
         try {
           const res = await fetch("/api/assessment-session", {
@@ -343,13 +315,17 @@ export default function PopiaAssessment() {
           });
           const data = await res.json();
           if (data.assessmentId) {
-            navigateTo = `/assessments/popia/results/${data.assessmentId}`;
+            router.push(`/assessments/popia/results/${data.assessmentId}`);
+          } else {
+            handleError("Your results couldn't be saved. Please try again.");
           }
         } catch (err) {
           console.error("[popia] session save failed:", err);
+          handleError("Something went wrong. Please check your connection and try again.");
         }
+      } else {
+        handleError("Session could not be established. Please refresh and try again.");
       }
-      router.push(navigateTo);
     }
   }, [authedProfile, router]);
 
@@ -497,15 +473,27 @@ export default function PopiaAssessment() {
           </div>
         )}
 
-        {/* Phase 2: Saving spinner — shown while persisting results before navigation */}
+        {/* Phase 2: Saving spinner / error — shown while persisting results before navigation */}
         {currentStep === 10 && (
           <div className="flex items-center justify-center py-32">
-            <div className="text-center">
-              <div className="h-10 w-10 border-2 border-montana-pink border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-              <p className="text-montana-muted text-sm">
-                {pendingFinalAnswers !== null ? "Checking your account…" : "Saving your results…"}
-              </p>
-            </div>
+            {submitError ? (
+              <div className="text-center max-w-sm">
+                <p className="text-red-400 text-sm mb-5">{submitError}</p>
+                <button
+                  onClick={() => { setSubmitError(null); setCurrentStep(9); }}
+                  className="text-xs text-montana-muted hover:text-white hover-interactive"
+                >
+                  ← Go back and try again
+                </button>
+              </div>
+            ) : (
+              <div className="text-center">
+                <div className="h-10 w-10 border-2 border-montana-pink border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+                <p className="text-montana-muted text-sm">
+                  {pendingFinalAnswers !== null ? "Checking your account…" : "Saving your results…"}
+                </p>
+              </div>
+            )}
           </div>
         )}
 

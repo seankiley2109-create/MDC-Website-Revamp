@@ -243,36 +243,6 @@ const questions = [
   },
 ];
 
-// Fallback URL using query params — used when the API doesn't return an assessmentId.
-function buildFallbackUrl(finalAnswers: Record<number, number>, score: number): string {
-  const risk = score <= 7 ? "High Risk" : score <= 14 ? "Moderate Risk" : "Low Risk";
-  const compliant = Object.values(finalAnswers).filter((v) => v === 2).length;
-  const partial = Object.values(finalAnswers).filter((v) => v === 1).length;
-  const critical = Object.values(finalAnswers).filter((v) => v === 0).length;
-
-  const catScores: Record<string, { total: number; count: number }> = {};
-  questions.forEach((q, i) => {
-    const s = finalAnswers[i] ?? 0;
-    if (!catScores[q.category]) catScores[q.category] = { total: 0, count: 0 };
-    catScores[q.category].total += s;
-    catScores[q.category].count += 1;
-  });
-  const gaps = Object.entries(catScores)
-    .filter(([, v]) => v.total / v.count < 2)
-    .sort(([, a], [, b]) => a.total / a.count - b.total / b.count)
-    .map(([cat]) => cat)
-    .join(",");
-
-  const params = new URLSearchParams({
-    score: String(score),
-    risk,
-    compliant: String(compliant),
-    partial: String(partial),
-    critical: String(critical),
-    ...(gaps ? { gaps } : {}),
-  });
-  return `/assessments/security/results?${params.toString()}`;
-}
 
 type AuthedProfile = {
   id: string;
@@ -287,6 +257,7 @@ export default function SecurityAssessment() {
   const [answers, setAnswers] = useState<Record<number, number>>({});
   const [leadForm, setLeadForm] = useState({ name: "", company: "", email: "" });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const [authedProfile, setAuthedProfile] = useState<AuthedProfile | null>(null);
   const [isAuthChecking, setIsAuthChecking] = useState(true);
   const [pendingFinalAnswers, setPendingFinalAnswers] = useState<Record<number, number> | null>(null);
@@ -325,10 +296,10 @@ export default function SecurityAssessment() {
   // Silently submit the assessment using profile data and navigate to results.
   const autoSubmitFromProfile = useCallback(async (finalAnswers: Record<number, number>) => {
     const finalScore = Object.values(finalAnswers).reduce((a, b) => a + b, 0);
-    const fallbackUrl = buildFallbackUrl(finalAnswers, finalScore);
     if (!authedProfile) {
       console.error("[security] autoSubmitFromProfile called with no authedProfile — skipping");
-      router.push(fallbackUrl);
+      setSubmitError("Unable to identify your account. Please refresh and try again.");
+      setCurrentStep(10);
       return;
     }
     const profileLead = {
@@ -337,7 +308,6 @@ export default function SecurityAssessment() {
       email:   authedProfile.email,
     };
     setLeadForm(profileLead);
-    let navigateTo = fallbackUrl;
     try {
       const res = await fetch("/api/assessment", {
         method: "POST",
@@ -352,12 +322,16 @@ export default function SecurityAssessment() {
       });
       const data = await res.json();
       if (data.assessmentId) {
-        navigateTo = `/assessments/security/results/${data.assessmentId}`;
+        router.push(`/assessments/security/results/${data.assessmentId}`);
+      } else {
+        setSubmitError("Your results couldn't be saved. Please try again.");
+        setCurrentStep(10);
       }
     } catch (err) {
       console.error("[security] auto-submit failed:", err);
+      setSubmitError("Something went wrong. Please check your connection and try again.");
+      setCurrentStep(10);
     }
-    router.push(navigateTo);
   }, [authedProfile, router]);
 
   useEffect(() => {
@@ -399,8 +373,7 @@ export default function SecurityAssessment() {
   const submitLead = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    const fallbackUrl = buildFallbackUrl(answers, totalScore);
-    let navigateTo = fallbackUrl;
+    setSubmitError(null);
     try {
       const res = await fetch("/api/assessment", {
         method: "POST",
@@ -414,13 +387,15 @@ export default function SecurityAssessment() {
       });
       const data = await res.json();
       if (data.assessmentId) {
-        navigateTo = `/assessments/security/results/${data.assessmentId}`;
+        router.push(`/assessments/security/results/${data.assessmentId}`);
+      } else {
+        setSubmitError("Your results couldn't be saved. Please try again.");
       }
     } catch (error) {
       console.error(error);
+      setSubmitError("Something went wrong. Please check your connection and try again.");
     } finally {
       setIsSubmitting(false);
-      router.push(navigateTo);
     }
   };
 
@@ -561,6 +536,18 @@ export default function SecurityAssessment() {
         {/* Phase 2b: Value-before-gate — show score immediately, gate the full report */}
         {currentStep === 10 && pendingFinalAnswers === null && (
           <div className="animate-in fade-in duration-500 space-y-8">
+            {/* Error banner — shown if save failed */}
+            {submitError && (
+              <div className="flex items-center justify-between gap-4 border border-red-500/30 bg-red-500/5 px-5 py-4">
+                <p className="text-sm text-red-400">{submitError}</p>
+                <button
+                  onClick={() => { setSubmitError(null); setCurrentStep(9); }}
+                  className="text-xs text-montana-muted hover:text-white shrink-0 hover-interactive"
+                >
+                  ← Go back
+                </button>
+              </div>
+            )}
             {/* Score preview — visible immediately, no gate */}
             {(() => {
               const gateScore = Object.values(answers).reduce((a, b) => a + b, 0);
@@ -669,6 +656,9 @@ export default function SecurityAssessment() {
                         {isSubmitting ? "Generating Report..." : "Reveal Full Report"}
                       </AnimatedButton>
                     </div>
+                    {submitError && (
+                      <p className="text-xs text-red-400 text-center">{submitError}</p>
+                    )}
                     <p className="text-xs text-center text-white/40">
                       Your results are confidential. We will never share your information.
                     </p>
