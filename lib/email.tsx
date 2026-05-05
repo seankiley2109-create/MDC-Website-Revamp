@@ -12,6 +12,8 @@ import { SupportStaffEmail } from '@/emails/support-ticket';
 import SupportAutoEmail from '@/emails/support-ticket';
 import { CheckoutStaffEmail } from '@/emails/checkout-confirmation';
 import CheckoutAutoEmail from '@/emails/checkout-confirmation';
+import { ResourceDownloadStaffEmail } from '@/emails/resource-download';
+import ResourceDownloadAutoEmail from '@/emails/resource-download';
 
 // ---------------------------------------------------------------------------
 // Client
@@ -35,6 +37,7 @@ export type EnquiryType =
   | 'existing-client'
   | 'partnership'
   | 'compliance'
+  | 'ransomware'
   | 'general';
 
 export type AssessmentType = 'security' | 'popia';
@@ -63,16 +66,32 @@ export interface POSPayload {
   resolvedLines: POSServicePlan[];
 }
 
+export interface ResourceDownloadPayload {
+  name:          string;
+  email:         string;
+  resourceTitle: string;
+  resourceFile:  string;
+}
+
+export interface ResolvedConsultingService {
+  code:  string;
+  name:  string;
+  price: number;
+  type:  'once-off' | 'recurring';
+}
+
 export interface ConsultingPayload {
-  name: string;
-  email: string;
-  company: string;
-  phone?: string;
-  serviceType: string;
-  engagementModel?: string;
-  teamSize?: string;
-  timeline?: string;
-  requirements?: string;
+  type:              'consulting';
+  name:              string;
+  email:             string;
+  company:           string;
+  phone?:            string;
+  serviceType:       string;
+  resolvedServices?: ResolvedConsultingService[];
+  engagementModel?:  string;
+  teamSize?:         string;
+  timeline?:         string;
+  requirements?:     string;
 }
 
 export interface AssessmentPayload {
@@ -346,6 +365,42 @@ export async function sendCheckoutConfirmationEmails(p: CheckoutPayload): Promis
     return { success: true };
   } catch (err) {
     console.error('[email] sendCheckoutConfirmationEmails error:', err);
+    return { success: false, error: 'Email service unavailable.' };
+  }
+}
+
+export async function sendResourceDownloadEmails(p: ResourceDownloadPayload): Promise<EmailResult> {
+  try {
+    const [staffHtml, autoHtml] = await Promise.all([
+      render(createElement(ResourceDownloadStaffEmail, p)),
+      render(createElement(ResourceDownloadAutoEmail, p)),
+    ]);
+
+    const [staff, auto] = await Promise.all([
+      resend.emails.send({
+        from:    FROM_ADDRESS,
+        to:      [SALES_EMAIL],
+        replyTo: p.email,
+        subject: `[Resource Download] ${p.resourceTitle} — ${p.name}`,
+        html:    staffHtml,
+      }),
+      resend.emails.send({
+        from:    FROM_ADDRESS,
+        to:      [p.email],
+        replyTo: SALES_EMAIL,
+        subject: `Your download: ${p.resourceTitle} — Montana Data Company`,
+        html:    autoHtml,
+      }),
+    ]);
+
+    if (staff.error || auto.error) {
+      console.error('[email] Resource download email errors:', staff.error, auto.error);
+      return { success: false, error: 'Failed to send emails.' };
+    }
+
+    return { success: true };
+  } catch (err) {
+    console.error('[email] sendResourceDownloadEmails error:', err);
     return { success: false, error: 'Email service unavailable.' };
   }
 }

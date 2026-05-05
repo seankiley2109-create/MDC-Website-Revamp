@@ -1,12 +1,4 @@
 import * as React from 'react';
-
-export const PreviewProps: ContactEmailProps = {
-  name:        'Jane Smith',
-  email:       'jane@acme.co.za',
-  company:     'Acme Corp',
-  enquiryType: 'enterprise-backup',
-  message:     'We are looking to migrate 50TB of archival data to a resilient cloud backup solution before end of Q3.',
-};
 import { Link, Section, Text } from 'react-email';
 import {
   Badge,
@@ -41,6 +33,14 @@ export interface ContactEmailProps {
   enquiryType: EnquiryType;
   message:     string;
 }
+
+export const PreviewProps: ContactEmailProps = {
+  name:        'Jane Smith',
+  email:       'jane@acme.co.za',
+  company:     'Acme Corp',
+  enquiryType: 'enterprise-backup',
+  message:     'We are looking to migrate 50TB of archival data to a resilient cloud backup solution before end of Q3.',
+};
 
 const enquiryLabels: Record<EnquiryType, string> = {
   'enterprise-backup': 'Enterprise Backup',

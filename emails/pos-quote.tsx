@@ -1,15 +1,4 @@
 import * as React from 'react';
-
-export const PreviewProps: POSEmailProps = {
-  contact:     { name: 'Jane Smith', email: 'jane@acme.co.za', company: 'Acme Corp', notes: 'Prefer annual billing.' },
-  services:    ['enterprise-backup', 'guardium'],
-  plans:       { 'enterprise-backup': 'professional', guardium: 'standard' },
-  environment: { dataSize: '10TB', cloudProvider: 'AWS', retentionPeriod: '7 years' },
-  resolvedLines: [
-    { serviceId: 'enterprise-backup', serviceName: 'Enterprise Backup', planName: 'Professional', price: 'R 4 500 / mo' },
-    { serviceId: 'guardium', serviceName: 'IBM Guardium', planName: 'Standard', price: 'R 3 200 / mo' },
-  ],
-};
 import { Link, Section, Text } from 'react-email';
 import {
   C,
@@ -43,6 +32,17 @@ export interface POSEmailProps {
   environment:  Record<string, string>;
   resolvedLines: POSServicePlan[];
 }
+
+export const PreviewProps: POSEmailProps = {
+  contact:     { name: 'Jane Smith', email: 'jane@acme.co.za', company: 'Acme Corp', notes: 'Prefer annual billing.' },
+  services:    ['enterprise-backup', 'guardium'],
+  plans:       { 'enterprise-backup': 'professional', guardium: 'standard' },
+  environment: { dataSize: '10TB', cloudProvider: 'AWS', retentionPeriod: '7 years' },
+  resolvedLines: [
+    { serviceId: 'enterprise-backup', serviceName: 'Enterprise Backup', planName: 'Professional', price: 'R 4 500 / mo' },
+    { serviceId: 'guardium', serviceName: 'IBM Guardium', planName: 'Standard', price: 'R 3 200 / mo' },
+  ],
+};
 
 const NEXT_STEPS_CONFIRM = [
   'A senior Montana Data engineer will review your configuration and prepare a tailored proposal.',

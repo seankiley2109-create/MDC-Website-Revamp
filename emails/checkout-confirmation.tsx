@@ -1,15 +1,4 @@
 import * as React from 'react';
-
-export const PreviewProps: CheckoutEmailProps = {
-  customer:     { name: 'Jane Smith', email: 'jane@acme.co.za', company: 'Acme Corp' },
-  cart:         [
-    { name: 'Enterprise Backup — Professional', quantity: 1, unit_price: 4500,  line_total: 4500 },
-    { name: 'IBM Guardium — Standard',          quantity: 1, unit_price: 3200,  line_total: 3200 },
-  ],
-  totalZAR:     7700,
-  contractTerm: 'monthly',
-  reference:    'MDC-2026-00142',
-};
 import { Link, Section, Text } from 'react-email';
 import {
   C,
@@ -43,6 +32,17 @@ export interface CheckoutEmailProps {
   contractTerm: 'monthly' | 'yearly';
   reference:    string;
 }
+
+export const PreviewProps: CheckoutEmailProps = {
+  customer:     { name: 'Jane Smith', email: 'jane@acme.co.za', company: 'Acme Corp' },
+  cart:         [
+    { name: 'Enterprise Backup — Professional', quantity: 1, unit_price: 4500,  line_total: 4500 },
+    { name: 'IBM Guardium — Standard',          quantity: 1, unit_price: 3200,  line_total: 3200 },
+  ],
+  totalZAR:     7700,
+  contractTerm: 'monthly',
+  reference:    'MDC-2026-00142',
+};
 
 const NEXT_STEPS = [
   'Our engineering team will provision your services within one business day.',

@@ -1,14 +1,4 @@
 import * as React from 'react';
-
-export const PreviewProps: SupportTicketEmailProps = {
-  name:     'Jane Smith',
-  email:    'jane@acme.co.za',
-  company:  'Acme Corp',
-  subject:  'Backup agent not connecting to vault',
-  category: 'technical',
-  priority: 'high',
-  message:  'Our backup agent on the Johannesburg node has been failing since Tuesday. Logs show a TLS handshake timeout when reaching the vault endpoint.',
-};
 import { Link, Section, Text } from 'react-email';
 import {
   Badge,
@@ -38,6 +28,16 @@ export interface SupportTicketEmailProps {
   priority: SupportPriority;
   message:  string;
 }
+
+export const PreviewProps: SupportTicketEmailProps = {
+  name:     'Jane Smith',
+  email:    'jane@acme.co.za',
+  company:  'Acme Corp',
+  subject:  'Backup agent not connecting to vault',
+  category: 'technical',
+  priority: 'high',
+  message:  'Our backup agent on the Johannesburg node has been failing since Tuesday. Logs show a TLS handshake timeout when reaching the vault endpoint.',
+};
 
 const categoryLabels: Record<SupportCategory, string> = {
   technical:  'Technical Issue',

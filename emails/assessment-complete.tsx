@@ -1,15 +1,4 @@
 import * as React from 'react';
-
-export const PreviewProps: AssessmentEmailProps = {
-  type:           'popia',
-  lead:           { name: 'Jane Smith', email: 'jane@acme.co.za', company: 'Acme Corp' },
-  answers:        { 1: 2, 2: 1, 3: 3 },
-  score:          13,
-  riskLevel:      'Moderate Risk',
-  fullyCompliant: 6,
-  partial:        5,
-  criticalGaps:   2,
-};
 import { Link, Section, Text } from 'react-email';
 import {
   Badge,
@@ -41,6 +30,17 @@ export interface AssessmentEmailProps {
   partial:        number;
   criticalGaps:   number;
 }
+
+export const PreviewProps: AssessmentEmailProps = {
+  type:           'popia',
+  lead:           { name: 'Jane Smith', email: 'jane@acme.co.za', company: 'Acme Corp' },
+  answers:        { 1: 2, 2: 1, 3: 3 },
+  score:          13,
+  riskLevel:      'Moderate Risk',
+  fullyCompliant: 6,
+  partial:        5,
+  criticalGaps:   2,
+};
 
 function riskColor(level: RiskLevel): string {
   if (level === 'High Risk') return 'red';
