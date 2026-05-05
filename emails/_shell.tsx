@@ -5,6 +5,7 @@ import {
   Head,
   Hr,
   Html,
+  Img,
   Link,
   Preview,
   Row,
@@ -63,10 +64,14 @@ export function EmailShell({ title, preview, children }: ShellProps) {
                     {title}
                   </Text>
                 </Column>
-                <Column style={{ width: '60px', verticalAlign: 'middle', textAlign: 'right' }}>
-                  <div style={{ width: '48px', height: '48px', background: C.accent, borderRadius: '50%', display: 'inline-block', lineHeight: '48px', textAlign: 'center' }}>
-                    <span style={{ fontSize: '22px', color: '#fff' }}>&#9632;</span>
-                  </div>
+                <Column style={{ width: '80px', verticalAlign: 'middle', textAlign: 'right' }}>
+                  <Img
+                    src="https://montanadc.com/logos/montana-logo.svg"
+                    width="80"
+                    height="46"
+                    alt="Montana Data Company"
+                    style={{ display: 'block', marginLeft: 'auto' }}
+                  />
                 </Column>
               </Row>
             </Section>
