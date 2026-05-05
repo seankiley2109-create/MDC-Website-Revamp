@@ -328,6 +328,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
           reference,
         };
 
+        console.log('[subscribe/callback] Sending checkout email to:', verifyData.customer.email, 'cart items:', checkoutCart.length);
         const [emailResult] = await Promise.allSettled([
           sendCheckoutConfirmationEmails(checkoutPayload),
         ]);

@@ -107,7 +107,7 @@ const CLOUD_SERVICES: {
     tagline:     "Device Management",
     description: "Unified endpoint management and threat defense. Secure corporate data across all mobile devices, tablets, and BYOD environments.",
     unitLabel:   "devices",
-    imageSrc:    "/products/maas360-logo.png",
+    imageSrc:    "/products/IBM.png",
   },
 ];
 
