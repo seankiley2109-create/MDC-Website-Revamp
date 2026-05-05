@@ -224,6 +224,7 @@ function ServiceConfigCard({
   const dims = SERVICE_DIMENSIONS[service.id];
   const { unitPrice, lineTotal, planId, valid } = getCartItemPrice(service.id, config);
   const isServer = service.id === "druva-server";
+  const maxQty = service.id === "druva-server" ? 10 : 50;
   const needsEmails = service.id === "druva-m365" || service.id === "druva-endpoint";
   const parsedEmails = needsEmails
     ? userEmails.split(/[\n,;]+/).map(e => e.trim()).filter(e => e.includes('@'))
@@ -459,19 +460,22 @@ function ServiceConfigCard({
                   <input
                     type="number"
                     min="1"
+                    max={maxQty}
                     value={config.quantity}
-                    onChange={e => { quantityTouched.current = true; setPendingSync(null); onConfigChange(service.id, { quantity: Math.max(1, parseInt(e.target.value) || 1) }); }}
+                    onChange={e => { quantityTouched.current = true; setPendingSync(null); onConfigChange(service.id, { quantity: Math.min(maxQty, Math.max(1, parseInt(e.target.value) || 1)) }); }}
                     className="w-20 text-center border border-white/10 bg-montana-surface/50 py-1.5 text-white text-sm focus:border-montana-pink focus:outline-none"
                   />
                   <button
                     type="button"
-                    onClick={() => { quantityTouched.current = true; setPendingSync(null); onConfigChange(service.id, { quantity: config.quantity + 1 }); }}
-                    className="h-8 w-8 flex items-center justify-center border border-white/10 text-white/70 hover:border-white/30 hover:text-white transition-colors"
+                    disabled={config.quantity >= maxQty}
+                    onClick={() => { quantityTouched.current = true; setPendingSync(null); onConfigChange(service.id, { quantity: Math.min(maxQty, config.quantity + 1) }); }}
+                    className="h-8 w-8 flex items-center justify-center border border-white/10 text-white/70 hover:border-white/30 hover:text-white transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
                   >
                     <Plus className="h-3 w-3" />
                   </button>
                   <span className="text-xs text-montana-muted">{service.unitLabel}</span>
                 </div>
+                <div className="text-[10px] text-white/30 mt-1">Max {maxQty} per order — contact us for larger volumes</div>
               </div>
             )}
 

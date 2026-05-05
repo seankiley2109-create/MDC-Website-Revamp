@@ -104,7 +104,6 @@ function renderExcerpt(text: string) {
   return (
     <>
       {nodes}
-      <span className="text-montana-muted/50 text-sm"> …</span>
     </>
   );
 }
