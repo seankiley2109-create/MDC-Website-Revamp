@@ -1,16 +1,8 @@
 import Link from "next/link";
-import { ArrowRight, BookOpen, Calendar, Clock } from "lucide-react";
 import type { Metadata } from "next";
-import {
-  getAllPosts,
-  formatDate,
-  CATEGORY_COLORS,
-  BLOG_CATEGORIES,
-  type BlogCategory,
-} from "@/lib/blog";
-import { SpotlightCard } from "@/components/ui/spotlight-card";
+import { getAllPosts } from "@/lib/blog";
 import { AnimatedButton } from "@/components/ui/animated-button";
-import { CategoryFilter } from "./components/CategoryFilter";
+import { BlogGrid } from "./components/BlogGrid";
 
 export const metadata: Metadata = {
   title: "Blog & Insights | Montana Data Company",
@@ -24,33 +16,9 @@ export const metadata: Metadata = {
   },
 };
 
-export default async function BlogPage(props: {
-  searchParams: Promise<{ category?: string }>;
-}) {
-  const searchParams = await props.searchParams;
-  const activeCategory = searchParams.category as BlogCategory | undefined;
-
-  const allPosts = getAllPosts();
-
-  const filtered = activeCategory
-    ? allPosts.filter((p) => p.category === activeCategory)
-    : allPosts;
-
-  const featured = !activeCategory ? allPosts.find((p) => p.featured) : undefined;
-  // When a category is active, show ALL matching posts in the grid (including featured).
-  // When on "All", hide the featured post from the grid only if other posts exist alongside it.
-  const otherPosts = filtered.filter((p) => !p.featured);
-  const nonFeatured = activeCategory
-    ? filtered
-    : otherPosts.length > 0
-    ? otherPosts
-    : filtered; // only 1 post and it's featured → still show it in the grid
-
-  // Category counts for filter badges
-  const counts = BLOG_CATEGORIES.reduce<Record<string, number>>((acc, cat) => {
-    acc[cat] = allPosts.filter((p) => p.category === cat).length;
-    return acc;
-  }, {});
+export default function BlogPage() {
+  const posts = getAllPosts();
+  const featured = posts.find((p) => p.featured);
 
   return (
     <div className="pt-24 min-h-screen">
@@ -73,144 +41,8 @@ export default async function BlogPage(props: {
           </p>
         </div>
 
-        {/* ── Featured Post ─────────────────────────────────────────────────── */}
-        {featured && !activeCategory && (
-          <div className="mb-16">
-            <SpotlightCard customSize className="p-0 overflow-hidden">
-              <div className="flex flex-col lg:flex-row">
-                {/* Content */}
-                <div className="flex-1 p-8 md:p-12 flex flex-col justify-between">
-                  <div>
-                    <div className="flex items-center gap-3 mb-6">
-                      <span
-                        className={`inline-flex items-center gap-1.5 px-3 py-1 text-xs font-bold uppercase border ${CATEGORY_COLORS[featured.category].bg} ${CATEGORY_COLORS[featured.category].border} ${CATEGORY_COLORS[featured.category].text}`}
-                      >
-                        {featured.category}
-                      </span>
-                      <span className="text-xs text-montana-muted/60 font-medium uppercase tracking-wider">
-                        Featured
-                      </span>
-                    </div>
-                    <h2 className="font-display text-2xl md:text-3xl font-bold text-white mb-4 leading-tight">
-                      {featured.title}
-                    </h2>
-                    <p className="text-montana-muted leading-relaxed mb-6 max-w-xl">
-                      {featured.excerpt}
-                    </p>
-                  </div>
-                  <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-                    <Link href={`/blog/${featured.slug}`}>
-                      <AnimatedButton variant="primary" className="group">
-                        Read Article
-                        <ArrowRight className="ml-2 h-4 w-4 btn-arrow" />
-                      </AnimatedButton>
-                    </Link>
-                    <div className="flex items-center gap-4 text-xs text-montana-muted/60">
-                      <span className="flex items-center gap-1.5">
-                        <Calendar className="h-3.5 w-3.5" />
-                        {formatDate(featured.publishedAt)}
-                      </span>
-                      <span className="flex items-center gap-1.5">
-                        <Clock className="h-3.5 w-3.5" />
-                        {featured.readTime}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-                {/* Accent panel */}
-                <div className="hidden lg:flex w-72 bg-montana-pink/5 border-l border-white/5 items-center justify-center p-12 relative overflow-hidden">
-                  <div className="absolute inset-0 bg-grid-pattern opacity-20" />
-                  <div className="relative z-10 flex flex-col items-center text-center gap-4">
-                    <div className="h-16 w-16 rounded-full bg-montana-pink/10 border border-montana-pink/20 flex items-center justify-center">
-                      <BookOpen className="h-7 w-7 text-montana-pink" />
-                    </div>
-                    <div className="text-xs font-bold uppercase tracking-widest text-montana-muted">
-                      {featured.readTime}
-                    </div>
-                    <div className="flex flex-wrap gap-1 justify-center">
-                      {featured.tags.slice(0, 3).map((tag) => (
-                        <span
-                          key={tag}
-                          className="text-xs px-2 py-0.5 bg-white/5 border border-white/10 text-montana-muted/70"
-                        >
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </SpotlightCard>
-          </div>
-        )}
-
-        {/* ── Filter + Grid ─────────────────────────────────────────────────── */}
-        <div className="mb-8">
-          <CategoryFilter counts={counts} totalCount={allPosts.length} />
-        </div>
-
-        {activeCategory && nonFeatured.length === 0 ? (
-          <div className="py-24 text-center text-montana-muted">
-            <BookOpen className="h-10 w-10 mx-auto mb-4 opacity-30" />
-            <p className="text-lg">No articles in this category yet.</p>
-            <p className="text-sm mt-1 opacity-60">Check back soon.</p>
-          </div>
-        ) : nonFeatured.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-24">
-            {nonFeatured.map((post) => {
-              const colors = CATEGORY_COLORS[post.category];
-              return (
-                <SpotlightCard key={post.slug} customSize className="flex flex-col h-full group">
-                  {/* Category badge */}
-                  <div className="flex items-center justify-between mb-5">
-                    <span
-                      className={`inline-flex px-2.5 py-1 text-xs font-bold uppercase border ${colors.bg} ${colors.border} ${colors.text}`}
-                    >
-                      {post.category}
-                    </span>
-                    <span className="text-xs text-montana-muted/50 flex items-center gap-1">
-                      <Clock className="h-3 w-3" />
-                      {post.readTime}
-                    </span>
-                  </div>
-
-                  {/* Title + excerpt */}
-                  <h3 className="font-display text-lg font-bold text-white mb-3 leading-snug group-hover:text-montana-pink transition-colors duration-200">
-                    {post.title}
-                  </h3>
-                  <p className="text-sm text-montana-muted leading-relaxed flex-1 mb-5">
-                    {post.excerpt}
-                  </p>
-
-                  {/* Meta */}
-                  <div className="flex items-center gap-1.5 text-xs text-montana-muted/50 mb-5">
-                    <Calendar className="h-3.5 w-3.5" />
-                    {formatDate(post.publishedAt)}
-                  </div>
-
-                  {/* Tags */}
-                  <div className="flex flex-wrap gap-1.5 mb-5">
-                    {post.tags.slice(0, 3).map((tag) => (
-                      <span
-                        key={tag}
-                        className="text-xs px-2 py-0.5 bg-white/[0.03] border border-white/5 text-montana-muted/60"
-                      >
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-
-                  <Link href={`/blog/${post.slug}`} className="mt-auto">
-                    <AnimatedButton variant="outline" className="w-full text-sm">
-                      Read Article
-                      <ArrowRight className="ml-2 h-3.5 w-3.5 btn-arrow" />
-                    </AnimatedButton>
-                  </Link>
-                </SpotlightCard>
-              );
-            })}
-          </div>
-        ) : null}
+        {/* ── Interactive grid (client) ─────────────────────────────────────── */}
+        <BlogGrid posts={posts} featured={featured} />
 
         {/* ── CTA Banner ────────────────────────────────────────────────────── */}
         <div className="border border-white/10 bg-montana-surface/30 p-10 md:p-14 text-center relative overflow-hidden">

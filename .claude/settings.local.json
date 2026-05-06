@@ -28,7 +28,8 @@
       "Bash(node *)",
       "Bash(Remove-Item *)",
       "Bash(Get-ChildItem *)",
-      "Bash(grep -E \"\\\\.\\(ts|js|css\\))"
+      "Bash(grep -E \"\\\\.\\(ts|js|css\\))",
+      "Bash(del *)"
     ]
   }
 }
