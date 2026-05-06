@@ -31,9 +31,9 @@ This document is the single source of truth for the blog content programme. Upda
 | # | Slug | Title | Category | Target Keyword | Est. Words | Status |
 |---|------|-------|----------|----------------|-----------|--------|
 | 1 | `m365-backup` | What Microsoft 365 Doesn't Back Up | SaaS Protection | microsoft 365 backup south africa | ~1,400 | ✅ Published |
-| 2 | `popia-information-officer` | POPIA Information Officer: Duties, Liability & Appointment | POPIA Compliance | popia information officer | ~2,000 | 📋 Planned |
-| 3 | `rto-rpo-explained` | RTO vs RPO: A Plain-Language Guide for Executives | Data Governance | rto rpo explained | ~1,500 | 📋 Planned |
-| 4 | `ransomware-recovery-time` | How Long Does Ransomware Recovery Take? | Ransomware & Recovery | ransomware recovery time | ~1,600 | 📋 Planned |
+| 2 | `popia-information-officer` | POPIA Information Officer: Duties, Liability & Appointment | POPIA Compliance | popia information officer | ~1,800 | ✅ Published |
+| 3 | `rto-rpo-explained` | RTO vs RPO: A Plain-Language Guide for Executives | Data Governance | rto rpo explained | ~1,500 | ✅ Published |
+| 4 | `ransomware-recovery-time` | How Long Does Ransomware Recovery Take? | Ransomware & Recovery | ransomware recovery time | ~1,700 | ✅ Published |
 
 ---
 
