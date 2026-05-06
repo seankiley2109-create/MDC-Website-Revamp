@@ -24,7 +24,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
     // Legal — excluded from search indexing via metadata but included for crawlability
     { url: `${BASE}/privacy`,               lastModified: now, changeFrequency: 'yearly',  priority: 0.2 },
-    { url: `${BASE}/terms`,                 lastModified: now, changeFrequency: 'yearly',  priority: 0.2 },
     { url: `${BASE}/paia`,                  lastModified: now, changeFrequency: 'yearly',  priority: 0.2 },
   ];
 }

@@ -19,6 +19,7 @@ const spaceGrotesk = Space_Grotesk({
 const BASE_URL = 'https://montanadc.com';
 const TITLE    = 'Enterprise Cloud Backup & Data Protection | Montana Data Company';
 const DESC     = 'Montana Data Company helps organisations protect, recover, move, and govern critical data through enterprise-grade cloud backup, secure transfer, and cyber resilience.';
+const OG_IMAGE = [{ url: '/opengraph-image', width: 1200, height: 630, alt: 'Montana Data Company' }];
 
 export const metadata: Metadata = {
   metadataBase: new URL(BASE_URL),
@@ -33,16 +34,50 @@ export const metadata: Metadata = {
     title:       TITLE,
     description: DESC,
     url:         BASE_URL,
+    images:      OG_IMAGE,
   },
   twitter: {
     card:        'summary_large_image',
     title:       TITLE,
     description: DESC,
+    images:      OG_IMAGE,
   },
   robots: {
     index:  true,
     follow: true,
   },
+};
+
+const ORG_SCHEMA = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'Organization',
+      '@id': `${BASE_URL}/#organization`,
+      name: 'Montana Data Company',
+      url: BASE_URL,
+      logo: { '@type': 'ImageObject', url: `${BASE_URL}/logos/montana-logo.svg` },
+      description: DESC,
+      telephone: '+27871883843',
+      email: 'support@montanadc.com',
+      address: {
+        '@type': 'PostalAddress',
+        streetAddress: 'Suite 24, Frazzitta Business Park, Cnr Langeberg & Batis Roads',
+        addressLocality: 'Durbanville',
+        addressRegion: 'Western Cape',
+        postalCode: '7550',
+        addressCountry: 'ZA',
+      },
+      areaServed: { '@type': 'Country', name: 'South Africa' },
+    },
+    {
+      '@type': 'WebSite',
+      '@id': `${BASE_URL}/#website`,
+      url: BASE_URL,
+      name: 'Montana Data Company',
+      publisher: { '@id': `${BASE_URL}/#organization` },
+    },
+  ],
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -72,6 +107,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <Chatbot />
           <SpeedInsights />
         </div>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(ORG_SCHEMA) }}
+        />
       </body>
     </html>
   );

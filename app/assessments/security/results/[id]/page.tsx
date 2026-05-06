@@ -17,6 +17,7 @@ import type { LucideIcon } from "lucide-react";
 export const metadata: Metadata = {
   title: "Security Assessment Results | Montana Data Company",
   description: "Your backup and cyber-resilience risk score with personalised recommendations from Montana Data Company.",
+  robots: { index: false, follow: false },
 };
 
 const GAP_META: Record<string, { Icon: LucideIcon; description: string }> = {

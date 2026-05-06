@@ -5,11 +5,14 @@ import { Shield, Target, Globe, Users, Server, Database, Smartphone, CheckCircle
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "About Us — Enterprise Data Resilience Partner | Montana Data Company",
+  title: "About Us — Enterprise Data Resilience Partner",
   description: "Montana Data Company is a trusted enterprise data resilience partner delivering cloud backup, cyber security, and POPIA compliance solutions across South Africa.",
+  alternates: { canonical: '/about' },
   openGraph: {
     title: "About Us — Enterprise Data Resilience Partner | Montana Data Company",
     description: "Montana Data Company is a trusted enterprise data resilience partner delivering cloud backup, cyber security, and POPIA compliance solutions across South Africa.",
+    url: 'https://montanadc.com/about',
+    images: [{ url: '/opengraph-image', width: 1200, height: 630, alt: 'Montana Data Company' }],
   },
 };
 

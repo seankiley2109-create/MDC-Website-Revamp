@@ -9,13 +9,15 @@ import {
 } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'Become a Reseller — Montana Data Company Partner Programme',
+  title: 'Become a Reseller — Partner Programme',
   description:
     'Grow your business by reselling Montana Data Company\'s enterprise data protection, backup, and compliance portfolio across South Africa.',
+  alternates: { canonical: '/partners' },
   openGraph: {
-    title:       'Reseller Programme | Montana Data Company',
-    description: 'Grow your business by reselling Montana\'s enterprise data protection portfolio.',
+    title:       'Become a Reseller — Montana Data Company Partner Programme',
+    description: 'Grow your business by reselling Montana Data Company\'s enterprise data protection, backup, and compliance portfolio across South Africa.',
     url:         'https://montanadc.com/partners',
+    images:      [{ url: '/opengraph-image', width: 1200, height: 630, alt: 'Montana Data Company' }],
   },
 };
 

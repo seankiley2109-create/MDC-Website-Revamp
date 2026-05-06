@@ -17,6 +17,7 @@ import type { LucideIcon } from "lucide-react";
 export const metadata: Metadata = {
   title: "POPIA Assessment Results | Montana Data Company",
   description: "Your POPIA compliance risk score and personalised recommendations from Montana Data Company.",
+  robots: { index: false, follow: false },
 };
 
 const GAP_CTA: Record<string, { label: string; href: string }> = {

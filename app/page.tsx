@@ -1,3 +1,17 @@
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: { absolute: 'Enterprise Cloud Backup & Data Protection | Montana Data Company' },
+  description: 'Montana Data Company helps organisations protect, recover, move, and govern critical data through enterprise-grade cloud backup, secure transfer, and cyber resilience.',
+  alternates: { canonical: '/' },
+  openGraph: {
+    title: 'Enterprise Cloud Backup & Data Protection | Montana Data Company',
+    description: 'Montana Data Company helps organisations protect, recover, move, and govern critical data through enterprise-grade cloud backup, secure transfer, and cyber resilience.',
+    url: 'https://montanadc.com',
+    images: [{ url: '/opengraph-image', width: 1200, height: 630, alt: 'Montana Data Company' }],
+  },
+};
+
 import { Hero } from "@/components/sections/hero";
 import { TrustStrip } from "@/components/sections/trust-strip";
 import { ClientLogos } from "@/components/sections/client-logos";

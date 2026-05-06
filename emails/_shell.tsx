@@ -67,8 +67,8 @@ export function EmailShell({ title, preview, children }: ShellProps) {
                 <Column style={{ width: '80px', verticalAlign: 'middle', textAlign: 'right' }}>
                   <Img
                     src="https://montanadc.com/logos/montana-logo.svg"
-                    width="140"
-                    height="100"
+                    width="120"
+                    height="75"
                     alt="Montana Data Company"
                     style={{ display: 'block', marginLeft: 'auto' }}
                   />

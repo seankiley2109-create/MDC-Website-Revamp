@@ -5,12 +5,56 @@ import { Database, ShieldCheck, FileText, Server, Smartphone, Lock, Archive, Shi
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Enterprise Data Protection & Backup Services | Montana Data Company",
+  title: "Enterprise Data Protection & Backup Services",
   description: "Explore Montana Data Company's enterprise-grade cloud backup, ransomware protection, POPIA compliance consulting, and cyber resilience services across South Africa.",
+  alternates: { canonical: '/services' },
   openGraph: {
     title: "Enterprise Data Protection & Backup Services | Montana Data Company",
     description: "Explore Montana Data Company's enterprise-grade cloud backup, ransomware protection, POPIA compliance consulting, and cyber resilience services across South Africa.",
+    url: 'https://montanadc.com/services',
+    images: [{ url: '/opengraph-image', width: 1200, height: 630, alt: 'Montana Data Company' }],
   },
+};
+
+const SERVICES_SCHEMA = {
+  '@context': 'https://schema.org',
+  '@type': 'ItemList',
+  name: 'Montana Data Company Services',
+  url: 'https://montanadc.com/services',
+  itemListElement: [
+    {
+      '@type': 'ListItem', position: 1,
+      item: { '@type': 'Service', name: 'Enterprise Backup', description: 'Bespoke, consultative data protection architecture for complex, multi-cloud, and hybrid environments.', provider: { '@id': 'https://montanadc.com/#organization' }, areaServed: 'ZA' },
+    },
+    {
+      '@type': 'ListItem', position: 2,
+      item: { '@type': 'Service', name: 'SaaS & Endpoint Backup', description: 'Structured, scalable cloud backup for Microsoft 365, Google Workspace, Salesforce, and distributed endpoints.', provider: { '@id': 'https://montanadc.com/#organization' }, areaServed: 'ZA' },
+    },
+    {
+      '@type': 'ListItem', position: 3,
+      item: { '@type': 'Service', name: 'Ransomware Protection', description: 'Immutable air-gapped storage, AI anomaly detection, and guaranteed clean-copy recovery against ransomware attacks.', provider: { '@id': 'https://montanadc.com/#organization' }, areaServed: 'ZA' },
+    },
+    {
+      '@type': 'ListItem', position: 4,
+      item: { '@type': 'Service', name: 'Archive & Lifecycle Management', description: 'Intelligent data lifecycle management for cost-effective storage tiers and compliance-ready retention.', provider: { '@id': 'https://montanadc.com/#organization' }, areaServed: 'ZA' },
+    },
+    {
+      '@type': 'ListItem', position: 5,
+      item: { '@type': 'Service', name: 'MaaS360 MDM / UEM', description: 'Unified endpoint management securing corporate data across all mobile devices, tablets, and BYOD environments.', provider: { '@id': 'https://montanadc.com/#organization' }, areaServed: 'ZA' },
+    },
+    {
+      '@type': 'ListItem', position: 6,
+      item: { '@type': 'Service', name: 'IBM Guardium', description: 'Advanced data security, monitoring, and governance — discover, encrypt, and monitor sensitive data in real-time.', provider: { '@id': 'https://montanadc.com/#organization' }, areaServed: 'ZA' },
+    },
+    {
+      '@type': 'ListItem', position: 7,
+      item: { '@type': 'Service', name: 'POPIA Consulting', description: 'Strategic alignment of data practices with POPIA privacy laws and South African regulatory requirements.', provider: { '@id': 'https://montanadc.com/#organization' }, areaServed: 'ZA' },
+    },
+    {
+      '@type': 'ListItem', position: 8,
+      item: { '@type': 'Service', name: 'Quantum Security (PQC)', description: 'Post-Quantum Cryptography consulting and NIST alignment to future-proof encryption against quantum computing threats.', provider: { '@id': 'https://montanadc.com/#organization' }, areaServed: 'ZA' },
+    },
+  ],
 };
 
 export default function ServicesPage() {
@@ -326,6 +370,7 @@ export default function ServicesPage() {
         </div>
 
       </div>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(SERVICES_SCHEMA) }} />
     </div>
   );
 }
