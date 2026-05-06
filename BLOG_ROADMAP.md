@@ -10,7 +10,7 @@ This document is the single source of truth for the blog content programme. Upda
 |---|---|---|
 | `/blog` listing page | ✅ Done | Server component, category filter, featured post, CTA banner |
 | `/blog/[slug]` article page | ✅ Done | Article schema, breadcrumbs, sidebar CTAs, related articles |
-| `lib/blog.ts` registry | ✅ Done | All 15 articles registered; article 1 published, 2–15 drafts |
+| `lib/blog.ts` registry | ✅ Done | All 37 articles registered; articles 1–37 published |
 | `CategoryFilter` client component | ✅ Done | URL-param based filtering, category counts |
 | `ArticleContent` renderer | ✅ Done | react-markdown with Tailwind typography prose styles |
 | Blog added to navbar | ✅ Done | Inserted between Resources and Assessments |
@@ -41,8 +41,8 @@ This document is the single source of truth for the blog content programme. Upda
 
 | # | Slug | Title | Category | Target Keyword | Est. Words | Status |
 |---|------|-------|----------|----------------|-----------|--------|
-| 5 | `immutable-backup-explained` | Immutable Backup: What It Is and Why Your Current Backup Isn't Enough | Ransomware & Recovery | immutable backup | ~1,400 | 📋 Planned |
-| 6 | `popia-vs-gdpr` | POPIA vs GDPR: Key Differences | POPIA Compliance | popia vs gdpr | ~1,800 | 📋 Planned |
+| 5 | `immutable-backup-explained` | Immutable Backup: What It Is and Why Your Current Backup Isn't Enough | Ransomware & Recovery | immutable backup | ~1,400 | ✅ Published |
+| 6 | `popia-vs-gdpr` | POPIA vs GDPR: Key Differences | POPIA Compliance | popia vs gdpr | ~1,800 | ✅ Published |
 | 7 | `popia-data-breach-notification` | POPIA Data Breach Notification: Step-by-Step | POPIA Compliance | popia data breach notification | ~2,000 | 📋 Planned |
 | 8 | `popia-compliance-financial-services` | POPIA for Financial Services: FSCA, FAIS & Data Protection | POPIA Compliance | popia financial services | ~2,200 | 📋 Planned |
 
@@ -54,8 +54,8 @@ This document is the single source of truth for the blog content programme. Upda
 |---|------|-------|----------|----------------|-----------|--------|
 | 9 | `ibm-guardium-explained` | What Is IBM Guardium and Which Organisations Need It? | Data Governance | ibm guardium | ~1,800 | 📋 Planned |
 | 10 | `business-continuity-plan-south-africa` | How to Build a Business Continuity Plan for SA Organisations | Data Governance | business continuity plan south africa | ~2,500 | 📋 Planned |
-| 11 | `post-quantum-cryptography-guide` | Post-Quantum Cryptography: What Executives Need to Know Before 2030 | Quantum Security | post quantum cryptography | ~2,000 | 📋 Planned |
-| 12 | `popia-readiness-checklist` | POPIA Readiness Checklist: 20 Questions Every CIO Should Answer | POPIA Compliance | popia compliance checklist | ~1,600 | 📋 Planned |
+| 11 | `post-quantum-cryptography-guide` | Post-Quantum Cryptography: What Executives Need to Know Before 2030 | Quantum Security | post quantum cryptography | ~2,000 | ✅ Published |
+| 12 | `popia-readiness-checklist` | POPIA Readiness Checklist: 20 Questions Every CIO Should Answer | POPIA Compliance | popia compliance checklist | ~1,600 | ✅ Published |
 
 ---
 
@@ -63,9 +63,9 @@ This document is the single source of truth for the blog content programme. Upda
 
 | # | Slug | Title | Category | Target Keyword | Est. Words | Status |
 |---|------|-------|----------|----------------|-----------|--------|
-| 13 | `salesforce-backup-risks` | Salesforce Data Loss: 5 Scenarios Nobody Talks About | SaaS Protection | salesforce backup | ~1,400 | 📋 Planned |
-| 14 | `3-2-1-1-0-backup-rule` | The 3-2-1-1-0 Backup Rule Explained | Cloud Backup | 3-2-1 backup rule | ~1,000 | 📋 Planned |
-| 15 | `byod-data-risk` | BYOD Data Risk: What Leaves with the Employee | Data Governance | byod data security | ~1,200 | 📋 Planned |
+| 13 | `salesforce-backup-risks` | Salesforce Data Loss: 5 Scenarios Nobody Talks About | SaaS Protection | salesforce backup | ~1,400 | ✅ Published |
+| 14 | `3-2-1-1-0-backup-rule` | The 3-2-1-1-0 Backup Rule Explained | Cloud Backup | 3-2-1 backup rule | ~1,000 | ✅ Published |
+| 15 | `byod-data-risk` | BYOD Data Risk: What Leaves with the Employee | Data Governance | byod data security | ~1,200 | ✅ Published |
 | 16 | `what-is-ransomware` | What Is Ransomware? A Plain-English Guide for Business | Ransomware & Recovery | what is ransomware | ~1,400 | ✅ Published |
 | 17 | `what-is-popia` | What Is POPIA and Does It Apply to My Business? | POPIA Compliance | what is popia | ~1,600 | ✅ Published |
 | 18 | `how-ransomware-spreads` | How Does Ransomware Spread? 6 Common Entry Points | Ransomware & Recovery | how does ransomware spread | ~1,400 | ✅ Published |
@@ -74,6 +74,20 @@ This document is the single source of truth for the blog content programme. Upda
 | 21 | `ransomware-cost-south-africa` | How Much Does a Ransomware Attack Cost SA Businesses? | Ransomware & Recovery | ransomware cost south africa | ~1,400 | ✅ Published |
 | 22 | `popia-compliance-guide` | POPIA Compliance: The Complete Guide for South African SMEs | POPIA Compliance | popia compliance south africa | ~2,400 | ✅ Published |
 | 23 | `cloud-backup-south-africa` | Cloud Backup for South African Businesses: A Complete Guide | Cloud Backup | cloud backup south africa | ~2,200 | ✅ Published |
+| 24 | `how-to-backup-m365` | How to Back Up Microsoft 365 for Your Business | SaaS Protection | how to backup microsoft 365 | ~1,600 | ✅ Published |
+| 25 | `popia-compliance-mistakes` | 7 Common POPIA Compliance Mistakes South African Businesses Make | POPIA Compliance | popia compliance mistakes | ~1,700 | ✅ Published |
+| 26 | `ransomware-backup-failure` | Ransomware vs Backup: Why Most Backups Fail After an Attack | Ransomware & Recovery | ransomware backup failure | ~1,400 | ✅ Published |
+| 27 | `onprem-vs-cloud-backup` | On-Premise vs Cloud Backup: Which Is Right for Your Business? | Cloud Backup | on premise vs cloud backup | ~1,600 | ✅ Published |
+| 28 | `should-you-pay-ransomware` | Should You Pay a Ransomware Ransom? The Honest Answer | Ransomware & Recovery | should you pay ransomware ransom | ~1,500 | ✅ Published |
+| 29 | `paia-manual-guide` | How to Build a PAIA Manual for Your Business | POPIA Compliance | paia manual south africa | ~1,700 | ✅ Published |
+| 30 | `endpoint-backup-vs-antivirus` | Endpoint Backup vs Antivirus: Why Your Business Needs Both | Cloud Backup | endpoint backup south africa | ~1,500 | ✅ Published |
+| 31 | `ransomware-recovery-without-paying` | Ransomware Recovery Without Paying the Ransom | Ransomware & Recovery | ransomware recovery south africa | ~1,600 | ✅ Published |
+| 32 | `popia-cloud-storage` | POPIA and Cloud Storage: What SA Businesses Must Know | POPIA Compliance | popia cloud storage compliance | ~1,700 | ✅ Published |
+| 33 | `salesforce-backup-guide` | How to Back Up Salesforce Data: A Business Guide | SaaS Protection | salesforce backup south africa | ~1,600 | ✅ Published |
+| 34 | `ransomware-first-24-hours` | Ransomware Attack: What to Do in the First 24 Hours | Ransomware & Recovery | ransomware attack response | ~1,800 | ✅ Published |
+| 35 | `ransomware-response-plan` | How to Build a Ransomware Response Plan for Your Business | Ransomware & Recovery | ransomware response plan | ~2,000 | ✅ Published |
+| 36 | `cloud-backup-pricing-sa` | Cloud Backup Pricing in South Africa: What to Expect | Cloud Backup | cloud backup pricing south africa | ~1,400 | ✅ Published |
+| 37 | `popia-compliance-consultant` | Do I Need a POPIA Compliance Consultant? | POPIA Compliance | popia compliance consultant | ~1,600 | ✅ Published |
 
 ---
 
