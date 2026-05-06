@@ -17,6 +17,7 @@ export interface BlogPost {
   readTime: string;
   tags: string[];
   featured?: boolean;
+  displayOrder: number;
   status: "published" | "draft";
   content: string; // markdown
   serviceLink?: string;
@@ -75,6 +76,7 @@ const ALL_POSTS: BlogPost[] = [
   // ── ARTICLE 1 ──────────────────────────────────────────────────────────────
   {
     slug: "m365-backup",
+    displayOrder: 16,
     title: "What Microsoft 365 Doesn't Back Up — And What You Stand to Lose",
     excerpt:
       "Microsoft 365 is not a backup solution. Here's exactly what falls through the gaps — accidental deletion, ransomware, admin errors, and licence removal — and what South African organisations need to do about it.",
@@ -189,6 +191,7 @@ Montana Data Company offers a **complimentary M365 Backup Gap Assessment** that 
   // ── ARTICLE 2 (draft) ──────────────────────────────────────────────────────
   {
     slug: "popia-information-officer",
+    displayOrder: 5,
     title:
       "POPIA Information Officer: Duties, Liability, and How to Appoint One",
     excerpt:
@@ -296,6 +299,7 @@ Montana Data Company's POPIA Consulting service assists organisations with the f
   // ── ARTICLE 3 (draft) ──────────────────────────────────────────────────────
   {
     slug: "rto-rpo-explained",
+    displayOrder: 33,
     title: "RTO vs RPO: A Plain-Language Guide for Executives",
     excerpt:
       "Recovery Time Objective and Recovery Point Objective are the two numbers that define your organisation's true tolerance for downtime. Most executives don't know theirs. Here's how to find out.",
@@ -400,6 +404,7 @@ Montana Data Company conducts Recovery Architecture Reviews that map documented 
   // ── ARTICLE 4 (draft) ──────────────────────────────────────────────────────
   {
     slug: "ransomware-recovery-time",
+    displayOrder: 26,
     title: "How Long Does Ransomware Recovery Take?",
     excerpt:
       "The average ransomware recovery takes 22 days. Here's why, what the phases look like, and how the right architecture can compress that to hours instead of weeks.",
@@ -512,6 +517,7 @@ Montana Data Company builds ransomware-resilient backup architectures using IBM 
   // ── ARTICLE 5 (draft) ──────────────────────────────────────────────────────
   {
     slug: "immutable-backup-explained",
+    displayOrder: 27,
     title: "Immutable Backup: What It Is and Why Your Current Backup Isn't Enough",
     excerpt:
       "Traditional backups can be deleted by ransomware. Immutable backups cannot. Here's the technical difference, and why the distinction matters when an attack is already in progress.",
@@ -628,6 +634,7 @@ Montana Data Company deploys Druva's cloud backup platform, which stores all bac
   // ── ARTICLE 6 (draft) ──────────────────────────────────────────────────────
   {
     slug: "popia-vs-gdpr",
+    displayOrder: 3,
     title: "POPIA vs GDPR: Key Differences Every Global Business Must Know",
     excerpt:
       "If your organisation handles data from both South African and EU residents, you're subject to two separate frameworks. Here's where POPIA and GDPR align — and where they diverge.",
@@ -724,6 +731,7 @@ Navigating dual compliance requirements is manageable with a structured approach
   // ── ARTICLE 7 (draft) ──────────────────────────────────────────────────────
   {
     slug: "popia-data-breach-notification",
+    displayOrder: 7,
     title: "POPIA Data Breach Notification: A Step-by-Step Guide",
     excerpt:
       "POPIA Section 22 requires notification to the Information Regulator and affected data subjects within a reasonable time. Here's exactly what that process looks like and how to be ready before an incident occurs.",
@@ -849,6 +857,7 @@ A POPIA assessment will identify whether your organisation has these elements in
   // ── ARTICLE 8 (draft) ──────────────────────────────────────────────────────
   {
     slug: "popia-compliance-financial-services",
+    displayOrder: 9,
     title:
       "POPIA Compliance for Financial Services: FSCA, FAIS, and the Data Protection Overlap",
     excerpt:
@@ -957,6 +966,7 @@ POPIA compliance for financial services is not separate from your existing regul
   // ── ARTICLE 9 (draft) ──────────────────────────────────────────────────────
   {
     slug: "ibm-guardium-explained",
+    displayOrder: 36,
     title: "What Is IBM Guardium and Which Organisations Actually Need It?",
     excerpt:
       "IBM Guardium provides real-time database activity monitoring, sensitive data discovery, and compliance reporting. Here's who needs it, what it does, and how it compares to native database auditing.",
@@ -1052,6 +1062,7 @@ Montana Data Company deploys and manages IBM Guardium for South African organisa
   // ── ARTICLE 10 (draft) ─────────────────────────────────────────────────────
   {
     slug: "business-continuity-plan-south-africa",
+    displayOrder: 35,
     title:
       "How to Build a Business Continuity Plan for South African Organisations",
     excerpt:
@@ -1171,6 +1182,7 @@ Our resilience architecture assessments evaluate your BCP, DR capabilities, and 
   // ── ARTICLE 11 (draft) ─────────────────────────────────────────────────────
   {
     slug: "post-quantum-cryptography-guide",
+    displayOrder: 37,
     title:
       "Post-Quantum Cryptography: What Executives Need to Know Before 2030",
     excerpt:
@@ -1341,6 +1353,7 @@ Post-quantum cryptography is not a theoretical concern for 2035 — it is an ope
   // ── ARTICLE 12 (draft) ─────────────────────────────────────────────────────
   {
     slug: "popia-readiness-checklist",
+    displayOrder: 8,
     title:
       "POPIA Readiness Checklist: 20 Questions Every CIO Should Be Able to Answer",
     excerpt:
@@ -1500,6 +1513,7 @@ If this checklist has surfaced gaps you want to address, our [free POPIA readine
   // ── ARTICLE 13 (draft) ─────────────────────────────────────────────────────
   {
     slug: "salesforce-backup-risks",
+    displayOrder: 21,
     title: "Salesforce Data Loss: 5 Scenarios Nobody Talks About",
     excerpt:
       "Salesforce doesn't guarantee data recovery. Here are five ways organisations lose CRM data permanently — and what a proper backup strategy looks like for the world's most critical sales platform.",
@@ -1634,6 +1648,7 @@ Data loss events in Salesforce are not rare. They are a predictable consequence 
   // ── ARTICLE 14 (draft) ─────────────────────────────────────────────────────
   {
     slug: "3-2-1-1-0-backup-rule",
+    displayOrder: 14,
     title: "The 3-2-1-1-0 Backup Rule: Why the Original Rule Isn't Enough Anymore",
     excerpt:
       "The classic 3-2-1 backup rule was written before ransomware could encrypt your backup target. Here's the updated 3-2-1-1-0 rule, what each digit means, and how to implement it in a modern enterprise.",
@@ -1777,6 +1792,7 @@ If your current backup strategy does not include an immutable or air-gapped copy
   // ── ARTICLE 16 ─────────────────────────────────────────────────────────────
   {
     slug: "what-is-ransomware",
+    displayOrder: 23,
     title: "What Is Ransomware? A Plain-English Guide for Business",
     excerpt:
       "Ransomware locks your business data and demands payment to restore it. Here's what it is, how attacks unfold, and what South African businesses can do to protect themselves.",
@@ -1906,6 +1922,7 @@ Under POPIA Section 22, if a security compromise results in unauthorised access 
   // ── ARTICLE 17 ─────────────────────────────────────────────────────────────
   {
     slug: "what-is-popia",
+    displayOrder: 1,
     title: "What Is POPIA and Does It Apply to My Business?",
     excerpt:
       "POPIA is South Africa's data privacy law — and it applies to almost every business that processes personal information. Here's what it requires, who it covers, and what the penalties look like.",
@@ -2025,6 +2042,7 @@ POPIA compliance is not a destination — it is an ongoing operational disciplin
   // ── ARTICLE 18 ─────────────────────────────────────────────────────────────
   {
     slug: "how-ransomware-spreads",
+    displayOrder: 24,
     title: "How Does Ransomware Spread? 6 Common Entry Points",
     excerpt:
       "Ransomware doesn't appear from nowhere. It enters through specific, predictable weaknesses in your business. Here are the six most common entry points — and what to do about each one.",
@@ -2118,6 +2136,7 @@ The other half of the equation is what happens if prevention fails. Immutable, o
   // ── ARTICLE 19 ─────────────────────────────────────────────────────────────
   {
     slug: "popia-penalties",
+    displayOrder: 2,
     title: "POPIA Fines: What Are the Real Penalties?",
     excerpt:
       "POPIA carries fines of up to R10 million and 10 years imprisonment — but what does enforcement actually look like? Here's an honest breakdown of POPIA penalties and how they're applied.",
@@ -2241,6 +2260,7 @@ The best time to address POPIA compliance was before July 2021. The second-best 
   // ── ARTICLE 20 ─────────────────────────────────────────────────────────────
   {
     slug: "backup-strategy-failing",
+    displayOrder: 13,
     title: "5 Signs Your Business Backup Strategy Is Failing",
     excerpt:
       "Having backup software installed is not the same as having a working backup strategy. Here are five warning signs that your data protection is less reliable than you think.",
@@ -2333,6 +2353,7 @@ Montana Data Company's Build Your Solution configurator lets you specify your en
   // ── ARTICLE 21 ─────────────────────────────────────────────────────────────
   {
     slug: "ransomware-cost-south-africa",
+    displayOrder: 25,
     title: "How Much Does a Ransomware Attack Cost SA Businesses?",
     excerpt:
       "The ransom is only the beginning. Here's the full cost of a ransomware attack for a South African business — downtime, recovery, regulatory fines, and reputational damage included.",
@@ -2435,6 +2456,7 @@ That is what immutable, off-network backup actually buys. Not the prevention of 
   // ── ARTICLE 22 ─────────────────────────────────────────────────────────────
   {
     slug: "popia-compliance-guide",
+    displayOrder: 4,
     title: "POPIA Compliance: The Complete Guide for South African SMEs",
     excerpt:
       "Everything a South African business needs to know about POPIA compliance — what it requires, the eight conditions, common gaps, and practical steps to get your organisation in order.",
@@ -2615,6 +2637,7 @@ POPIA compliance is not about perfection. It is about being able to demonstrate,
   // ── ARTICLE 23 ─────────────────────────────────────────────────────────────
   {
     slug: "cloud-backup-south-africa",
+    displayOrder: 15,
     title: "Cloud Backup for South African Businesses: A Complete Guide",
     excerpt:
       "Cloud backup protects your business data off-site and off-network — but not all solutions are equal. Here's everything SA businesses need to know before choosing a cloud backup provider.",
@@ -2755,6 +2778,7 @@ The starting point is always the same: understanding what you have, what is curr
   // ── ARTICLE 24 ─────────────────────────────────────────────────────────────
   {
     slug: "how-to-backup-m365",
+    displayOrder: 17,
     title: "How to Back Up Microsoft 365 for Your Business",
     excerpt:
       "Microsoft 365 doesn't back up your data automatically. Here's a plain-English guide to your options — from native retention policies to third-party backup — and which approach actually works.",
@@ -2869,6 +2893,7 @@ If you are currently relying on Microsoft 365's native retention features — or
   // ── ARTICLE 25 ─────────────────────────────────────────────────────────────
   {
     slug: "popia-compliance-mistakes",
+    displayOrder: 6,
     title: "7 Common POPIA Compliance Mistakes South African Businesses Make",
     excerpt:
       "Many South African businesses believe they are POPIA-compliant when they are not. Here are the seven most common mistakes we find in practice — and how to fix each one.",
@@ -2972,6 +2997,7 @@ Our POPIA Assessment evaluates your organisation against all eight conditions of
   // ── ARTICLE 26 ─────────────────────────────────────────────────────────────
   {
     slug: "ransomware-backup-failure",
+    displayOrder: 28,
     title: "Ransomware vs Backup: Why Most Backups Fail After an Attack",
     excerpt:
       "Having backup software doesn't mean you can recover from ransomware. Here's exactly how ransomware defeats standard backup — and what your backup needs to survive an attack.",
@@ -3056,6 +3082,7 @@ That is the distinction between backup that provides a false sense of security a
   // ── ARTICLE 27 ─────────────────────────────────────────────────────────────
   {
     slug: "onprem-vs-cloud-backup",
+    displayOrder: 18,
     title: "On-Premise vs Cloud Backup: Which Is Right for Your Business?",
     excerpt:
       "On-premise backup is fast and familiar. Cloud backup is resilient and off-site. Most South African businesses need both. Here's how to decide what mix is right for your environment.",
@@ -3165,6 +3192,7 @@ Our Build Your Solution configurator lets you specify your environment and see a
   // ── ARTICLE 28 ─────────────────────────────────────────────────────────────
   {
     slug: "should-you-pay-ransomware",
+    displayOrder: 29,
     title: "Should You Pay a Ransomware Ransom? The Honest Answer",
     excerpt:
       "When ransomware hits, the pressure to pay is enormous. Here's an honest look at what paying actually gets you, the legal considerations in South Africa, and the cases where it may be your only option.",
@@ -3239,6 +3267,7 @@ The strongest position to be in when ransomware hits is one where paying is not 
   // ── ARTICLE 29 ─────────────────────────────────────────────────────────────
   {
     slug: "paia-manual-guide",
+    displayOrder: 10,
     title: "How to Build a PAIA Manual for Your Business",
     excerpt:
       "A PAIA manual is a legal requirement most South African businesses have never heard of. Here's what it is, who needs one, what it must contain, and how to build it step by step.",
@@ -3369,6 +3398,7 @@ The good news is that building a PAIA manual is not a significant undertaking. F
   // ── ARTICLE 30 ─────────────────────────────────────────────────────────────
   {
     slug: "endpoint-backup-vs-antivirus",
+    displayOrder: 19,
     title: "Endpoint Backup vs Antivirus: Why Your Business Needs Both",
     excerpt:
       "Antivirus protects against threats. Endpoint backup recovers from them. They are not alternatives — they serve completely different functions. Here's why your business needs both.",
@@ -3467,6 +3497,7 @@ Montana Data Company's Build Your Solution configurator includes endpoint backup
   // ── ARTICLE 31 ─────────────────────────────────────────────────────────────
   {
     slug: "ransomware-recovery-without-paying",
+    displayOrder: 30,
     title: "Ransomware Recovery Without Paying the Ransom",
     excerpt:
       "Most businesses that pay a ransomware ransom didn't have to. Here's what recovery without payment actually looks like — the three scenarios, what each requires, and how long each takes.",
@@ -3555,6 +3586,7 @@ If you are not certain which scenario you are currently in, our free security as
   // ── ARTICLE 32 ─────────────────────────────────────────────────────────────
   {
     slug: "popia-cloud-storage",
+    displayOrder: 11,
     title: "POPIA and Cloud Storage: What South African Businesses Must Know",
     excerpt:
       "Using cloud storage or cloud backup to process personal information triggers specific POPIA obligations. Here's what the Act requires, what to check in your provider agreements, and how to stay compliant.",
@@ -3654,6 +3686,7 @@ This means that when you deploy backup through Montana, the POPIA operator compl
   // ── ARTICLE 33 ─────────────────────────────────────────────────────────────
   {
     slug: "salesforce-backup-guide",
+    displayOrder: 20,
     title: "How to Back Up Salesforce Data: A Business Guide",
     excerpt:
       "Salesforce does not back up your data the way most businesses assume. Here's what Salesforce retains, the common data loss scenarios it cannot recover from, and how to protect your CRM properly.",
@@ -3752,6 +3785,7 @@ If your organisation uses Salesforce and has not yet assessed your backup covera
   // ── ARTICLE 34 ─────────────────────────────────────────────────────────────
   {
     slug: "ransomware-first-24-hours",
+    displayOrder: 31,
     title: "Ransomware Attack: What to Do in the First 24 Hours",
     excerpt:
       "The decisions you make in the first 24 hours after a ransomware attack determine how bad the outcome is. Here's a step-by-step response guide for South African businesses.",
@@ -3847,6 +3881,7 @@ If you have not yet documented your ransomware response plan or assessed your ba
   // ── ARTICLE 35 ─────────────────────────────────────────────────────────────
   {
     slug: "ransomware-response-plan",
+    displayOrder: 32,
     title: "How to Build a Ransomware Response Plan for Your Business",
     excerpt:
       "A ransomware response plan tells your team exactly what to do when an attack hits — before panic sets in. Here's how to build one that actually works for a South African SME.",
@@ -3997,6 +4032,7 @@ Our team works with South African businesses to build and test both the plan and
   // ── ARTICLE 36 ─────────────────────────────────────────────────────────────
   {
     slug: "cloud-backup-pricing-sa",
+    displayOrder: 22,
     title: "Cloud Backup Pricing in South Africa: What to Expect",
     excerpt:
       "Cloud backup pricing in South Africa varies widely depending on what you're protecting and how. Here's a plain-English breakdown of pricing models, typical costs, and hidden fees to watch for.",
@@ -4099,6 +4135,7 @@ Our Build Your Solution configurator lets you specify your platforms, user count
   // ── ARTICLE 37 ─────────────────────────────────────────────────────────────
   {
     slug: "popia-compliance-consultant",
+    displayOrder: 12,
     title: "Do I Need a POPIA Compliance Consultant?",
     excerpt:
       "Not every South African business needs external POPIA help — but many do and don't know it. Here's an honest guide to when you can handle compliance yourself and when expert support is worth the cost.",
@@ -4173,6 +4210,7 @@ The honest answer to "do I need a consultant" is: assess your situation against 
   // ── ARTICLE 15 (draft) ─────────────────────────────────────────────────────
   {
     slug: "byod-data-risk",
+    displayOrder: 34,
     title: "BYOD Data Risk: What Leaves with the Employee",
     excerpt:
       "When an employee leaves with their personal device, what organisational data leaves with them? Here's an honest assessment of BYOD data risk and how MaaS360 UEM changes the equation.",
@@ -4326,10 +4364,7 @@ The first step is an honest inventory: which employees use personal devices for 
 export function getAllPosts(): Omit<BlogPost, "content">[] {
   return ALL_POSTS.filter((p) => p.status === "published")
     .map(({ content: _content, ...meta }) => meta)
-    .sort(
-      (a, b) =>
-        new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
-    );
+    .sort((a, b) => a.displayOrder - b.displayOrder);
 }
 
 export function getPostBySlug(slug: string): BlogPost | undefined {
