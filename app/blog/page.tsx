@@ -36,8 +36,15 @@ export default async function BlogPage(props: {
     ? allPosts.filter((p) => p.category === activeCategory)
     : allPosts;
 
-  const featured = allPosts.find((p) => p.featured);
-  const nonFeatured = filtered.filter((p) => !p.featured || activeCategory);
+  const featured = !activeCategory ? allPosts.find((p) => p.featured) : undefined;
+  // When a category is active, show ALL matching posts in the grid (including featured).
+  // When on "All", hide the featured post from the grid only if other posts exist alongside it.
+  const otherPosts = filtered.filter((p) => !p.featured);
+  const nonFeatured = activeCategory
+    ? filtered
+    : otherPosts.length > 0
+    ? otherPosts
+    : filtered; // only 1 post and it's featured → still show it in the grid
 
   // Category counts for filter badges
   const counts = BLOG_CATEGORIES.reduce<Record<string, number>>((acc, cat) => {
@@ -142,13 +149,13 @@ export default async function BlogPage(props: {
           <CategoryFilter counts={counts} totalCount={allPosts.length} />
         </div>
 
-        {nonFeatured.length === 0 ? (
+        {activeCategory && nonFeatured.length === 0 ? (
           <div className="py-24 text-center text-montana-muted">
             <BookOpen className="h-10 w-10 mx-auto mb-4 opacity-30" />
             <p className="text-lg">No articles in this category yet.</p>
             <p className="text-sm mt-1 opacity-60">Check back soon.</p>
           </div>
-        ) : (
+        ) : nonFeatured.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-24">
             {nonFeatured.map((post) => {
               const colors = CATEGORY_COLORS[post.category];
@@ -203,7 +210,7 @@ export default async function BlogPage(props: {
               );
             })}
           </div>
-        )}
+        ) : null}
 
         {/* ── CTA Banner ────────────────────────────────────────────────────── */}
         <div className="border border-white/10 bg-montana-surface/30 p-10 md:p-14 text-center relative overflow-hidden">
