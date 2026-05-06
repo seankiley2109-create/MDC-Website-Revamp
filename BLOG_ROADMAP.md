@@ -66,6 +66,14 @@ This document is the single source of truth for the blog content programme. Upda
 | 13 | `salesforce-backup-risks` | Salesforce Data Loss: 5 Scenarios Nobody Talks About | SaaS Protection | salesforce backup | ~1,400 | 📋 Planned |
 | 14 | `3-2-1-1-0-backup-rule` | The 3-2-1-1-0 Backup Rule Explained | Cloud Backup | 3-2-1 backup rule | ~1,000 | 📋 Planned |
 | 15 | `byod-data-risk` | BYOD Data Risk: What Leaves with the Employee | Data Governance | byod data security | ~1,200 | 📋 Planned |
+| 16 | `what-is-ransomware` | What Is Ransomware? A Plain-English Guide for Business | Ransomware & Recovery | what is ransomware | ~1,400 | ✅ Published |
+| 17 | `what-is-popia` | What Is POPIA and Does It Apply to My Business? | POPIA Compliance | what is popia | ~1,600 | ✅ Published |
+| 18 | `how-ransomware-spreads` | How Does Ransomware Spread? 6 Common Entry Points | Ransomware & Recovery | how does ransomware spread | ~1,400 | ✅ Published |
+| 19 | `popia-penalties` | POPIA Fines: What Are the Real Penalties? | POPIA Compliance | popia penalties south africa | ~1,500 | ✅ Published |
+| 20 | `backup-strategy-failing` | 5 Signs Your Business Backup Strategy Is Failing | Cloud Backup | backup strategy south africa | ~1,300 | ✅ Published |
+| 21 | `ransomware-cost-south-africa` | How Much Does a Ransomware Attack Cost SA Businesses? | Ransomware & Recovery | ransomware cost south africa | ~1,400 | ✅ Published |
+| 22 | `popia-compliance-guide` | POPIA Compliance: The Complete Guide for South African SMEs | POPIA Compliance | popia compliance south africa | ~2,400 | ✅ Published |
+| 23 | `cloud-backup-south-africa` | Cloud Backup for South African Businesses: A Complete Guide | Cloud Backup | cloud backup south africa | ~2,200 | ✅ Published |
 
 ---
 
