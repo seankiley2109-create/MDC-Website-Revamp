@@ -26,20 +26,33 @@ export default function BlogPage() {
 
         {/* ── Hero ──────────────────────────────────────────────────────────── */}
         <div className="py-16 md:py-20">
-          <div className="inline-flex items-center border border-white/10 bg-montana-surface/80 backdrop-blur-sm px-4 py-1.5 text-xs font-bold tracking-widest text-montana-muted uppercase mb-8">
-            <span className="flex h-2 w-2 bg-montana-pink rounded-full mr-3 shadow-[0_0_8px_#F24567]" />
-            Blog &amp; Insights
+          <div className="flex flex-col lg:flex-row items-center gap-12">
+            <div className="flex-1">
+              <div className="inline-flex items-center border border-white/10 bg-montana-surface/80 backdrop-blur-sm px-4 py-1.5 text-xs font-bold tracking-widest text-montana-muted uppercase mb-8">
+                <span className="flex h-2 w-2 bg-montana-pink rounded-full mr-3 shadow-[0_0_8px_#F24567]" />
+                Blog &amp; Insights
+              </div>
+              <h1 className="font-display text-4xl md:text-6xl font-bold tracking-tight text-white mb-6 max-w-3xl">
+                Data protection expertise{" "}
+                <span className="text-montana-gradient">you can trust.</span>
+              </h1>
+              <p className="text-lg text-montana-muted leading-relaxed max-w-2xl">
+                In-depth guides on POPIA compliance, ransomware recovery, Microsoft 365
+                backup, and enterprise data resilience — written by our team for South
+                African organisations.
+              </p>
+            </div>
+            <div className="flex-1 flex justify-center">
+              <img
+                src="/illustrations/blog.svg"
+                alt=""
+                aria-hidden="true"
+                className="w-full max-w-md opacity-90"
+              />
+            </div>
           </div>
-          <h1 className="font-display text-4xl md:text-6xl font-bold tracking-tight text-white mb-6 max-w-3xl">
-            Data protection expertise{" "}
-            <span className="text-montana-gradient">you can trust.</span>
-          </h1>
-          <p className="text-lg text-montana-muted leading-relaxed max-w-2xl">
-            In-depth guides on POPIA compliance, ransomware recovery, Microsoft 365
-            backup, and enterprise data resilience — written by our team for South
-            African organisations.
-          </p>
         </div>
+
 
         {/* ── Interactive grid (client) ─────────────────────────────────────── */}
         <BlogGrid posts={posts} featured={featured} />
