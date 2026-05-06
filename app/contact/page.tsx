@@ -554,8 +554,7 @@ function ContactFormInner() {
                 <div className="absolute inset-0 border-l-0 border-montana-pink/10 pointer-events-none z-10" />
                 <iframe
                   src="https://maps.google.com/maps?q=Frazzitta+Business+Park,+Durbanville,+Western+Cape,+7550,+South+Africa&output=embed&z=15"
-                  className="w-full h-full grayscale contrast-[0.85] opacity-80"
-                  style={{ filter: "grayscale(0.1) invert(0.9) hue-rotate(180deg) brightness(0.9) contrast(0.9)" }}
+                  className="w-full h-full map-dark-filter opacity-80"
                   loading="lazy"
                   referrerPolicy="no-referrer-when-downgrade"
                   title="Montana Data Company Head Office"

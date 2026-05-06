@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { Phone, Mail, Facebook, Linkedin } from "lucide-react";
+import { Phone, Mail, Facebook, Linkedin, Twitter, Instagram, Youtube } from "lucide-react";
 
 export function Footer() {
   return (
@@ -71,6 +71,36 @@ export function Footer() {
                 aria-label="LinkedIn"
               >
                 <Linkedin className="h-5 w-5" />
+              </a>
+              {/* TODO: Replace # with actual X/Twitter profile URL */}
+              <a
+                href="https://x.com/montanadc"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-montana-muted hover:text-white hover-interactive"
+                aria-label="X (Twitter)"
+              >
+                <Twitter className="h-5 w-5" />
+              </a>
+              {/* TODO: Replace # with actual Instagram profile URL */}
+              <a
+                href="https://www.instagram.com/montanadc"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-montana-muted hover:text-white hover-interactive"
+                aria-label="Instagram"
+              >
+                <Instagram className="h-5 w-5" />
+              </a>
+              {/* TODO: Replace # with actual YouTube channel URL */}
+              <a
+                href="https://www.youtube.com/@montanadc"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-montana-muted hover:text-white hover-interactive"
+                aria-label="YouTube"
+              >
+                <Youtube className="h-5 w-5" />
               </a>
             </div>
           </div>

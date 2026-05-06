@@ -126,8 +126,8 @@ export function Chatbot() {
             <div className="flex justify-start">
               <div className="bg-white/5 border border-white/10 rounded-2xl rounded-tl-sm px-4 py-3 flex items-center gap-2">
                 <div className="w-2 h-2 bg-montana-pink rounded-full animate-bounce" />
-                <div className="w-2 h-2 bg-montana-pink rounded-full animate-bounce" style={{ animationDelay: '0.2s' }} />
-                <div className="w-2 h-2 bg-montana-pink rounded-full animate-bounce" style={{ animationDelay: '0.4s' }} />
+                <div className="w-2 h-2 bg-montana-pink rounded-full animate-bounce [animation-delay:0.2s]" />
+                <div className="w-2 h-2 bg-montana-pink rounded-full animate-bounce [animation-delay:0.4s]" />
               </div>
             </div>
           )}

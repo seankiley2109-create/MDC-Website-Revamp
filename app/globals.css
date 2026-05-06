@@ -32,6 +32,10 @@
   background: #333333;
 }
 
+.map-dark-filter {
+  filter: grayscale(0.1) invert(0.9) hue-rotate(180deg) brightness(0.9) contrast(0.9);
+}
+
 .bg-montana-gradient {
   background: linear-gradient(135deg, var(--color-montana-magenta), var(--color-montana-pink), var(--color-montana-coral), var(--color-montana-orange));
 }

@@ -148,8 +148,7 @@ export function DataResilienceFramework() {
           {/* Orbital diagram */}
           <div className="flex items-center justify-center">
             <div
-              className="relative w-full max-w-[440px] mx-auto"
-              style={{ aspectRatio: "1" }}
+              className="relative w-full max-w-[440px] mx-auto aspect-square"
             >
               {/* SVG: orbital ring, hub glow, connecting lines */}
               <svg
@@ -243,8 +242,7 @@ export function DataResilienceFramework() {
                       {/* Pulse ring — active only */}
                       {isActive && (
                         <motion.div
-                          className="absolute inset-0 rounded-full pointer-events-none"
-                          style={{ background: "rgba(221,41,125,0.28)" }}
+                          className="absolute inset-0 rounded-full pointer-events-none bg-[rgba(221,41,125,0.28)]"
                           animate={{ scale: [1, 1.8], opacity: [0.55, 0] }}
                           transition={{ duration: 2.2, repeat: Infinity, ease: "easeOut" }}
                         />

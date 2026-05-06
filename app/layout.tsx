@@ -17,8 +17,8 @@ const spaceGrotesk = Space_Grotesk({
 });
 
 const BASE_URL = 'https://montanadc.com';
-const TITLE    = 'Enterprise Cloud Backup & Data Protection | Montana Data Company';
-const DESC     = 'Montana Data Company helps organisations protect, recover, move, and govern critical data through enterprise-grade cloud backup, secure transfer, and cyber resilience.';
+const TITLE    = 'Enterprise Backup & Data Protection | Montana Data Co.';
+const DESC     = 'Montana Data Company protects and governs critical data through enterprise-grade cloud backup, secure transfer, and cyber resilience for global organisations.';
 const OG_IMAGE = [{ url: '/opengraph-image', width: 1200, height: 630, alt: 'Montana Data Company' }];
 
 export const metadata: Metadata = {
@@ -69,6 +69,24 @@ const ORG_SCHEMA = {
         addressCountry: 'ZA',
       },
       areaServed: { '@type': 'Country', name: 'South Africa' },
+    },
+    {
+      '@type': 'LocalBusiness',
+      '@id': `${BASE_URL}/#localbusiness`,
+      name: 'Montana Data Company',
+      url: BASE_URL,
+      telephone: '+27871883843',
+      email: 'support@montanadc.com',
+      address: {
+        '@type': 'PostalAddress',
+        streetAddress: 'Suite 24, Frazzitta Business Park, Cnr Langeberg & Batis Roads',
+        addressLocality: 'Durbanville',
+        addressRegion: 'Western Cape',
+        postalCode: '7550',
+        addressCountry: 'ZA',
+      },
+      openingHours: 'Mo-Fr 08:00-17:00',
+      parentOrganization: { '@id': `${BASE_URL}/#organization` },
     },
     {
       '@type': 'WebSite',
