@@ -95,6 +95,11 @@ const ORG_SCHEMA = {
       url: BASE_URL,
       name: 'Montana Data Company',
       publisher: { '@id': `${BASE_URL}/#organization` },
+      potentialAction: {
+        '@type': 'SearchAction',
+        target: { '@type': 'EntryPoint', urlTemplate: `${BASE_URL}/resources?q={search_term_string}` },
+        'query-input': 'required name=search_term_string',
+      },
     },
   ],
 };

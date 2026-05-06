@@ -25,7 +25,8 @@
       "Bash(kill %1)",
       "WebFetch(domain:undraw.co)",
       "Bash(xargs grep *)",
-      "Bash(node *)"
+      "Bash(node *)",
+      "Bash(Remove-Item *)"
     ]
   }
 }

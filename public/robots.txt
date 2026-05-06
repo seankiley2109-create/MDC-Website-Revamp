@@ -1,5 +1,0 @@
-User-agent: *
-Allow: /
-Disallow: /legal/
-
-Sitemap: https://montanadc.com/sitemap.xml

@@ -21,9 +21,32 @@ import { WhyMontana } from "@/components/sections/why-montana";
 import { TechStack } from "@/components/sections/tech-stack";
 import { DataResilienceFramework } from "@/components/sections/data-resilience-framework";
 
+const BASE_URL = 'https://montanadc.com';
+
+const HOME_PAGE_SCHEMA = {
+  '@context': 'https://schema.org',
+  '@type': 'WebPage',
+  '@id': `${BASE_URL}/#webpage`,
+  url: BASE_URL,
+  name: 'Enterprise Backup & Data Protection | Montana Data Co.',
+  description: 'Montana Data Company protects and governs critical data through enterprise-grade cloud backup, secure transfer, and cyber resilience for global organisations.',
+  isPartOf: { '@id': `${BASE_URL}/#website` },
+  about: { '@id': `${BASE_URL}/#organization` },
+  breadcrumb: {
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: BASE_URL },
+    ],
+  },
+};
+
 export default function Home() {
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(HOME_PAGE_SCHEMA) }}
+      />
       <Hero />
       <TrustStrip />
       <WhoWeServe />
