@@ -30,6 +30,7 @@ export async function GET(
   });
 
   const response = NextResponse.redirect(new URL('/pos', request.url));
+  response.headers.set('X-Robots-Tag', 'noindex');
 
   response.cookies.set(COOKIE_NAME, attribution, {
     maxAge:   COOKIE_MAX_AGE,
