@@ -29,6 +29,7 @@ export function Footer() {
             <ul className="space-y-3 text-sm">
               <li><Link href="/services" className="text-montana-muted hover:text-white hover-interactive">Services</Link></li>
               <li><Link href="/resources" className="text-montana-muted hover:text-white hover-interactive">Resources</Link></li>
+              <li><Link href="/blog" className="text-montana-muted hover:text-white hover-interactive">Blog</Link></li>
               <li><Link href="/assessments" className="text-montana-muted hover:text-white hover-interactive">Assessments</Link></li>
               <li><Link href="/partners" className="text-montana-muted hover:text-white hover-interactive">Partners</Link></li>
               <li><Link href="/about" className="text-montana-muted hover:text-white hover-interactive">About</Link></li>
