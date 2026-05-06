@@ -1,12 +1,12 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: { absolute: 'Enterprise Backup & Data Protection | Montana Data Co.' },
-  description: 'Montana Data Company protects and governs critical data through enterprise-grade cloud backup, secure transfer, and cyber resilience for global organisations.',
+  title: { absolute: 'Business Data Protection & Backup | Montana Data Co.' },
+  description: 'Montana Data Company protects and governs critical data through professional cloud backup, secure transfer, and cyber resilience for South African businesses of every size.',
   alternates: { canonical: '/' },
   openGraph: {
-    title: 'Enterprise Backup & Data Protection | Montana Data Co.',
-    description: 'Montana Data Company protects and governs critical data through enterprise-grade cloud backup, secure transfer, and cyber resilience for global organisations.',
+    title: 'Business Data Protection & Backup | Montana Data Co.',
+    description: 'Montana Data Company protects and governs critical data through professional cloud backup, secure transfer, and cyber resilience for South African businesses of every size.',
     url: 'https://montanadc.com',
     images: [{ url: '/opengraph-image', width: 1200, height: 630, alt: 'Montana Data Company' }],
   },

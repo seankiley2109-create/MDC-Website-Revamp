@@ -18,8 +18,8 @@ const spaceGrotesk = Space_Grotesk({
 });
 
 const BASE_URL = 'https://montanadc.com';
-const TITLE    = 'Enterprise Backup & Data Protection | Montana Data Co.';
-const DESC     = 'Montana Data Company protects and governs critical data through enterprise-grade cloud backup, secure transfer, and cyber resilience for global organisations.';
+const TITLE    = 'Business Data Protection & Backup | Montana Data Co.';
+const DESC     = 'Montana Data Company protects and governs critical data through professional cloud backup, secure transfer, and cyber resilience for South African businesses of every size.';
 const OG_IMAGE = [{ url: '/opengraph-image', width: 1200, height: 630, alt: 'Montana Data Company' }];
 
 export const metadata: Metadata = {

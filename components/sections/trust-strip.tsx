@@ -1,7 +1,7 @@
 import { Shield, Clock, Users, FileCheck } from "lucide-react";
 
 const trustItems = [
-  { text: "Established in 2013",        sub: "Over a decade of enterprise delivery",           icon: Clock     },
+  { text: "Established in 2013",        sub: "Over a decade of proven delivery",                icon: Clock     },
   { text: "Best of breed solutions", sub: "Backed by world-class technology partners",       icon: Shield    },
   { text: "Direct and partner delivery",sub: "Flexible engagement through any channel",         icon: Users     },
   { text: "Compliance-aware approach",  sub: "Built around POPIA and data governance standards", icon: FileCheck },

@@ -19,7 +19,7 @@ export function Footer() {
               />
             </Link>
             <p className="text-sm text-montana-muted max-w-sm">
-              Enterprise-grade data protection, secure transfer, cyber resilience, and compliance support for businesses and channel partners.
+              Professional data protection, secure transfer, cyber resilience, and compliance support for businesses and channel partners.
             </p>
           </div>
 

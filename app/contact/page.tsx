@@ -412,7 +412,7 @@ function ContactFormInner() {
                       {errors.name && <p className="text-xs text-red-400">{errors.name.message}</p>}
                     </div>
                     <div className="space-y-2">
-                      <label htmlFor="email" className="text-xs font-bold uppercase tracking-wider text-white/50">Corporate Email</label>
+                      <label htmlFor="email" className="text-xs font-bold uppercase tracking-wider text-white/50">Work Email</label>
                       <div className="relative">
                         <input
                           {...register("email")}
