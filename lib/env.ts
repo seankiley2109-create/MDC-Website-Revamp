@@ -8,6 +8,7 @@ const serverSchema = z.object({
   MONDAY_POS_BOARD_ID:           z.string().min(1),
   MONDAY_ASSESSMENT_BOARD_ID:    z.string().min(1),
   PAYSTACK_SECRET_KEY:           z.string().min(1),
+  GEMINI_API_KEY:                z.string().min(1),
 });
 
 const publicSchema = z.object({
