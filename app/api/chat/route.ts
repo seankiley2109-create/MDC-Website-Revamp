@@ -27,7 +27,7 @@ ENTERPRISE SOLUTIONS (quote required)
 
 POPIA CONSULTING
 [Book Consulting](/pos?tab=consulting) · [Take Self-Assessment](/assessments/popia)
-Compliance Assessment R2,500/4h · Remedial Consulting R1,600/2h · Info Officer Reg R300 · Training R850/1h/5pax · Retainer R300/mo
+Compliance Assessment · Remedial Consulting · Info Officer Reg · Training · Retainer
 
 OTHER PAGES: [Services](/services) · [All Assessments](/assessments) · [Security Assessment](/assessments/security) · [Contact](/contact)
 
