@@ -22,6 +22,7 @@ import { createServerClient }                    from '@/lib/supabase/server';
 import { createPurchase, updatePurchaseMondayId } from '@/lib/purchases';
 import { createOrderItem, createOrderSubitem }   from '@/lib/monday';
 import type { CartLineItem }                     from '@/app/api/subscribe/route';
+import { sendCheckoutConfirmationEmails, type CheckoutPayload } from '@/lib/email';
 
 // ─── Validation schemas ───────────────────────────────────────────────────────
 
@@ -296,7 +297,56 @@ export async function processOrder(
       data: { authorization_url: string; reference: string };
     };
 
-    console.log('[order] Transaction initialised — order:', orderId, 'ref:', initData.data.reference);
+    const paystackRef = initData.data.reference;
+    console.log('[order] Transaction initialised — order:', orderId, 'ref:', paystackRef);
+
+    // Send order confirmation email immediately — non-critical, does not block the redirect.
+    // Sending here rather than in the callback avoids the callback's Paystack-redirect
+    // timing and Supabase dependency chain that was preventing reliable delivery.
+    try {
+      const emailCart = cart
+        .filter(l => l.product_code !== 'DISCOUNT')
+        .map(l => ({
+          name:       l.name,
+          quantity:   l.quantity,
+          unit_price: l.unit_price,
+          line_total: l.line_total,
+        }));
+
+      const emailPayload: CheckoutPayload = {
+        customer: {
+          name:      `${form.firstName} ${form.lastName}`,
+          email:     form.email,
+          company:   form.company,
+          vatNumber: form.vatNumber || undefined,
+        },
+        billing: {
+          address1:   form.address1,
+          address2:   form.address2 || undefined,
+          city:       form.city,
+          province:   form.province,
+          postalCode: form.postalCode,
+          country:    form.country,
+        },
+        cart:         emailCart,
+        totalZAR:     nettTotal,
+        discountZAR:  discountAmt > 0 ? discountAmt : undefined,
+        discountCode: form.discountCode || undefined,
+        contractTerm: isAnnual ? 'yearly' : 'monthly',
+        reference:    paystackRef,
+        orderId,
+      };
+
+      const emailResult = await sendCheckoutConfirmationEmails(emailPayload);
+      if (!emailResult.success) {
+        console.error('[order] Checkout confirmation email failed:', emailResult.error);
+      } else {
+        console.log('[order] Checkout confirmation email sent — order:', orderId);
+      }
+    } catch (emailErr) {
+      console.error('[order] Checkout confirmation email threw:', emailErr);
+    }
+
     return { success: true, authorization_url: initData.data.authorization_url };
   } catch (err) {
     console.error('[order] Paystack threw:', err);

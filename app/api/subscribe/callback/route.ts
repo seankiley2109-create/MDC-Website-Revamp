@@ -298,8 +298,10 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     }
 
     // ── Phase 3: Send purchase confirmation email ─────────────────────────────
-    // Runs regardless of Phase 1/2 success — alreadyStacked guards against duplicates.
-    if (!alreadyStacked) {
+    // Checkout flow (orderId present): email already sent by processOrder server action.
+    // Subscribe flow (no orderId): send here as this is the only reliable trigger point.
+    // alreadyStacked guards against duplicates on repeated callback hits.
+    if (!alreadyStacked && !orderId) {
       const checkoutCart: CheckoutLineItem[] = (verifyData.metadata?.cart ?? [])
         .filter(l => l.product_code !== 'DISCOUNT')
         .map(l => ({
