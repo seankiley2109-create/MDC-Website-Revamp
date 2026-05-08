@@ -120,7 +120,7 @@ export function Hero() {
         <div className="flex-1 text-center lg:text-left z-10">
           <div className="inline-flex items-center border border-white/10 bg-montana-surface/80 backdrop-blur-sm px-4 py-1.5 text-xs font-bold tracking-widest text-montana-muted uppercase mb-8">
             <span className="flex h-2 w-2 bg-montana-pink mr-3 shadow-[0_0_8px_#F24567]"></span>
-            Data Resilience Solutions for South African Business
+            Business Data Resilience Solutions
           </div>
           <h1 className="font-display text-4xl md:text-7xl font-bold tracking-tight text-white mb-6 leading-[1.1]">
             Protect, recover, and govern with{" "}
@@ -129,7 +129,7 @@ export function Hero() {
             </span>
           </h1>
           <p className="text-lg md:text-xl text-montana-muted mb-10 max-w-2xl mx-auto lg:mx-0 font-light leading-relaxed">
-            We engineer data resilience for businesses that cannot afford downtime. Professional-grade protection, secure transfer, and compliance frameworks built to eliminate operational risk.
+            We engineer data resilience for individuals and organizations that cannot afford downtime. Enterprise-grade protection, secure transfer, and compliance frameworks built to eliminate operational risk.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
             <Link href="/pos" className="w-full sm:w-auto">

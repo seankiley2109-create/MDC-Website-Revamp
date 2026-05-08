@@ -121,14 +121,46 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
   const userId = verifyData.metadata?.user_id;
 
   if (userId) {
+    // Hoist shared state so each phase can access it and failures in one phase
+    // cannot prevent later phases (especially the email send) from running.
+    const contractTerm = (verifyData.metadata?.contract_term === 'yearly'
+      ? 'yearly'
+      : 'monthly') as 'monthly' | 'yearly';
+    const orderId = verifyData.metadata?.order_id;
+
+    type ExistingProfile = {
+      subscribed_services?: unknown;
+      full_name?:           string | null;
+      company_name?:        string | null;
+    };
+    type PurchaseRow = {
+      monday_item_id?:      string;
+      customer_name?:       string;
+      customer_phone?:      string;
+      order_notes?:         string;
+      paystack_reference?:  string | null;
+      vat_number?:          string;
+      address_line1?:       string;
+      address_line2?:       string;
+      city?:                string;
+      province?:            string;
+      postal_code?:         string;
+      country?:             string;
+      discount_amount?:     number;
+      discount_code?:       string;
+    };
+
+    let alreadyStacked   = false;
+    let existingProfile: ExistingProfile | null = null;
+    let purchaseRow:     PurchaseRow    | null = null;
+
+    const supabase = createServiceRoleClient();
+
+    // ── Phase 1: Stack new entries onto the profile ───────────────────────────
     try {
-      const contractTerm = (verifyData.metadata?.contract_term === 'yearly'
-        ? 'yearly'
-        : 'monthly') as 'monthly' | 'yearly';
       const customerCode = verifyData.customer?.customer_code ?? null;
       const purchasedAt  = verifyData.paid_at ?? new Date().toISOString();
 
-      // Build new entries from cart line items (preferred) or legacy services
       const newEntries: StoredEntry[] = buildNewEntries(
         verifyData.metadata,
         contractTerm,
@@ -136,7 +168,6 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
         reference,
       );
 
-      // Compute contract end date (informational — Sage is the authority)
       const baseDate  = new Date(purchasedAt);
       const periodEnd = new Date(baseDate);
       if (contractTerm === 'yearly') {
@@ -145,25 +176,18 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
         periodEnd.setMonth(periodEnd.getMonth() + 1);
       }
 
-      const supabase = createServiceRoleClient();
-
-      // Fetch existing entries to append rather than overwrite
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const { data: existing } = await (supabase.from('profiles') as any)
         .select('subscribed_services, subscribed_quantity, full_name, company_name')
         .eq('id', userId)
         .single();
 
-      const existingProfile = existing as {
-        subscribed_services?: unknown;
-        full_name?:           string | null;
-        company_name?:        string | null;
-      } | null;
+      existingProfile = existing as ExistingProfile | null;
 
       const existingEntries = normaliseExisting(existingProfile?.subscribed_services);
 
       // De-dupe: skip if this reference is already stacked (webhook beat us)
-      const alreadyStacked = existingEntries.some(
+      alreadyStacked = existingEntries.some(
         (e) => e.paystack_reference && e.paystack_reference === reference,
       );
       const mergedEntries = alreadyStacked
@@ -189,30 +213,14 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
           `stacked ${newEntries.length} new entries (total now ${mergedEntries.length})`,
         );
       }
+    } catch (err) {
+      console.error('[subscribe/callback] Unexpected error updating profile:', err);
+    }
 
-      // ── Fetch purchase row for billing details, stamp reference, update Monday ──
-      // Runs regardless of whether the profile update succeeded.
-      const orderId = verifyData.metadata?.order_id;
-
-      type PurchaseRow = {
-        monday_item_id?:      string;
-        customer_name?:       string;
-        customer_phone?:      string;
-        order_notes?:         string;
-        paystack_reference?:  string | null;
-        vat_number?:          string;
-        address_line1?:   string;
-        address_line2?:   string;
-        city?:            string;
-        province?:        string;
-        postal_code?:     string;
-        country?:         string;
-        discount_amount?: number;
-        discount_code?:   string;
-      };
-      let purchaseRow: PurchaseRow | null = null;
-
-      if (orderId) {
+    // ── Phase 2: Stamp reference + update Monday (checkout flow only) ─────────
+    // Isolated in its own try/catch — failures here must NOT prevent the email.
+    if (orderId) {
+      try {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const { data: pRow } = await (supabase.from('purchases') as any)
           .select('monday_item_id, customer_name, customer_phone, order_notes, paystack_reference, vat_number, address_line1, address_line2, city, province, postal_code, country, discount_amount, discount_code')
@@ -221,7 +229,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
           .single();
         purchaseRow = pRow as PurchaseRow | null;
 
-        // True only on the very first callback hit for this order — paystack_reference is null until we stamp it below
+        // True only on the very first callback hit — paystack_reference is null until stamped below
         const isFirstProcessing = !purchaseRow?.paystack_reference;
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -243,7 +251,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
           }
         }
 
-        // ── Create technical onboarding item — first hit only ──────────────────
+        // ── Create technical onboarding item — first hit only ────────────────
         if (isFirstProcessing) {
           const userEmailContext = (verifyData.metadata as Record<string, unknown> | null)
             ?.user_email_context as { serviceId: string; emails: string[] }[] | undefined;
@@ -284,64 +292,62 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
             console.error('[subscribe/callback] createTechnicalOnboardingItem threw:', err);
           }
         }
+      } catch (err) {
+        console.error('[subscribe/callback] Unexpected error processing purchase row:', err);
+      }
+    }
+
+    // ── Phase 3: Send purchase confirmation email ─────────────────────────────
+    // Runs regardless of Phase 1/2 success — alreadyStacked guards against duplicates.
+    if (!alreadyStacked) {
+      const checkoutCart: CheckoutLineItem[] = (verifyData.metadata?.cart ?? [])
+        .filter(l => l.product_code !== 'DISCOUNT')
+        .map(l => ({
+          name:       l.name,
+          quantity:   l.quantity,
+          unit_price: l.unit_price,
+          line_total: l.line_total,
+        }));
+
+      if (checkoutCart.length === 0) {
+        console.warn('[subscribe/callback] Checkout email: cart is empty for reference', reference);
       }
 
-      // ── Send purchase confirmation email (non-critical, first-time only) ──────
-      // Intentionally outside the Supabase error check — fires on successful payment
-      // regardless of whether the profile update succeeded.
-      // alreadyStacked means this reference was already processed — skip to avoid duplicate.
-      if (!alreadyStacked) {
-        const checkoutCart: CheckoutLineItem[] = (verifyData.metadata?.cart ?? [])
-          .filter(l => l.product_code !== 'DISCOUNT')
-          .map(l => ({
-            name:       l.name,
-            quantity:   l.quantity,
-            unit_price: l.unit_price,
-            line_total: l.line_total,
-          }));
+      const checkoutPayload: CheckoutPayload = {
+        customer: {
+          name:      existingProfile?.full_name    ?? verifyData.customer.email,
+          email:     verifyData.customer.email,
+          company:   existingProfile?.company_name ?? 'Unknown Organisation',
+          vatNumber: purchaseRow?.vat_number       ?? undefined,
+        },
+        billing: purchaseRow?.address_line1 ? {
+          address1:   purchaseRow.address_line1,
+          address2:   purchaseRow.address_line2  ?? undefined,
+          city:       purchaseRow.city            ?? '',
+          province:   purchaseRow.province        ?? '',
+          postalCode: purchaseRow.postal_code     ?? '',
+          country:    purchaseRow.country         ?? 'ZA',
+        } : undefined,
+        orderId:      orderId                                 ?? undefined,
+        cart:         checkoutCart,
+        totalZAR:     verifyData.metadata?.total_zar         ?? verifyData.amount / 100,
+        discountZAR:  purchaseRow?.discount_amount           ?? verifyData.metadata?.discount_zar ?? 0,
+        discountCode: purchaseRow?.discount_code             ?? undefined,
+        contractTerm,
+        reference,
+      };
 
-        if (checkoutCart.length === 0) {
-          console.warn('[subscribe/callback] Checkout email: cart is empty for reference', reference);
-        }
-
-        const checkoutPayload: CheckoutPayload = {
-          customer: {
-            name:      existingProfile?.full_name    ?? verifyData.customer.email,
-            email:     verifyData.customer.email,
-            company:   existingProfile?.company_name ?? 'Unknown Organisation',
-            vatNumber: purchaseRow?.vat_number       ?? undefined,
-          },
-          billing: purchaseRow?.address_line1 ? {
-            address1:   purchaseRow.address_line1,
-            address2:   purchaseRow.address_line2  ?? undefined,
-            city:       purchaseRow.city            ?? '',
-            province:   purchaseRow.province        ?? '',
-            postalCode: purchaseRow.postal_code     ?? '',
-            country:    purchaseRow.country         ?? 'ZA',
-          } : undefined,
-          orderId:      orderId                                 ?? undefined,
-          cart:         checkoutCart,
-          totalZAR:     verifyData.metadata?.total_zar         ?? verifyData.amount / 100,
-          discountZAR:  purchaseRow?.discount_amount           ?? verifyData.metadata?.discount_zar ?? 0,
-          discountCode: purchaseRow?.discount_code             ?? undefined,
-          contractTerm,
-          reference,
-        };
-
-        console.log('[subscribe/callback] Sending checkout email to:', verifyData.customer.email, 'cart items:', checkoutCart.length);
-        const [emailResult] = await Promise.allSettled([
-          sendCheckoutConfirmationEmails(checkoutPayload),
-        ]);
-        if (emailResult.status === 'rejected') {
-          console.error('[subscribe/callback] Checkout email threw:', emailResult.reason);
-        } else if (!emailResult.value.success) {
-          console.error('[subscribe/callback] Checkout email failed:', emailResult.value.error);
-        } else {
-          console.log('[subscribe/callback] Checkout confirmation email sent for order:', orderId ?? reference);
-        }
+      console.log('[subscribe/callback] Sending checkout email to:', verifyData.customer.email, 'cart items:', checkoutCart.length);
+      const [emailResult] = await Promise.allSettled([
+        sendCheckoutConfirmationEmails(checkoutPayload),
+      ]);
+      if (emailResult.status === 'rejected') {
+        console.error('[subscribe/callback] Checkout email threw:', emailResult.reason);
+      } else if (!emailResult.value.success) {
+        console.error('[subscribe/callback] Checkout email failed:', emailResult.value.error);
+      } else {
+        console.log('[subscribe/callback] Checkout confirmation email sent for order:', orderId ?? reference);
       }
-    } catch (err) {
-      console.error('[subscribe/callback] Unexpected error writing profile:', err);
     }
   } else {
     console.warn('[subscribe/callback] No user_id in metadata — profile not updated. reference:', reference);

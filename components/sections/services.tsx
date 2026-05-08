@@ -82,7 +82,7 @@ export function Services() {
             const Icon = service.icon;
             return (
               <SpotlightCard key={index} customSize className="p-6 md:p-8 flex flex-col h-full w-full group">
-                <div className="mb-6 inline-flex h-12 w-12 items-center justify-center rounded-sm bg-montana-surface border border-white/10">
+                <div className="mb-6 inline-flex h-12 w-12 items-center justify-center rounded-sm bg-montana-surface border border-white/10//">
                   <Icon className="h-6 w-6 text-montana-pink" />
                 </div>
                 <h3 className="font-display text-lg font-bold text-white mb-3">{service.title}</h3>
