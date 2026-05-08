@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 import { Inter, Space_Grotesk } from 'next/font/google';
 import { Analytics } from '@vercel/analytics/next';
-import { SpeedInsights } from '@vercel/speed-insights/next';
 import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
 import { Chatbot } from "@/components/chatbot";
@@ -130,7 +129,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <Footer />
           <Chatbot />
           <Analytics />
-          <SpeedInsights />
         </div>
         <script
           type="application/ld+json"
