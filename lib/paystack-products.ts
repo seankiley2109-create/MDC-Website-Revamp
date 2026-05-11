@@ -102,8 +102,8 @@ export const SERVICE_DIMENSIONS: Record<SelfServeServiceId, ServiceDimensions> =
     storageTiers:     ['Plan 1', 'Plan 2'],
     storageTierLabel: 'Mailbox Plan',
     storageTierDescriptions: {
-      'Plan 1': '50 GB primary mailbox · 50 GB archive · Web & mobile access · No desktop Outlook',
-      'Plan 2': '100 GB primary mailbox · Unlimited archive (up to 1.5 TB) · Data Loss Prevention · Litigation Hold',
+      'Plan 1': '50 GB mailbox · 50 GB archive · Access via web & mobile · Outlook on the web included · No desktop Outlook app',
+      'Plan 2': '100 GB mailbox · Unlimited auto-expanding archive · Outlook on the web & desktop · Data Loss Prevention · Litigation Hold for legal compliance',
     },
     billingPeriods:   ['monthly'],
     composePlanId: ({ storageTier = 'Plan 1' }) =>
@@ -114,10 +114,10 @@ export const SERVICE_DIMENSIONS: Record<SelfServeServiceId, ServiceDimensions> =
     storageTiers:     ['Basic + Teams', 'Basic (No Teams)', 'Standard + Teams', 'Standard (No Teams)'],
     storageTierLabel: 'Plan',
     storageTierDescriptions: {
-      'Basic + Teams':       'Cloud email · Microsoft Teams · Web Office apps (Word, Excel, PowerPoint, Outlook) · 1 TB OneDrive',
-      'Basic (No Teams)':    'Cloud email · Web Office apps (Word, Excel, PowerPoint, Outlook) · 1 TB OneDrive · No Teams',
-      'Standard + Teams':    'Full desktop Office apps · Microsoft Teams · Business email · 1 TB OneDrive · Advanced security',
-      'Standard (No Teams)': 'Full desktop Office apps · Business email · 1 TB OneDrive · Advanced security · No Teams',
+      'Basic + Teams':       'Business email · Microsoft Teams · Web versions of Word, Excel & PowerPoint · 1 TB OneDrive storage',
+      'Basic (No Teams)':    'Business email · Web versions of Word, Excel & PowerPoint · 1 TB OneDrive storage · Teams not included',
+      'Standard + Teams':    'Desktop Office apps (Word, Excel, PowerPoint, Outlook) · Microsoft Teams · Business email · 1 TB OneDrive storage',
+      'Standard (No Teams)': 'Desktop Office apps (Word, Excel, PowerPoint, Outlook) · Business email · 1 TB OneDrive storage · Teams not included',
     },
     billingPeriods:   ['monthly', 'annual'],
     composePlanId: ({ storageTier = 'Basic + Teams', billingPeriod }) => {
