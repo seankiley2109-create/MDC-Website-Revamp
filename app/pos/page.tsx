@@ -1051,12 +1051,16 @@ function POSForm() {
   // Auth
   useEffect(() => {
     if (!process.env.NEXT_PUBLIC_SUPABASE_URL) return;
-    const supabase = createBrowserClient();
-    supabase.auth.getUser().then(({ data }) => setUser(data.user ?? null));
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_, session) => {
-      setUser(session?.user ?? null);
-    });
-    return () => subscription.unsubscribe();
+    try {
+      const supabase = createBrowserClient();
+      supabase.auth.getUser().then(({ data }) => setUser(data.user ?? null)).catch(() => {});
+      const { data: { subscription } } = supabase.auth.onAuthStateChange((_, session) => {
+        setUser(session?.user ?? null);
+      });
+      return () => subscription.unsubscribe();
+    } catch {
+      // Auth unavailable — user stays null, page continues without sign-in state
+    }
   }, []);
 
   // Restore cart from localStorage on mount (persistent across sessions)
