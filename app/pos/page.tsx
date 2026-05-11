@@ -1095,7 +1095,7 @@ function POSForm() {
       }
       setCartToast(true);
     } catch {
-      localStorage.removeItem(LS_CART_KEY);
+      try { localStorage.removeItem(LS_CART_KEY); } catch { /* storage unavailable */ }
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -1128,7 +1128,8 @@ function POSForm() {
   // Restore cart after sign-in redirect
   useEffect(() => {
     if (searchParams.get("checkout") !== "1") return;
-    const saved = sessionStorage.getItem("pos_cart_state");
+    let saved: string | null = null;
+    try { saved = sessionStorage.getItem("pos_cart_state"); } catch { return; }
     if (!saved) return;
     try {
       const state = JSON.parse(saved) as {
@@ -1147,9 +1148,9 @@ function POSForm() {
         }
         setUserEmails(safeEmails);
       }
-      sessionStorage.removeItem("pos_cart_state");
+      try { sessionStorage.removeItem("pos_cart_state"); } catch { /* ignore */ }
     } catch {
-      sessionStorage.removeItem("pos_cart_state");
+      try { sessionStorage.removeItem("pos_cart_state"); } catch { /* ignore */ }
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
