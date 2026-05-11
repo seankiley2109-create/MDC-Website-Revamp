@@ -22,6 +22,8 @@ export const SELF_SERVE_SERVICE_IDS = [
   'druva-endpoint',
   'druva-server',
   'maas360',
+  'exchange-online',
+  'microsoft-365',
 ] as const;
 
 export type SelfServeServiceId = (typeof SELF_SERVE_SERVICE_IDS)[number];
@@ -56,9 +58,13 @@ export interface PaystackProductEntry {
 // ─── Product dimensions (used by the configurator UI) ────────────────────────
 
 export interface ServiceDimensions {
-  storageTiers?:     string[];   // e.g. ['50GB','250GB','300GB','500GB']
-  protectionLevels?: ProtectionLevel[];
-  billingPeriods:    BillingPeriod[];
+  storageTiers?:      string[];   // e.g. ['50GB','250GB','300GB','500GB']
+  /** Custom label for the storageTiers selector — defaults to "Storage per {unit}" */
+  storageTierLabel?:  string;
+  /** Per-tier description shown in rich plan cards. When present, renders expanded cards instead of simple tag buttons. */
+  storageTierDescriptions?: Record<string, string>;
+  protectionLevels?:  ProtectionLevel[];
+  billingPeriods:     BillingPeriod[];
   /** How to compose a plan_id from selections */
   composePlanId: (opts: {
     storageTier?:     string;
@@ -90,6 +96,37 @@ export const SERVICE_DIMENSIONS: Record<SelfServeServiceId, ServiceDimensions> =
   'maas360': {
     billingPeriods: ['monthly', 'annual'],
     composePlanId: ({ billingPeriod }) => `essential-${billingPeriod}`,
+  },
+
+  'exchange-online': {
+    storageTiers:     ['Plan 1', 'Plan 2'],
+    storageTierLabel: 'Mailbox Plan',
+    storageTierDescriptions: {
+      'Plan 1': '50 GB primary mailbox · 50 GB archive · Web & mobile access · No desktop Outlook',
+      'Plan 2': '100 GB primary mailbox · Unlimited archive (up to 1.5 TB) · Data Loss Prevention · Litigation Hold',
+    },
+    billingPeriods:   ['monthly'],
+    composePlanId: ({ storageTier = 'Plan 1' }) =>
+      storageTier.toLowerCase().replace(/ /g, '-'),
+  },
+
+  'microsoft-365': {
+    storageTiers:     ['Basic + Teams', 'Basic (No Teams)', 'Standard + Teams', 'Standard (No Teams)'],
+    storageTierLabel: 'Plan',
+    storageTierDescriptions: {
+      'Basic + Teams':       'Cloud email · Microsoft Teams · Web Office apps (Word, Excel, PowerPoint, Outlook) · 1 TB OneDrive',
+      'Basic (No Teams)':    'Cloud email · Web Office apps (Word, Excel, PowerPoint, Outlook) · 1 TB OneDrive · No Teams',
+      'Standard + Teams':    'Full desktop Office apps · Microsoft Teams · Business email · 1 TB OneDrive · Advanced security',
+      'Standard (No Teams)': 'Full desktop Office apps · Business email · 1 TB OneDrive · Advanced security · No Teams',
+    },
+    billingPeriods:   ['monthly', 'annual'],
+    composePlanId: ({ storageTier = 'Basic + Teams', billingPeriod }) => {
+      const key = storageTier === 'Basic + Teams'        ? 'basic-teams'
+                : storageTier === 'Basic (No Teams)'     ? 'basic-noteams'
+                : storageTier === 'Standard + Teams'     ? 'standard-teams'
+                :                                          'standard-noteams';
+      return `${key}-${billingPeriod}`;
+    },
   },
 };
 
@@ -266,6 +303,67 @@ export const PAYSTACK_PRODUCT_MAP: Record<
       product_code: 'MS-EM-ESY', unitPrice: 1200, billingPeriod: 'annual',
       label: 'MaaS360 Security Essentials (12 Month)',
       unit: 'device',
+    },
+  },
+
+  // ── Exchange Online Mailbox Licensing ──────────────────────────────────────
+  // M2M billing only; prices are per-user per month.
+  'exchange-online': {
+    'plan-1': {
+      product_code: 'EMP1-M2M', unitPrice: 110,  billingPeriod: 'monthly',
+      label: 'Exchange Online Mailbox Plan 1 (M2M)',
+      unit: 'user', storageTier: 'Plan 1',
+    },
+    'plan-2': {
+      product_code: 'EMP2-M2M', unitPrice: 220,  billingPeriod: 'monthly',
+      label: 'Exchange Online Mailbox Plan 2 (M2M)',
+      unit: 'user', storageTier: 'Plan 2',
+    },
+  },
+
+  // ── Microsoft 365 Business Licensing ──────────────────────────────────────
+  // Annual prices are the full-year commitment total per user (monthly × 12).
+  // Standard + Teams 12M costs more than M2M — no annual saving badge is shown.
+  'microsoft-365': {
+    'basic-teams-monthly': {
+      product_code: 'M365-WBT-M2M', unitPrice: 176.575, billingPeriod: 'monthly',
+      label: 'Microsoft 365 Business Basic + Teams (M2M)',
+      unit: 'user', storageTier: 'Basic + Teams',
+    },
+    'basic-teams-annual': {
+      product_code: 'M365-WBT-12M', unitPrice: 1852.20, billingPeriod: 'annual',
+      label: 'Microsoft 365 Business Basic + Teams (12 Month)',
+      unit: 'user', storageTier: 'Basic + Teams',
+    },
+    'basic-noteams-monthly': {
+      product_code: 'M365-WB-M2M', unitPrice: 129.43, billingPeriod: 'monthly',
+      label: 'Microsoft 365 Business Basic — No Teams (M2M)',
+      unit: 'user', storageTier: 'Basic (No Teams)',
+    },
+    'basic-noteams-annual': {
+      product_code: 'M365-WB-12M', unitPrice: 1341.06, billingPeriod: 'annual',
+      label: 'Microsoft 365 Business Basic — No Teams (12 Month)',
+      unit: 'user', storageTier: 'Basic (No Teams)',
+    },
+    'standard-teams-monthly': {
+      product_code: 'M365-BST-M2M', unitPrice: 243.6464, billingPeriod: 'monthly',
+      label: 'Microsoft 365 Business Standard + Teams (M2M)',
+      unit: 'user', storageTier: 'Standard + Teams',
+    },
+    'standard-teams-annual': {
+      product_code: 'M365-BST-12M', unitPrice: 3414.588, billingPeriod: 'annual',
+      label: 'Microsoft 365 Business Standard + Teams (12 Month)',
+      unit: 'user', storageTier: 'Standard + Teams',
+    },
+    'standard-noteams-monthly': {
+      product_code: 'M365-BS-M2M', unitPrice: 273.28, billingPeriod: 'monthly',
+      label: 'Microsoft 365 Business Standard — No Teams (M2M)',
+      unit: 'user', storageTier: 'Standard (No Teams)',
+    },
+    'standard-noteams-annual': {
+      product_code: 'M365-BS-12M', unitPrice: 2868.39, billingPeriod: 'annual',
+      label: 'Microsoft 365 Business Standard — No Teams (12 Month)',
+      unit: 'user', storageTier: 'Standard (No Teams)',
     },
   },
 };

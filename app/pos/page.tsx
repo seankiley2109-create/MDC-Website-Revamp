@@ -8,7 +8,7 @@ import Link from "next/link";
 import { SpotlightCard } from "@/components/ui/spotlight-card";
 import { AnimatedButton } from "@/components/ui/animated-button";
 import {
-  Cloud, Monitor, HardDrive, Smartphone,
+  Cloud, Monitor, HardDrive, Smartphone, Mail, LayoutGrid,
   FileText, Server, ShieldAlert, Archive, Activity, Lock,
   CheckCircle2, AlertCircle, ShoppingCart, ChevronDown, ChevronUp,
   ArrowRight, Minus, Plus, X, Info,
@@ -56,15 +56,17 @@ const LS_GUEST_KEY = 'mdc_guest_id';
 // ─── Default configs per service ─────────────────────────────────────────────
 
 const DEFAULT_CONFIGS: Record<SelfServeServiceId, ServiceConfig> = {
-  "druva-m365":      { storageTier: "50GB",  protectionLevel: "standard", billingPeriod: "monthly", quantity: 1 },
-  "druva-endpoint":  { storageTier: "50GB",  protectionLevel: "standard", billingPeriod: "monthly", quantity: 1 },
-  "druva-server":    { storageTier: "1TB",   protectionLevel: "standard", billingPeriod: "monthly", quantity: 1  },
-  "maas360":         { storageTier: "",      protectionLevel: "standard", billingPeriod: "monthly", quantity: 1 },
+  "druva-m365":      { storageTier: "50GB",           protectionLevel: "standard", billingPeriod: "monthly", quantity: 1 },
+  "druva-endpoint":  { storageTier: "50GB",           protectionLevel: "standard", billingPeriod: "monthly", quantity: 1 },
+  "druva-server":    { storageTier: "1TB",            protectionLevel: "standard", billingPeriod: "monthly", quantity: 1 },
+  "maas360":         { storageTier: "",               protectionLevel: "standard", billingPeriod: "monthly", quantity: 1 },
+  "exchange-online": { storageTier: "Plan 1",         protectionLevel: "standard", billingPeriod: "monthly", quantity: 1 },
+  "microsoft-365":   { storageTier: "Basic + Teams",  protectionLevel: "standard", billingPeriod: "monthly", quantity: 1 },
 };
 
 // ─── Cloud service metadata ───────────────────────────────────────────────────
 
-const CLOUD_SERVICES: {
+type CloudServiceMeta = {
   id:          SelfServeServiceId;
   name:        string;
   icon:        React.ElementType;
@@ -72,7 +74,9 @@ const CLOUD_SERVICES: {
   description: string;
   unitLabel:   string;
   imageSrc:    string | null;
-}[] = [
+};
+
+const BACKUP_SERVICES: CloudServiceMeta[] = [
   {
     id:          "druva-m365",
     name:        "M365 / Google Workspace",
@@ -100,6 +104,9 @@ const CLOUD_SERVICES: {
     unitLabel:   "server",
     imageSrc:    "/products/Druva-Phoenix-Enterprise-01-xlg.png",
   },
+];
+
+const MDM_SERVICES: CloudServiceMeta[] = [
   {
     id:          "maas360",
     name:        "MaaS360 MDM / UEM",
@@ -108,6 +115,29 @@ const CLOUD_SERVICES: {
     description: "Unified endpoint management and threat defense. Secure corporate data across all mobile devices, tablets, and BYOD environments.",
     unitLabel:   "devices",
     imageSrc:    "/products/IBM.png",
+  },
+];
+
+// ─── Licensing services ───────────────────────────────────────────────────────
+
+const LICENSING_SERVICES: CloudServiceMeta[] = [
+  {
+    id:          "exchange-online",
+    name:        "Exchange Online",
+    icon:        Mail,
+    tagline:     "Email Licensing",
+    description: "Microsoft Exchange Online mailbox licensing. Plan 1 includes a 50 GB primary mailbox and 50 GB archive with web and mobile access. Plan 2 doubles to a 100 GB mailbox with unlimited auto-expanding archive (up to 1.5 TB) and adds Data Loss Prevention and Litigation Hold for legal compliance.",
+    unitLabel:   "licences",
+    imageSrc:    "/products/microsoft.jpg",
+  },
+  {
+    id:          "microsoft-365",
+    name:        "Microsoft 365 Business",
+    icon:        LayoutGrid,
+    tagline:     "M365 Licensing",
+    description: "Microsoft 365 Business licensing procured and managed by Montana Data Company. Basic includes cloud email, web versions of Office apps, and 1 TB OneDrive. Standard adds full desktop Office suite. All plans are per-user, per month — choose month-to-month or lock in a 12-month rate.",
+    unitLabel:   "licences",
+    imageSrc:    "/products/microsoft.jpg",
   },
 ];
 
@@ -187,7 +217,7 @@ function ServiceConfigCard({
   onRemoveFromCart,
   onUserEmailsChange,
 }: {
-  service:             typeof CLOUD_SERVICES[number];
+  service:             CloudServiceMeta;
   config:              ServiceConfig;
   inCart:              boolean;
   isExpanded:          boolean;
@@ -352,23 +382,57 @@ function ServiceConfigCard({
             {/* Storage Tier */}
             {dims.storageTiers && (
               <div className="mb-4">
-                <div className="text-xs font-bold tracking-wider text-white/50 uppercase mb-2">Storage per {isServer ? "server" : service.unitLabel.slice(0, -1)}</div>
-                <div className="flex flex-wrap gap-2">
-                  {dims.storageTiers.map(tier => (
-                    <button
-                      key={tier}
-                      type="button"
-                      onClick={() => onConfigChange(service.id, { storageTier: tier })}
-                      className={`px-3 py-1.5 text-xs font-bold border transition-colors ${
-                        config.storageTier === tier
-                          ? "border-montana-pink bg-montana-pink/20 text-white"
-                          : "border-white/10 text-montana-muted hover:border-white/30 hover:text-white"
-                      }`}
-                    >
-                      {tier}
-                    </button>
-                  ))}
-                </div>
+                <div className="text-xs font-bold tracking-wider text-white/50 uppercase mb-2">{dims.storageTierLabel ?? `Storage per ${isServer ? "server" : service.unitLabel.slice(0, -1)}`}</div>
+                {dims.storageTierDescriptions ? (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    {dims.storageTiers.map(tier => {
+                      const testPlanId = dims.composePlanId({ storageTier: tier, protectionLevel: config.protectionLevel, billingPeriod: config.billingPeriod });
+                      const testEntry  = getProductEntry(service.id, testPlanId);
+                      const isSelected = config.storageTier === tier;
+                      return (
+                        <button
+                          key={tier}
+                          type="button"
+                          onClick={() => onConfigChange(service.id, { storageTier: tier })}
+                          className={`text-left px-3 py-3 border text-xs transition-colors ${
+                            isSelected
+                              ? "border-montana-pink bg-montana-pink/10 text-white"
+                              : "border-white/10 text-montana-muted hover:border-white/30"
+                          }`}
+                        >
+                          <div className="font-bold text-sm mb-1">{tier}</div>
+                          <div className="text-[10px] text-montana-muted leading-relaxed mb-2">
+                            {dims.storageTierDescriptions![tier].split(' · ').map((point, i) => (
+                              <span key={i} className="block">· {point}</span>
+                            ))}
+                          </div>
+                          {testEntry && (
+                            <div className={`font-mono text-xs font-bold mt-1 ${isSelected ? "text-montana-pink" : "text-white/40"}`}>
+                              {formatZAR(testEntry.unitPrice)}/{config.billingPeriod === "annual" ? "yr" : "mo"}
+                            </div>
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <div className="flex flex-wrap gap-2">
+                    {dims.storageTiers.map(tier => (
+                      <button
+                        key={tier}
+                        type="button"
+                        onClick={() => onConfigChange(service.id, { storageTier: tier })}
+                        className={`px-3 py-1.5 text-xs font-bold border transition-colors ${
+                          config.storageTier === tier
+                            ? "border-montana-pink bg-montana-pink/20 text-white"
+                            : "border-white/10 text-montana-muted hover:border-white/30 hover:text-white"
+                        }`}
+                      >
+                        {tier}
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
             )}
 
@@ -968,7 +1032,7 @@ function POSForm() {
   );
   const rawService = searchParams.get("service") as SelfServeServiceId | null;
   const [focusedService, setFocusedService] = useState<SelfServeServiceId | null>(
-    rawService && CLOUD_SERVICES.some(s => s.id === rawService) ? rawService : null
+    rawService && [...BACKUP_SERVICES, ...MDM_SERVICES, ...LICENSING_SERVICES].some(s => s.id === rawService) ? rawService : null
   );
   // Comma-separated POPIA service codes, e.g. ?services=SE-PA002,SE-PZ001
   // Callers must not URL-encode the comma or use ?services=A&services=B
@@ -1262,7 +1326,65 @@ function POSForm() {
         <div className="flex flex-col lg:flex-row gap-8">
           {/* Configurator cards */}
           <div className="flex-1 space-y-6">
-            {CLOUD_SERVICES.map(service => (
+
+            {/* Cloud Backup */}
+            <div className="pb-2 flex items-center gap-4">
+              <div className="flex-1 border-t border-white/10" />
+              <span className="text-[10px] font-bold tracking-widest text-montana-muted uppercase whitespace-nowrap">Cloud Backup</span>
+              <div className="flex-1 border-t border-white/10" />
+            </div>
+
+            {BACKUP_SERVICES.map(service => (
+              <ServiceConfigCard
+                key={service.id}
+                service={service}
+                config={configs[service.id]}
+                inCart={cartIds.has(service.id)}
+                isExpanded={expandedServices.has(service.id)}
+                onToggle={() => toggleExpanded(service.id)}
+                isFocused={focusedService === service.id}
+                onFocusConsumed={() => setFocusedService(null)}
+                userEmails={userEmails[service.id] ?? ""}
+                onConfigChange={updateConfig}
+                onAddToCart={addToCart}
+                onRemoveFromCart={removeFromCart}
+                onUserEmailsChange={updateUserEmails}
+              />
+            ))}
+
+            {/* Device Management */}
+            <div className="pt-4 pb-2 flex items-center gap-4">
+              <div className="flex-1 border-t border-white/10" />
+              <span className="text-[10px] font-bold tracking-widest text-montana-muted uppercase whitespace-nowrap">Device Management</span>
+              <div className="flex-1 border-t border-white/10" />
+            </div>
+
+            {MDM_SERVICES.map(service => (
+              <ServiceConfigCard
+                key={service.id}
+                service={service}
+                config={configs[service.id]}
+                inCart={cartIds.has(service.id)}
+                isExpanded={expandedServices.has(service.id)}
+                onToggle={() => toggleExpanded(service.id)}
+                isFocused={focusedService === service.id}
+                onFocusConsumed={() => setFocusedService(null)}
+                userEmails={userEmails[service.id] ?? ""}
+                onConfigChange={updateConfig}
+                onAddToCart={addToCart}
+                onRemoveFromCart={removeFromCart}
+                onUserEmailsChange={updateUserEmails}
+              />
+            ))}
+
+            {/* Microsoft Licensing */}
+            <div className="pt-4 pb-2 flex items-center gap-4">
+              <div className="flex-1 border-t border-white/10" />
+              <span className="text-[10px] font-bold tracking-widest text-montana-muted uppercase whitespace-nowrap">Microsoft Licensing</span>
+              <div className="flex-1 border-t border-white/10" />
+            </div>
+
+            {LICENSING_SERVICES.map(service => (
               <ServiceConfigCard
                 key={service.id}
                 service={service}
